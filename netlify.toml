@@ -1,0 +1,74 @@
+# Netlify Configuration
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  publish = "."
+  command = "echo 'Static site - no build needed'"
+
+# Redirect rules
+[[redirects]]
+  from = "/checklist-download"
+  to = "/assets/The_Author_Signal_Checklist.pdf"
+  status = 200
+
+[[redirects]]
+  from = "/optimize"
+  to = "https://sonexial.gumroad.com/l/optimize"
+  status = 301
+
+# 404 page
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    
+    # Performance headers
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Enable Gzip compression
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Form handling
+[build.environment]
+  NODE_VERSION = "18"
+
+# Environment variables (set in Netlify UI)
+# GOOGLE_ANALYTICS_ID
+# CLARITY_PROJECT_ID
+# GUMROAD_PRODUCT_ID

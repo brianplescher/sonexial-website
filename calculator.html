@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonexial Labs | Ad Squeeze Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calculator-container {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-family: "Inter", sans-serif;
+        }
+        .input-prefix, .input-suffix {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .input-prefix { left: 1rem; }
+        .input-suffix { right: 1rem; }
+        .input-with-prefix input { padding-left: 2rem; }
+        .input-with-suffix input { padding-right: 2.5rem; }
+
+        .results-panel {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .result-value {
+            font-family: "Inter", sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .net-profit {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+        .net-profit .result-value {
+            font-size: 1.5rem;
+        }
+        .positive { color: #4ade80; }
+        .negative { color: #ef4444; }
+        
+        .squeeze-meter {
+            margin-top: 2rem;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .squeeze-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #fbbf24, #ef4444);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="index.html">Sonexial Labs</a></div>
+    </nav>
+
+    <main class="calculator-container">
+        <header>
+            <h1>Ad Squeeze Calculator</h1>
+            <p>Calculate your Amazon Ad profitability and discover if your book is being squeezed out of the market.</p>
+        </header>
+
+        <div class="calc-grid">
+            <div class="inputs-panel">
+                <div class="input-group">
+                    <label>Book Price (Ebook)</label>
+                    <div class="input-wrapper input-with-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="bookPrice" value="4.99" step="0.01">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Royalty Share</label>
+                    <div class="input-wrapper input-with-suffix">
+                        <input type="number" id="royalty" value="70">
+                        <span class="input-suffix">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Average CPC</label>
+                    <div class="input-wrapper input-with-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="cpc" value="0.45" step="0.01">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Clicks to Sale (One Sale per X Clicks)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="clicksToSale" value="10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <div class="result-item">
+                    <span class="result-label">Est. Royalty Per Sale</span>
+                    <span class="result-value" id="royaltyVal">$0.00</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Cost Per Acquisition (CPA)</span>
+                    <span class="result-value" id="cpaVal">$0.00</span>
+                </div>
+                <div class="result-item net-profit">
+                    <span class="result-label">Net Profit / Loss</span>
+                    <span class="result-value" id="profitVal">$0.00</span>
+                </div>
+                
+                <div class="squeeze-meter">
+                    <div class="squeeze-fill" id="squeezeMeter"></div>
+                </div>
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);" id="squeezeText"></p>
+
+                <div id="share-buttons" style="display: none; text-align: center; margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Share your result:</p>
+                    <button id="btn-twitter" style="background: #1DA1F2; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; margin-right: 0.5rem;">Tweet Score</button>
+                    <button id="btn-linkedin" style="background: #0077b5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">LinkedIn</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/calculator.js"></script>
+</body>
+</html>

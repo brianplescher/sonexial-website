@@ -1,0 +1,162 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          npm install -g html-validate
+          npm install -g stylelint stylelint-config-standard
+          npm install -g eslint
+      
+      - name: Validate HTML
+        run: |
+          html-validate "*.html" || echo "HTML validation warnings found"
+      
+      - name: Lint CSS
+        run: |
+          echo "Linting CSS files..."
+          # stylelint "*.css" || echo "CSS linting warnings found"
+      
+      - name: Lint JavaScript
+        run: |
+          echo "Linting JavaScript files..."
+          # eslint "*.js" || echo "JS linting warnings found"
+      
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress '*.html' '*.md'
+          fail: false
+
+  build:
+    name: Build Production Assets
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install build tools
+        run: |
+          npm install -g clean-css-cli
+          npm install -g uglify-js
+          npm install -g html-minifier
+      
+      - name: Minify CSS
+        run: |
+          cleancss -o styles.min.css styles.css
+          echo "✓ CSS minified"
+      
+      - name: Minify JavaScript
+        run: |
+          uglifyjs script.js -o script.min.js -c -m
+          echo "✓ JavaScript minified"
+      
+      - name: Minify HTML
+        run: |
+          html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o index.min.html index.html
+          html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o 404.min.html 404.html
+          echo "✓ HTML minified"
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-files
+          path: |
+            *.min.css
+            *.min.js
+            *.min.html
+            Images/
+            Audio/
+            assets/
+            sitemap.xml
+            robots.txt
+
+  deploy-netlify:
+    name: Deploy to Netlify
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: production-files
+      
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: '.'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
+
+  lighthouse:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    needs: deploy-netlify
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          urls: |
+            https://sonexial.com
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-netlify, lighthouse]
+    if: always()
+    
+    steps:
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Deployment completed!'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

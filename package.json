@@ -1,0 +1,70 @@
+{
+  "name": "sonexial-website",
+  "version": "1.0.0",
+  "description": "Sonexial Labs - Author Infrastructure Website",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -o",
+    "build": "npm run build:css && npm run build:js && npm run build:html",
+    "build:css": "cleancss -o styles.min.css styles.css",
+    "build:js": "terser script.js -o script.min.js -c -m",
+    "build:html": "html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o index.min.html index.html",
+    "watch": "npm-watch",
+    "watch:css": "watch 'npm run build:css' styles.css",
+    "watch:js": "watch 'npm run build:js' script.js",
+    "test": "npm run test:html && npm run test:css && npm run test:js && npm run test:a11y",
+    "test:html": "html-validate '*.html'",
+    "test:css": "stylelint '*.css'",
+    "test:js": "eslint '*.js'",
+    "test:a11y": "pa11y --standard WCAG2AA index.html",
+    "test:links": "linkinator *.html --recurse",
+    "optimize:images": "node scripts/optimize-images.js",
+    "lighthouse": "lighthouse https://sonexial.com --view",
+    "deploy": "npm run build && netlify deploy --prod",
+    "deploy:preview": "npm run build && netlify deploy"
+  },
+  "watch": {
+    "build:css": {
+      "patterns": ["styles.css"],
+      "extensions": "css"
+    },
+    "build:js": {
+      "patterns": ["script.js"],
+      "extensions": "js"
+    }
+  },
+  "keywords": [
+    "book-marketing",
+    "author-tools",
+    "amazon-optimization",
+    "metadata",
+    "kdp"
+  ],
+  "author": "Brian Plescher",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "eslint": "^9.15.0",
+    "html-minifier": "^4.0.0",
+    "html-validate": "^8.24.1",
+    "http-server": "^14.1.1",
+    "lighthouse": "^12.2.1",
+    "linkinator": "^6.1.2",
+    "netlify-cli": "^17.36.4",
+    "npm-watch": "^0.13.0",
+    "pa11y": "^8.0.0",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "terser": "^5.36.0",
+    "watch": "^1.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sonexial-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/sonexial-website/issues"
+  },
+  "homepage": "https://sonexial.com"
+}

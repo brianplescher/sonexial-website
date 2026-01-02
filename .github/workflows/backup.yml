@@ -1,0 +1,48 @@
+name: Automated Backup
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Backup Website Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Full history
+      
+      - name: Create backup archive
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          tar -czf "sonexial-backup-$DATE.tar.gz" \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.github' \
+            .
+          echo "✓ Backup created: sonexial-backup-$DATE.tar.gz"
+      
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: backup-${{ github.run_number }}
+          name: Automated Backup - ${{ github.run_number }}
+          body: |
+            Automated daily backup of Sonexial Labs website
+            Created: ${{ github.event.repository.updated_at }}
+          files: sonexial-backup-*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Clean old backups
+        uses: dev-drprasad/delete-older-releases@v0.2.1
+        with:
+          keep_latest: 30  # Keep last 30 days
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

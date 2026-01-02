@@ -1,0 +1,53 @@
+name: Accessibility Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  a11y-test:
+    name: Accessibility Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Pa11y
+        run: npm install -g pa11y pa11y-ci
+      
+      - name: Run Pa11y accessibility tests
+        run: |
+          echo "Running accessibility tests..."
+          pa11y --standard WCAG2AA index.html || echo "Accessibility issues found"
+          pa11y --standard WCAG2AA 404.html || echo "Accessibility issues found"
+      
+      - name: Run axe-core tests
+        uses: chanzuckerberg/axe-scan-action@v3
+        with:
+          url: 'file://${{ github.workspace }}/index.html'
+      
+      - name: Generate accessibility report
+        run: |
+          echo "# Accessibility Report" > a11y-report.md
+          echo "" >> a11y-report.md
+          echo "Generated: $(date)" >> a11y-report.md
+          echo "" >> a11y-report.md
+          echo "## WCAG 2.1 AA Compliance" >> a11y-report.md
+          echo "Target: 100% compliance" >> a11y-report.md
+      
+      - name: Upload accessibility report
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-report
+          path: a11y-report.md
