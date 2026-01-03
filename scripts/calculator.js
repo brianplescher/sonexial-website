@@ -69,6 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
             optimizationKit.style.display = "none";
         }
 
+        // Show/hide optimization kit based on profit
+        const optimizationKit = document.getElementById("optimization-kit");
+        if (profit < 0) {
+            optimizationKit.style.display = "block";
+        } else {
+            optimizationKit.style.display = "none";
+        }
+
         // Show share buttons if interaction has happened (simple check: always show)
         document.getElementById("share-buttons").style.display = "block";
     }
