@@ -3,7 +3,7 @@
 
 [build]
   publish = "."
-  command = "echo 'Static site - no build needed'"
+  command = ""
 
 # Redirect rules
 [[redirects]]
@@ -63,10 +63,6 @@
 
 [build.processing.images]
   compress = true
-
-# Form handling
-[build.environment]
-  NODE_VERSION = "18"
 
 # Environment variables (set in Netlify UI)
 # GOOGLE_ANALYTICS_ID
