@@ -1162,6 +1162,29 @@ img[loading="lazy"] {
     }
 }
 
+/* NAVBAR for standalone pages */
+.navbar {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    background: rgba(249, 247, 242, 0.95);
+}
+
+[data-theme="dark"] .navbar {
+    border-color: var(--border-dark);
+    background: rgba(28, 27, 26, 0.95);
+}
+
+.nav-brand a {
+    font-weight: 700;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+[data-theme="dark"] .nav-brand a {
+    color: var(--text-dark);
+}
+
 /* REDUCED MOTION */
 @media (prefers-reduced-motion: reduce) {
     *,
