@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimization Kit Intake | Sonexial Labs</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=260308">
     <style>
         .form-container {
             max-width: 700px;
@@ -15,18 +18,27 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
         }
+
         .form-section {
             margin-bottom: 2.5rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid var(--border-color);
         }
-        .form-section:last-child { border-bottom: none; }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
         .form-section h3 {
             color: var(--text-primary);
             margin-bottom: 1.5rem;
             font-family: "Merriweather", serif;
         }
-        .form-group { margin-bottom: 1.5rem; }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
@@ -35,6 +47,7 @@
             font-size: 0.95rem;
             color: var(--text-light);
         }
+
         .form-text {
             display: block;
             margin-bottom: 0.8rem;
@@ -42,7 +55,10 @@
             color: var(--text-secondary);
             line-height: 1.5;
         }
-        input[type="text"], input[type="email"], textarea {
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
             width: 100%;
             padding: 0.8rem;
             background: var(--bg-secondary);
@@ -52,12 +68,19 @@
             font-family: "Inter", sans-serif;
             font-size: 1rem;
         }
-        textarea { resize: vertical; min-height: 100px; }
-        input:focus, textarea:focus {
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
+
         button[type="submit"] {
             width: 100%;
             padding: 1rem;
@@ -69,9 +92,13 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
-        button[type="submit"]:hover { opacity: 0.9; }
+
+        button[type="submit"]:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-brand"><a href="index.html">Sonexial Labs</a></div>
@@ -84,16 +111,16 @@
         </header>
 
         <form name="optimization-kit-intake" method="POST" data-netlify="true" action="/index.html?success=true">
-            
+
             <!-- SECTION 1 -->
             <div class="form-section">
                 <h3>1. Book Details</h3>
-                
+
                 <div class="form-group">
                     <label>Book Title (Final)</label>
                     <input type="text" name="book_title" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Existing Subtitle/Tagline</label>
                     <span class="form-text">Contextual data for optimization.</span>
@@ -111,8 +138,8 @@
                     <span class="form-text">e.g., Leadership/Conflict Resolution; Military Sci-Fi</span>
                     <input type="text" name="genre_niche" required>
                 </div>
-                
-                 <div class="form-group">
+
+                <div class="form-group">
                     <label>Link to Book on Amazon</label>
                     <span class="form-text">If already published, for visual reference.</span>
                     <input type="text" name="amazon_link" placeholder="https://amazon.com/...">
@@ -122,10 +149,11 @@
             <!-- SECTION 2 -->
             <div class="form-section">
                 <h3>2. Core Content</h3>
-                
+
                 <div class="form-group">
                     <label>FULL Synopsis / Summary</label>
-                    <span class="form-text"><strong>(Most Critical Input)</strong> Paste the complete plot or argument here.</span>
+                    <span class="form-text"><strong>(Most Critical Input)</strong> Paste the complete plot or argument
+                        here.</span>
                     <textarea name="full_synopsis" style="min-height: 150px;" required></textarea>
                 </div>
 
@@ -134,24 +162,25 @@
                     <span class="form-text">e.g., Trust, Remote Work, Leadership Failure, Magic System</span>
                     <textarea name="key_themes" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Target Reader / Comp Titles</label>
                     <span class="form-text">e.g., New managers in tech; fans of John Grisham</span>
                     <input type="text" name="target_reader_comps" required>
                 </div>
 
-                 <div class="form-group">
+                <div class="form-group">
                     <label>Author Credentials / Experience</label>
-                    <span class="form-text">List degrees, professional titles, and key accomplishments for bio generation.</span>
+                    <span class="form-text">List degrees, professional titles, and key accomplishments for bio
+                        generation.</span>
                     <textarea name="author_credentials" required></textarea>
                 </div>
             </div>
 
-             <!-- SECTION 3 -->
-             <div class="form-section">
+            <!-- SECTION 3 -->
+            <div class="form-section">
                 <h3>3. Delivery</h3>
-                
+
                 <div class="form-group">
                     <label>Delivery Email</label>
                     <span class="form-text">The destination for the final audit.</span>
@@ -163,4 +192,5 @@
         </form>
     </main>
 </body>
+
 </html>
