@@ -1,311 +1,42 @@
 /**
- * SONEXIAL LABS - ENHANCED JAVASCRIPT
- * Handles theme, audio, forms, modals, FAQ, and user interactions
+ * SONEXIAL LABS — SCRIPT.JS
  */
 
 // ============================================
-// THEME TOGGLER
+// MOBILE NAV
 // ============================================
-function initThemeToggle() {
-    const btn = document.getElementById('toggleDark');
-    const html = document.documentElement;
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    
-    // Set initial theme
-    html.setAttribute('data-theme', currentTheme);
-    
-    // Toggle theme on button click
-    btn.addEventListener('click', () => {
-        const current = html.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        
-        // Track theme change
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'theme_toggle', {
-                'theme': next
-            });
-        }
+function initMobileNav() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.main-nav');
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener('click', () => {
+        const isOpen = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen);
     });
-}
 
-// ============================================
-// AUDIO WIDGET
-// ============================================
-function initAudioWidget() {
-    const audio = document.getElementById('ambient-audio');
-    const playBtn = document.getElementById('play-btn');
-    const iconPlay = document.getElementById('icon-play');
-    const iconPause = document.getElementById('icon-pause');
-    
-    // Set audio volume lower by default
-    audio.volume = 0.6;
-
-    playBtn.addEventListener('click', () => {
-        if (audio.paused) {
-            audio.play()
-                .then(() => {
-                    iconPlay.style.display = 'none';
-                    iconPause.style.display = 'block';
-                    playBtn.style.backgroundColor = 'var(--accent-hover)';
-                    
-                    // Track audio play
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'audio_play', {
-                            'event_category': 'engagement'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.log("Audio play failed. User interaction required.", error);
-                });
-        } else {
-            audio.pause();
-            iconPlay.style.display = 'block';
-            iconPause.style.display = 'none';
-            playBtn.style.backgroundColor = 'var(--accent)';
-        }
-    });
-}
-
-// ============================================
-// FORM VALIDATION & SUBMISSION
-// ============================================
-function initFormValidation() {
-    const forms = document.querySelectorAll('form');
-    
-    forms.forEach(form => {
-        // Real-time email validation
-        const emailInputs = form.querySelectorAll('input[type="email"]');
-        emailInputs.forEach(input => {
-            input.addEventListener('blur', () => {
-                validateEmailInput(input);
-            });
-            
-            input.addEventListener('input', () => {
-                if (input.classList.contains('invalid')) {
-                    validateEmailInput(input);
-                }
-            });
-        });
-        
-        // Form submission
-        form.addEventListener('submit', (e) => {
-            let isValid = true;
-            
-            // Validate all email inputs
-            emailInputs.forEach(input => {
-                if (!validateEmailInput(input)) {
-                    isValid = false;
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-                return;
-            }
-            
-            // Add loading state
-            form.classList.add('loading');
-            
-            // Track form submission
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'form_submit', {
-                    'form_name': form.getAttribute('name') || 'unknown'
-                });
-            }
-            
-            // For Netlify forms, let it submit naturally
-            // For other forms, you might want to handle with AJAX
-        });
-    });
-}
-
-function validateEmailInput(input) {
-    const email = input.value.trim();
-    const isValid = validateEmail(email);
-    
-    if (email === '') {
-        input.classList.remove('valid', 'invalid');
-        return true;
-    }
-    
-    if (isValid) {
-        input.classList.remove('invalid');
-        input.classList.add('valid');
-        return true;
-    } else {
-        input.classList.remove('valid');
-        input.classList.add('invalid');
-        return false;
-    }
-}
-
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-// ============================================
-// SUCCESS MODAL
-// ============================================
-function showSuccessModal(message = "Your message has been sent. We'll get back to you soon!") {
-    const modal = document.getElementById('success-modal');
-    const messageEl = document.getElementById('success-message');
-    
-    messageEl.textContent = message;
-    modal.style.display = 'flex';
-    
-    // Track modal view
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'success_modal_view', {
-            'event_category': 'engagement'
-        });
-    }
-}
-
-function initSuccessModal() {
-    const modal = document.getElementById('success-modal');
-    const closeBtn = document.getElementById('close-success');
-    
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    // Close on outside click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-    
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
-            modal.style.display = 'none';
-        }
-    });
-}
-
-// ============================================
-// SMOOTH SCROLL ENHANCEMENT
-// ============================================
-function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            
-            // Skip if it's just "#"
-            if (href === '#') return;
-            
-            const target = document.querySelector(href);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                
-                // Track navigation
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'navigation_click', {
-                        'link_text': this.textContent,
-                        'link_url': href
-                    });
-                }
-            }
+    // Close nav on link click
+    nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            nav.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
         });
     });
 }
 
 // ============================================
-// SCROLL TO TOP BUTTON
+// SCROLL TO TOP
 // ============================================
-function initScrollToTop() {
-    const scrollBtn = document.getElementById('scroll-to-top');
-    
-    // Show/hide button based on scroll position
+function initScrollTop() {
+    const btn = document.getElementById('scroll-top');
+    if (!btn) return;
+
     window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            scrollBtn.classList.add('visible');
-        } else {
-            scrollBtn.classList.remove('visible');
-        }
-    });
-    
-    // Scroll to top on click
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-        
-        // Track scroll to top
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'scroll_to_top', {
-                'event_category': 'engagement'
-            });
-        }
-    });
-}
+        btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
 
-// ============================================
-// EXIT INTENT MODAL
-// ============================================
-function initExitIntent() {
-    const modal = document.getElementById('exit-modal');
-    const closeBtn = modal.querySelector('.exit-modal-close');
-    const form = document.getElementById('exit-form');
-    let hasShown = sessionStorage.getItem('exitModalShown');
-    
-    // Don't show if already shown in this session
-    if (hasShown) return;
-    
-    // Detect exit intent
-    document.addEventListener('mouseleave', (e) => {
-        if (e.clientY <= 0 && !hasShown) {
-            modal.style.display = 'flex';
-            sessionStorage.setItem('exitModalShown', 'true');
-            hasShown = true;
-            
-            // Track exit intent
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'exit_intent_shown', {
-                    'event_category': 'engagement'
-                });
-            }
-        }
-    });
-    
-    // Close modal
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-    
-    // Handle form submission
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = form.querySelector('input[type="email"]').value;
-        
-        // Track exit intent conversion
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'exit_intent_conversion', {
-                'event_category': 'conversion'
-            });
-        }
-        
-        modal.style.display = 'none';
-        showSuccessModal("Thanks! Check your email for the free checklist.");
-        
-        // Here you would typically send the email to your backend
-        console.log('Exit intent email captured:', email);
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
@@ -313,162 +44,169 @@ function initExitIntent() {
 // FAQ ACCORDION
 // ============================================
 function initFAQ() {
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    
-    faqQuestions.forEach(question => {
-        question.addEventListener('click', () => {
-            const isExpanded = question.getAttribute('aria-expanded') === 'true';
-            const answer = question.nextElementSibling;
-            
-            // Close all other FAQs
-            faqQuestions.forEach(q => {
-                if (q !== question) {
-                    q.setAttribute('aria-expanded', 'false');
-                    q.nextElementSibling.classList.remove('active');
-                }
+    document.querySelectorAll('.faq-q').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            const answer = btn.nextElementSibling;
+
+            // Close all
+            document.querySelectorAll('.faq-q').forEach(b => {
+                b.setAttribute('aria-expanded', 'false');
+                const a = b.nextElementSibling;
+                if (a) a.hidden = true;
             });
-            
-            // Toggle current FAQ
-            question.setAttribute('aria-expanded', !isExpanded);
-            answer.classList.toggle('active');
-            
-            // Track FAQ interaction
-            if (typeof gtag !== 'undefined' && !isExpanded) {
-                gtag('event', 'faq_open', {
-                    'event_category': 'engagement',
-                    'faq_question': question.textContent.trim()
-                });
+
+            // Open this one if it was closed
+            if (!expanded) {
+                btn.setAttribute('aria-expanded', 'true');
+                if (answer) answer.hidden = false;
             }
         });
     });
 }
 
 // ============================================
-// KEYBOARD NAVIGATION ENHANCEMENT
+// SUCCESS MODAL
 // ============================================
-function initKeyboardNav() {
-    // Add visible focus indicators
+function initModal() {
+    const modal = document.getElementById('success-modal');
+    const closeBtn = document.getElementById('modal-close');
+    if (!modal) return;
+
+    // Close on button
+    closeBtn?.addEventListener('click', () => { modal.hidden = true; });
+
+    // Close on backdrop
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.hidden = true;
+    });
+
+    // Close on Escape
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab') {
-            document.body.classList.add('keyboard-nav');
-        }
+        if (e.key === 'Escape' && !modal.hidden) modal.hidden = true;
     });
-    
-    document.addEventListener('mousedown', () => {
-        document.body.classList.remove('keyboard-nav');
-    });
+
+    // Show on Netlify success redirect
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+        modal.hidden = false;
+    }
 }
 
 // ============================================
-// LAZY LOADING IMAGES
+// FORM VALIDATION
 // ============================================
-function initLazyLoading() {
-    const images = document.querySelectorAll('img[loading="lazy"]');
-    
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src || img.src;
-                    img.classList.add('loaded');
-                    observer.unobserve(img);
-                }
+function initForms() {
+    document.querySelectorAll('form').forEach(form => {
+        const emailInputs = form.querySelectorAll('input[type="email"]');
+
+        emailInputs.forEach(input => {
+            input.addEventListener('blur', () => validateEmail(input));
+            input.addEventListener('input', () => {
+                if (input.classList.contains('invalid')) validateEmail(input);
             });
         });
-        
-        images.forEach(img => imageObserver.observe(img));
-    }
+
+        form.addEventListener('submit', (e) => {
+            let valid = true;
+            emailInputs.forEach(input => {
+                if (!validateEmail(input)) valid = false;
+            });
+            if (!valid) e.preventDefault();
+        });
+    });
+}
+
+function validateEmail(input) {
+    const val = input.value.trim();
+    if (!val) { input.classList.remove('valid', 'invalid'); return true; }
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    input.classList.toggle('valid', ok);
+    input.classList.toggle('invalid', !ok);
+    return ok;
 }
 
 // ============================================
-// TRACK OUTBOUND LINKS
+// HEADER SCROLL STATE
 // ============================================
-function initOutboundTracking() {
+function initHeaderScroll() {
+    const header = document.getElementById('site-header');
+    if (!header) return;
+
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+}
+
+// ============================================
+// ANIMATE ON SCROLL (lightweight)
+// ============================================
+function initReveal() {
+    if (!('IntersectionObserver' in window)) return;
+
+    const items = document.querySelectorAll(
+        '.problem-card, .product-card, .step, .faq-item'
+    );
+
+    items.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(16px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                // Stagger siblings slightly
+                const siblings = Array.from(entry.target.parentElement?.children || []);
+                const idx = siblings.indexOf(entry.target);
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, idx * 60);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    items.forEach(el => observer.observe(el));
+}
+
+// ============================================
+// ANALYTICS HELPERS
+// ============================================
+function track(event, data = {}) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', event, data);
+    }
+}
+
+function initTracking() {
+    // CTA clicks
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+        btn.addEventListener('click', () => {
+            track('cta_click', { button_text: btn.textContent.trim() });
+        });
+    });
+
+    // Outbound links
     document.querySelectorAll('a[href^="http"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'click', {
-                    'event_category': 'outbound',
-                    'event_label': link.href
-                });
-            }
+        link.addEventListener('click', () => {
+            track('outbound_click', { url: link.href });
         });
     });
 }
 
 // ============================================
-// TRACK CTA CLICKS
-// ============================================
-function initCTATracking() {
-    document.querySelectorAll('.cta').forEach(button => {
-        button.addEventListener('click', () => {
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'cta_click', {
-                    'event_category': 'conversion',
-                    'button_text': button.textContent.trim(),
-                    'button_url': button.href || 'button'
-                });
-            }
-        });
-    });
-}
-
-// ============================================
-// PERFORMANCE MONITORING
-// ============================================
-function trackPerformance() {
-    if ('PerformanceObserver' in window) {
-        // Track Largest Contentful Paint
-        const lcpObserver = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            const lastEntry = entries[entries.length - 1];
-            
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'LCP', {
-                    'event_category': 'Web Vitals',
-                    'value': Math.round(lastEntry.startTime),
-                    'metric_id': 'v1-lcp'
-                });
-            }
-        });
-        
-        try {
-            lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-        } catch (e) {
-            console.log('LCP observation not supported');
-        }
-    }
-}
-
-// ============================================
-// INITIALIZE ON DOM READY
+// INIT
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    initThemeToggle();
-    initAudioWidget();
-    initFormValidation();
-    initSuccessModal();
-    initSmoothScroll();
-    initScrollToTop();
-    initExitIntent();
+    initMobileNav();
+    initScrollTop();
     initFAQ();
-    initKeyboardNav();
-    initLazyLoading();
-    initOutboundTracking();
-    initCTATracking();
-    trackPerformance();
-    
-    console.log('Sonexial Labs - All systems initialized ✓');
-});
-
-// ============================================
-// HANDLE FORM SUCCESS (for Netlify)
-// ============================================
-window.addEventListener('load', () => {
-    // Check if redirected from form submission
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-        showSuccessModal();
-    }
+    initModal();
+    initForms();
+    initHeaderScroll();
+    initReveal();
+    initTracking();
 });

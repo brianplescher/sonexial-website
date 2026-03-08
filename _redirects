@@ -1,0 +1,13 @@
+# Netlify Redirects Configuration
+# Canonical URL enforcement: force HTTPS non-www
+
+# Redirect www to non-www
+https://www.sonexial.com/* https://sonexial.com/:splat 301!
+http://www.sonexial.com/* https://sonexial.com/:splat 301!
+
+# Redirect HTTP to HTTPS
+http://sonexial.com/* https://sonexial.com/:splat 301!
+
+# Trailing slash consistency (optional - redirects /page to /page/)
+# Uncomment if needed:
+# /*/  /:splat  301

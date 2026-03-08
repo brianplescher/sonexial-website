@@ -5,7 +5,11 @@
 		},
 		{
 			"path": ".."
+		},
+		{
+			"path": "../../brianplescher"
 		}
 	],
-	"settings": {}
+	"settings": {
+	}
 }
