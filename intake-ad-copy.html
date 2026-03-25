@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Ad Copy Suite — Intake | Sonexial Labs</title>
+    <link rel="icon" href="../Images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../styles.css">
+
+    <style>
+        /* INTAKE-SPECIFIC STYLES */
+        .intake-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 4rem 2rem 6rem;
+        }
+
+        .intake-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .intake-header .section-label { margin-bottom: 0.75rem; }
+
+        .intake-header h1 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            margin-bottom: 0.75rem;
+        }
+
+        .intake-header p {
+            font-size: 0.95rem;
+            color: var(--text-1);
+            max-width: 520px;
+        }
+
+        .intake-meta {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .intake-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--text-2);
+        }
+
+        .intake-meta-item span:first-child { color: var(--accent); }
+
+        /* FORM SECTIONS */
+        .form-section {
+            margin-bottom: 3rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section:last-of-type { border-bottom: none; }
+
+        .form-section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section-num {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        .form-section-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-0);
+            margin: 0;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        /* FORM ELEMENTS */
+        .field {
+            margin-bottom: 1.75rem;
+        }
+
+        .field label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-2);
+            margin-bottom: 0.5rem;
+        }
+
+        .field .field-hint {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--text-2);
+            margin-bottom: 0.6rem;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .field input[type="text"],
+        .field input[type="email"],
+        .field input[type="url"],
+        .field textarea,
+        .field select {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-0);
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color var(--transition);
+            appearance: none;
+        }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            border-color: var(--accent-border);
+            box-shadow: 0 0 0 3px rgba(0, 229, 192, 0.06);
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder { color: var(--text-2); }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6;
+        }
+
+        .field textarea.tall { min-height: 180px; }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6a78' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        .field select option { background: var(--bg-2); }
+
+        /* CHECKBOX GROUP */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-1);
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color var(--transition), background var(--transition);
+        }
+
+        .checkbox-label:hover {
+            border-color: var(--accent-border);
+            background: var(--accent-dim);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-label input:checked ~ span { color: var(--text-0); }
+
+        /* TWO COL */
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* REQUIRED INDICATOR */
+        .req { color: var(--accent); margin-left: 2px; }
+
+        /* SUBMIT AREA */
+        .submit-area {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .submit-note {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: var(--text-2);
+            line-height: 1.6;
+        }
+
+        .submit-note strong { color: var(--text-1); }
+
+        /* PROGRESS BAR */
+        .intake-progress {
+            position: sticky;
+            top: 60px;
+            z-index: 10;
+            height: 3px;
+            background: var(--border);
+        }
+
+        .intake-progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* SUCCESS STATE */
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .success-screen.visible { display: block; }
+
+        .success-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .success-screen h2 { margin-bottom: 0.75rem; }
+        .success-screen p { color: var(--text-1); max-width: 480px; margin: 0 auto 2rem; }
+
+        @media (max-width: 600px) {
+            .field-row { grid-template-columns: 1fr; }
+            .intake-meta { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="site-header">
+    <div class="header-inner">
+        <a href="/" class="logo-link">
+            <span class="logo-mark">SX</span>
+            <span class="logo-name">SONEXIAL LABS</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="/#products">Products</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="intake-progress" aria-hidden="true">
+    <div class="intake-progress-fill" id="progress-fill"></div>
+</div>
+
+<main>
+<div class="intake-wrap">
+
+    <!-- HEADER -->
+    <div class="intake-header">
+        <div class="section-label">KIT-01 // INTAKE</div>
+        <h1>Ad Copy Suite</h1>
+        <p>Complete this form to initialize your order. The more specific you are, the sharper your copy will be. This takes about 10 minutes.</p>
+        <div class="intake-meta">
+            <div class="intake-meta-item"><span>→</span><span>48-hr delivery after submission</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Delivered to your email</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Human strategist review included</span></div>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <form
+        id="intake-form"
+        name="ad-copy-suite-intake"
+        method="POST"
+        data-netlify="true"
+        action="/?success=ad-copy"
+        novalidate
+    >
+        <input type="hidden" name="form-name" value="ad-copy-suite-intake">
+        <input type="hidden" name="product" value="ad-copy-suite">
+
+        <!-- SECTION 1: THE BOOK -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">01</span>
+                <h2>The Book</h2>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="book-title">Book Title <span class="req">*</span></label>
+                    <input type="text" id="book-title" name="book_title" placeholder="Final title" required>
+                </div>
+                <div class="field">
+                    <label for="book-subtitle">Subtitle</label>
+                    <input type="text" id="book-subtitle" name="book_subtitle" placeholder="If applicable">
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="genre">Genre &amp; Subgenre <span class="req">*</span></label>
+                <span class="field-hint">Be specific. "Dark romantasy" not "fantasy." "Military thriller" not "thriller."</span>
+                <input type="text" id="genre" name="genre" placeholder="e.g. Cozy mystery / amateur sleuth" required>
+            </div>
+
+            <div class="field">
+                <label for="one-sentence">One-Sentence Pitch <span class="req">*</span></label>
+                <span class="field-hint">The core promise or conflict in 25 words or less. This becomes the spine of your ad copy.</span>
+                <textarea id="one-sentence" name="one_sentence_pitch" rows="3" placeholder="e.g. A burned-out detective returns to her hometown to solve a cold case — and realizes the killer never left." required></textarea>
+            </div>
+
+            <div class="field">
+                <label for="synopsis">Full Synopsis or Back Cover Copy <span class="req">*</span></label>
+                <span class="field-hint">This is the most critical input. Paste your full synopsis, back cover blurb, or detailed plot summary. More detail = better copy.</span>
+                <textarea id="synopsis" name="synopsis" class="tall" placeholder="Paste your full synopsis here..." required></textarea>
+            </div>
+
+            <div class="field">
+                <label for="comp-titles">3 Comp Titles or Authors <span class="req">*</span></label>
+                <span class="field-hint">Books or authors that share your exact readership — not just your genre. These calibrate tone and hook style.</span>
+                <textarea id="comp-titles" name="comp_titles" rows="3" placeholder="e.g. Nora Roberts, The Thursday Murder Club, Lessons in Chemistry" required></textarea>
+            </div>
+
+            <div class="field">
+                <label for="amazon-link">Amazon Listing URL</label>
+                <span class="field-hint">If already published. Helps us see your current positioning.</span>
+                <input type="url" id="amazon-link" name="amazon_link" placeholder="https://amazon.com/...">
+            </div>
+        </div>
+
+        <!-- SECTION 2: THE READER -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">02</span>
+                <h2>The Reader</h2>
+            </div>
+
+            <div class="field">
+                <label for="ideal-reader">Ideal Reader <span class="req">*</span></label>
+                <span class="field-hint">Demographic and psychographic. The more vivid the better — "women 35–55 who read in bed after the kids are asleep" beats "women who like romance."</span>
+                <textarea id="ideal-reader" name="ideal_reader" rows="3" placeholder="Describe your ideal reader in detail..." required></textarea>
+            </div>
+
+            <div class="field">
+                <label for="emotion">Desired Emotional Response <span class="req">*</span></label>
+                <span class="field-hint">What do you want them to feel the moment they see your ad? Forces you to articulate the hook.</span>
+                <select id="emotion" name="desired_emotion" required>
+                    <option value="" disabled selected>Select the primary emotion...</option>
+                    <option value="curious">Curious — they need to know what happens</option>
+                    <option value="excited">Excited — they can't wait to start reading</option>
+                    <option value="unsettled">Unsettled — something feels off and they're hooked</option>
+                    <option value="hopeful">Hopeful — they see themselves in the protagonist</option>
+                    <option value="amused">Amused — they're already smiling</option>
+                    <option value="other">Other — I'll explain in the notes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="unique-angle">Your Unique Marketing Angle</label>
+                <span class="field-hint">What's the one thing about this book that you think nobody else is saying in their marketing? Your gut instinct here is valuable.</span>
+                <textarea id="unique-angle" name="unique_angle" rows="3" placeholder="e.g. Nobody is marketing this as a book about grief disguised as a heist story, but that's what makes readers cry at the end..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 3: THE CAMPAIGN -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">03</span>
+                <h2>The Campaign</h2>
+            </div>
+
+            <div class="field">
+                <label>Ad Platforms <span class="req">*</span></label>
+                <span class="field-hint">Select all that apply. Different platforms get different copy formats.</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="platforms" value="amazon">
+                        <span>Amazon Sponsored Products</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="platforms" value="facebook-meta">
+                        <span>Facebook / Meta Ads</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="platforms" value="bookbub">
+                        <span>BookBub Ads</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="platforms" value="newsletter">
+                        <span>Newsletter / Email</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="campaign-type">Campaign Type <span class="req">*</span></label>
+                <select id="campaign-type" name="campaign_type" required>
+                    <option value="" disabled selected>Select campaign type...</option>
+                    <option value="launch">New Launch</option>
+                    <option value="backlist">Backlist Refresh</option>
+                    <option value="ongoing">Ongoing / Always-On Campaign</option>
+                    <option value="preorder">Pre-Order</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="prior-ads">Prior Ad Experience</label>
+                <span class="field-hint">Have you run ads for this book before? What worked? What didn't? Saves us from retreading ground you've already covered.</span>
+                <textarea id="prior-ads" name="prior_ad_experience" rows="3" placeholder="e.g. Ran Amazon ads for 3 months. Broad match keywords performed better than exact. CTR was fine but conversion was low — suspect the description is the bottleneck."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 4: DELIVERY -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">04</span>
+                <h2>Delivery</h2>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="author-name">Author Name <span class="req">*</span></label>
+                    <input type="text" id="author-name" name="author_name" placeholder="As it appears on the book" required>
+                </div>
+                <div class="field">
+                    <label for="delivery-email">Delivery Email <span class="req">*</span></label>
+                    <input type="email" id="delivery-email" name="email" placeholder="your@email.com" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="notes">Anything Else</label>
+                <span class="field-hint">Constraints, sensitivities, tone notes, anything we should know before we start.</span>
+                <textarea id="notes" name="additional_notes" rows="3" placeholder="e.g. Please avoid any copy that references the romance subplot — it's a minor thread and I don't want to mislead readers."></textarea>
+            </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-area">
+            <button type="submit" class="btn-primary" id="submit-btn">Submit Intake</button>
+            <div class="submit-note">
+                <strong>What happens next:</strong><br>
+                A strategist reviews your intake within a few hours.<br>
+                Your Ad Copy Suite lands in your inbox within 48 hours.
+            </div>
+        </div>
+
+    </form>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-screen" id="success-screen">
+        <div class="success-icon">✓</div>
+        <h2>Intake received.</h2>
+        <p>Your Ad Copy Suite is in the queue. A strategist will review your submission and your deliverables will arrive within 48 hours.</p>
+        <a href="/" class="btn-primary">Back to Sonexial Labs</a>
+    </div>
+
+</div>
+</main>
+
+<script>
+// Progress bar
+const form = document.getElementById('intake-form');
+const fill = document.getElementById('progress-fill');
+
+function updateProgress() {
+    const fields = form.querySelectorAll('input[required], textarea[required], select[required]');
+    let filled = 0;
+    fields.forEach(f => {
+        if (f.value.trim()) filled++;
+    });
+    const pct = Math.round((filled / fields.length) * 100);
+    fill.style.width = pct + '%';
+}
+
+form.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', updateProgress);
+});
+
+// Platform checkbox — require at least one
+form.addEventListener('submit', function(e) {
+    const checked = form.querySelectorAll('input[name="platforms"]:checked');
+    if (checked.length === 0) {
+        e.preventDefault();
+        const group = form.querySelector('.checkbox-group');
+        group.style.outline = '1px solid rgba(0,229,192,0.4)';
+        group.style.borderRadius = '3px';
+        group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    document.getElementById('submit-btn').textContent = 'Submitting...';
+    document.getElementById('submit-btn').disabled = true;
+});
+
+// Show success if redirected back
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'ad-copy') {
+    document.getElementById('intake-form').style.display = 'none';
+    document.getElementById('success-screen').classList.add('visible');
+}
+</script>
+
+</body>
+</html>
