@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Author Website SEO Audit — Intake | Sonexial Labs</title>
+    <link rel="icon" href="Images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .intake-wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+        .intake-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .intake-header .section-label { margin-bottom: 0.75rem; }
+        .intake-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.75rem; }
+        .intake-header p { font-size: 0.95rem; color: var(--text-1); max-width: 520px; }
+        .intake-meta { display: flex; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .intake-meta-item { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-2); }
+        .intake-meta-item span:first-child { color: var(--accent); }
+        .form-section { margin-bottom: 3rem; padding-bottom: 3rem; border-bottom: 1px solid var(--border); }
+        .form-section:last-of-type { border-bottom: none; }
+        .form-section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
+        .form-section-num { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); opacity: 0.7; flex-shrink: 0; }
+        .form-section-header h2 { font-size: 1.1rem; color: var(--text-0); margin: 0; font-family: var(--font-sans); font-weight: 600; }
+        .field { margin-bottom: 1.75rem; }
+        .field label { display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); margin-bottom: 0.5rem; }
+        .field .field-hint { display: block; font-size: 0.82rem; color: var(--text-2); margin-bottom: 0.6rem; line-height: 1.5; font-style: italic; }
+        .field input[type="text"], .field input[type="email"], .field input[type="url"], .field textarea, .field select { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-0); padding: 0.8rem 1rem; border-radius: var(--radius); font-family: var(--font-sans); font-size: 0.9rem; outline: none; transition: border-color var(--transition); appearance: none; }
+        .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(0,229,192,0.06); }
+        .field input::placeholder, .field textarea::placeholder { color: var(--text-2); }
+        .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+        .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6a78' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; cursor: pointer; }
+        .field select option { background: var(--bg-2); }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .req { color: var(--accent); margin-left: 2px; }
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.9rem; color: var(--text-1); padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); transition: border-color var(--transition), background var(--transition); }
+        .checkbox-label:hover { border-color: var(--accent-border); background: var(--accent-dim); }
+        .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+        .submit-area { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .submit-note { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-2); line-height: 1.6; }
+        .submit-note strong { color: var(--text-1); }
+        .intake-progress { position: sticky; top: 60px; z-index: 10; height: 3px; background: var(--border); }
+        .intake-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+        .success-screen { display: none; text-align: center; padding: 6rem 2rem; }
+        .success-screen.visible { display: block; }
+        .success-icon { font-size: 3rem; color: var(--accent); margin-bottom: 1.5rem; }
+        .success-screen h2 { margin-bottom: 0.75rem; }
+        .success-screen p { color: var(--text-1); max-width: 480px; margin: 0 auto 2rem; }
+        @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header id="site-header">
+    <div class="header-inner">
+        <a href="/" class="logo-link">
+            <span class="logo-mark">SX</span>
+            <span class="logo-name">SONEXIAL LABS</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="/#products">Products</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<div class="intake-progress" aria-hidden="true">
+    <div class="intake-progress-fill" id="progress-fill"></div>
+</div>
+
+<main>
+<div class="intake-wrap">
+
+    <div class="intake-header">
+        <div class="section-label">KIT-04 // INTAKE</div>
+        <h1>Author Website SEO Audit</h1>
+        <p>We need access to your site and context about your goals to run a meaningful audit. This takes about 5 minutes.</p>
+        <div class="intake-meta">
+            <div class="intake-meta-item"><span>→</span><span>48-hr delivery after submission</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Ranked priority fix list</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Ready-to-paste meta rewrites</span></div>
+        </div>
+    </div>
+
+    <form id="intake-form" name="website-seo-intake" method="POST" data-netlify="true" action="/intake-website-seo.html?success=webseo" novalidate>
+        <input type="hidden" name="form-name" value="website-seo-intake">
+        <input type="hidden" name="product" value="website-seo-audit">
+
+        <!-- SECTION 1: YOUR SITE -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">01</span>
+                <h2>Your Site</h2>
+            </div>
+
+            <div class="field">
+                <label for="site-url">Author Website URL <span class="req">*</span></label>
+                <input type="url" id="site-url" name="site_url" placeholder="https://yourauthorsite.com" required>
+            </div>
+
+            <div class="field">
+                <label for="platform">Site Platform <span class="req">*</span></label>
+                <select id="platform" name="site_platform" required>
+                    <option value="" disabled selected>Select your platform...</option>
+                    <option value="wordpress">WordPress</option>
+                    <option value="squarespace">Squarespace</option>
+                    <option value="wix">Wix</option>
+                    <option value="webflow">Webflow</option>
+                    <option value="shopify">Shopify</option>
+                    <option value="custom">Custom / Hand-coded</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="site-age">How long has the site been live?</label>
+                <select id="site-age" name="site_age">
+                    <option value="" disabled selected>Select...</option>
+                    <option value="new">Less than 6 months</option>
+                    <option value="established">6 months – 2 years</option>
+                    <option value="mature">2+ years</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Pages to Audit <span class="req">*</span></label>
+                <span class="field-hint">Select all that apply. We'll focus our analysis on these pages.</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="pages" value="homepage">
+                        <span>Homepage</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="pages" value="books">
+                        <span>Books / Series page</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="pages" value="about">
+                        <span>About / Author Bio page</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="pages" value="blog">
+                        <span>Blog</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: YOUR GOALS -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">02</span>
+                <h2>Your Goals</h2>
+            </div>
+
+            <div class="field">
+                <label for="author-name">Author Name &amp; Genre <span class="req">*</span></label>
+                <span class="field-hint">So we know what search intent to optimize for.</span>
+                <input type="text" id="author-name" name="author_name_genre" placeholder="e.g. J. Morgan — dark fantasy author" required>
+            </div>
+
+            <div class="field">
+                <label for="primary-goal">Primary Goal for the Site <span class="req">*</span></label>
+                <select id="primary-goal" name="primary_goal" required>
+                    <option value="" disabled selected>What do you most want visitors to do?</option>
+                    <option value="newsletter">Join my email list</option>
+                    <option value="buy-book">Buy my book directly</option>
+                    <option value="amazon">Click through to Amazon</option>
+                    <option value="hire">Hire me / contact me</option>
+                    <option value="discover">Discover my back catalog</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="target-keywords">Keywords You Want to Rank For</label>
+                <span class="field-hint">What would your ideal reader type into Google to find you? Don't worry if you're not sure — this is informational, not required.</span>
+                <textarea id="target-keywords" name="target_keywords" rows="3" placeholder="e.g. dark fantasy series, epic fantasy female lead, books like Brandon Sanderson"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="known-issues">Known Issues or Pain Points</label>
+                <span class="field-hint">Anything you already suspect is wrong — low traffic, high bounce rate, poor mobile experience, slow load times.</span>
+                <textarea id="known-issues" name="known_issues" rows="3" placeholder="e.g. Traffic from Google is nearly zero. My homepage loads slowly on mobile."></textarea>
+            </div>
+
+            <div class="field">
+                <label for="analytics">Do You Have Google Analytics or Search Console?</label>
+                <select id="analytics" name="has_analytics">
+                    <option value="" disabled selected>Select...</option>
+                    <option value="both">Yes — both GA4 and Search Console</option>
+                    <option value="ga-only">Google Analytics only</option>
+                    <option value="sc-only">Search Console only</option>
+                    <option value="none">No analytics set up</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION 3: DELIVERY -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">03</span>
+                <h2>Delivery</h2>
+            </div>
+
+            <div class="field">
+                <label for="delivery-email">Delivery Email <span class="req">*</span></label>
+                <input type="email" id="delivery-email" name="email" placeholder="your@email.com" required>
+            </div>
+
+            <div class="field">
+                <label for="notes">Anything Else</label>
+                <textarea id="notes" name="additional_notes" rows="3" placeholder="e.g. I recently redesigned the site and want to know if the new structure is hurting my rankings..."></textarea>
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <button type="submit" class="btn-primary" id="submit-btn">Submit Intake</button>
+            <div class="submit-note">
+                <strong>What happens next:</strong><br>
+                We audit your site against search intent and structure.<br>
+                Your SEO Audit lands in your inbox within 48 hours.
+            </div>
+        </div>
+    </form>
+
+    <div class="success-screen" id="success-screen">
+        <div class="success-icon">✓</div>
+        <h2>Intake received.</h2>
+        <p>Your Author Website SEO Audit is in the queue. Deliverables arrive within 48 hours.</p>
+        <a href="/" class="btn-primary">Back to Sonexial Labs</a>
+    </div>
+
+</div>
+</main>
+
+<script>
+const form = document.getElementById('intake-form');
+const fill = document.getElementById('progress-fill');
+function updateProgress() {
+    const fields = form.querySelectorAll('input[required], textarea[required], select[required]');
+    let filled = 0;
+    fields.forEach(f => { if (f.value.trim()) filled++; });
+    fill.style.width = Math.round((filled / fields.length) * 100) + '%';
+}
+form.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', updateProgress);
+});
+form.addEventListener('submit', () => {
+    document.getElementById('submit-btn').textContent = 'Submitting...';
+    document.getElementById('submit-btn').disabled = true;
+});
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'webseo') {
+    document.getElementById('intake-form').style.display = 'none';
+    document.getElementById('success-screen').classList.add('visible');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Cover Design Signal Audit — Intake | Sonexial Labs</title>
+    <link rel="icon" href="Images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .intake-wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+        .intake-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .intake-header .section-label { margin-bottom: 0.75rem; }
+        .intake-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.75rem; }
+        .intake-header p { font-size: 0.95rem; color: var(--text-1); max-width: 520px; }
+        .intake-meta { display: flex; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .intake-meta-item { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-2); }
+        .intake-meta-item span:first-child { color: var(--accent); }
+        .form-section { margin-bottom: 3rem; padding-bottom: 3rem; border-bottom: 1px solid var(--border); }
+        .form-section:last-of-type { border-bottom: none; }
+        .form-section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
+        .form-section-num { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); opacity: 0.7; flex-shrink: 0; }
+        .form-section-header h2 { font-size: 1.1rem; color: var(--text-0); margin: 0; font-family: var(--font-sans); font-weight: 600; }
+        .field { margin-bottom: 1.75rem; }
+        .field label { display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); margin-bottom: 0.5rem; }
+        .field .field-hint { display: block; font-size: 0.82rem; color: var(--text-2); margin-bottom: 0.6rem; line-height: 1.5; font-style: italic; }
+        .field input[type="text"], .field input[type="email"], .field input[type="url"], .field textarea, .field select { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-0); padding: 0.8rem 1rem; border-radius: var(--radius); font-family: var(--font-sans); font-size: 0.9rem; outline: none; transition: border-color var(--transition); appearance: none; }
+        .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(0,229,192,0.06); }
+        .field input::placeholder, .field textarea::placeholder { color: var(--text-2); }
+        .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+        .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6a78' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; cursor: pointer; }
+        .field select option { background: var(--bg-2); }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .req { color: var(--accent); margin-left: 2px; }
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-size: 0.9rem; color: var(--text-1); padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); transition: border-color var(--transition), background var(--transition); }
+        .checkbox-label:hover { border-color: var(--accent-border); background: var(--accent-dim); }
+        .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+        .upload-note { background: var(--bg-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 1rem 1.25rem; border-radius: var(--radius); font-size: 0.85rem; color: var(--text-1); line-height: 1.6; margin-top: 0.5rem; }
+        .upload-note strong { color: var(--text-0); }
+        .submit-area { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .submit-note { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-2); line-height: 1.6; }
+        .submit-note strong { color: var(--text-1); }
+        .intake-progress { position: sticky; top: 60px; z-index: 10; height: 3px; background: var(--border); }
+        .intake-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+        .success-screen { display: none; text-align: center; padding: 6rem 2rem; }
+        .success-screen.visible { display: block; }
+        .success-icon { font-size: 3rem; color: var(--accent); margin-bottom: 1.5rem; }
+        .success-screen h2 { margin-bottom: 0.75rem; }
+        .success-screen p { color: var(--text-1); max-width: 480px; margin: 0 auto 2rem; }
+        @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header id="site-header">
+    <div class="header-inner">
+        <a href="/" class="logo-link">
+            <span class="logo-mark">SX</span>
+            <span class="logo-name">SONEXIAL LABS</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="/#products">Products</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<div class="intake-progress" aria-hidden="true">
+    <div class="intake-progress-fill" id="progress-fill"></div>
+</div>
+
+<main>
+<div class="intake-wrap">
+
+    <div class="intake-header">
+        <div class="section-label">KIT-05 // INTAKE</div>
+        <h1>Cover Design Signal Audit</h1>
+        <p>Your cover is a data signal before it's a piece of art. We audit it against genre conventions, thumbnail legibility, and competitive positioning. Takes about 5 minutes.</p>
+        <div class="intake-meta">
+            <div class="intake-meta-item"><span>→</span><span>48-hr delivery after submission</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Actionable design brief included</span></div>
+            <div class="intake-meta-item"><span>→</span><span>Human strategist review included</span></div>
+        </div>
+    </div>
+
+    <form id="intake-form" name="cover-audit-intake" method="POST" data-netlify="true" action="/intake-cover-audit.html?success=cover" novalidate>
+        <input type="hidden" name="form-name" value="cover-audit-intake">
+        <input type="hidden" name="product" value="cover-signal-audit">
+
+        <!-- SECTION 1: THE COVER -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">01</span>
+                <h2>The Cover</h2>
+            </div>
+
+            <div class="field">
+                <label for="cover-link">Cover Image Link <span class="req">*</span></label>
+                <span class="field-hint">Share a link to your cover file — Google Drive, Dropbox, or your Amazon listing. High-res preferred but not required.</span>
+                <input type="url" id="cover-link" name="cover_link" placeholder="https://drive.google.com/... or https://amazon.com/..." required>
+                <div class="upload-note">
+                    <strong>Don't have a shareable link?</strong> Upload your cover to Google Drive or Dropbox, set sharing to "Anyone with the link can view," and paste the URL above.
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="book-title">Book Title <span class="req">*</span></label>
+                    <input type="text" id="book-title" name="book_title" placeholder="As it appears on the cover" required>
+                </div>
+                <div class="field">
+                    <label for="genre">Genre &amp; Subgenre <span class="req">*</span></label>
+                    <input type="text" id="genre" name="genre" placeholder="e.g. Epic fantasy / grimdark" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="cover-status">Cover Status <span class="req">*</span></label>
+                <select id="cover-status" name="cover_status" required>
+                    <option value="" disabled selected>Select...</option>
+                    <option value="final-live">Final — already live on Amazon</option>
+                    <option value="final-not-live">Final — not yet published</option>
+                    <option value="draft">Draft / concept — still in design phase</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="designer">Who Designed the Cover?</label>
+                <select id="designer" name="cover_designer">
+                    <option value="" disabled selected>Select...</option>
+                    <option value="professional">Professional designer</option>
+                    <option value="premade">Premade cover purchased</option>
+                    <option value="self">Self-designed</option>
+                    <option value="ai">AI-generated</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION 2: CONTEXT -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">02</span>
+                <h2>Context</h2>
+            </div>
+
+            <div class="field">
+                <label for="comp-covers">Comp Covers or Authors <span class="req">*</span></label>
+                <span class="field-hint">Books whose covers you consider direct competition or whose visual style you're targeting. We benchmark your cover against these.</span>
+                <textarea id="comp-covers" name="comp_covers" rows="3" placeholder="e.g. Brandon Sanderson's Stormlight Archive, Michael J. Sullivan's Riyria Chronicles" required></textarea>
+            </div>
+
+            <div class="field">
+                <label>Where Will This Cover Appear?</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="placements" value="amazon-ebook">
+                        <span>Amazon eBook (thumbnail-critical)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="placements" value="amazon-print">
+                        <span>Amazon Print / Paperback</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="placements" value="facebook-ads">
+                        <span>Facebook / Meta Ads</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="placements" value="bookbub">
+                        <span>BookBub / Newsletter ads</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="concerns">Your Concerns About the Cover</label>
+                <span class="field-hint">What are you worried about? What feedback have you already received? Your instincts here are useful signal.</span>
+                <textarea id="concerns" name="cover_concerns" rows="3" placeholder="e.g. I'm not sure the title is legible at thumbnail size. A few readers said it looks more like thriller than fantasy."></textarea>
+            </div>
+
+            <div class="field">
+                <label for="amazon-link">Amazon Listing URL</label>
+                <span class="field-hint">If already published — lets us see how it renders in the actual marketplace context.</span>
+                <input type="url" id="amazon-link" name="amazon_link" placeholder="https://amazon.com/...">
+            </div>
+        </div>
+
+        <!-- SECTION 3: DELIVERY -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <span class="form-section-num">03</span>
+                <h2>Delivery</h2>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="author-name">Author Name <span class="req">*</span></label>
+                    <input type="text" id="author-name" name="author_name" placeholder="As it appears on the book" required>
+                </div>
+                <div class="field">
+                    <label for="delivery-email">Delivery Email <span class="req">*</span></label>
+                    <input type="email" id="delivery-email" name="email" placeholder="your@email.com" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="notes">Anything Else</label>
+                <textarea id="notes" name="additional_notes" rows="3" placeholder="e.g. I have a series of 5 books and want consistent branding advice across all of them..."></textarea>
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <button type="submit" class="btn-primary" id="submit-btn">Submit Intake</button>
+            <div class="submit-note">
+                <strong>What happens next:</strong><br>
+                We audit your cover against genre &amp; market data.<br>
+                Your Cover Signal Audit lands in your inbox within 48 hours.
+            </div>
+        </div>
+    </form>
+
+    <div class="success-screen" id="success-screen">
+        <div class="success-icon">✓</div>
+        <h2>Intake received.</h2>
+        <p>Your Cover Design Signal Audit is in the queue. Deliverables arrive within 48 hours.</p>
+        <a href="/" class="btn-primary">Back to Sonexial Labs</a>
+    </div>
+
+</div>
+</main>
+
+<script>
+const form = document.getElementById('intake-form');
+const fill = document.getElementById('progress-fill');
+function updateProgress() {
+    const fields = form.querySelectorAll('input[required], textarea[required], select[required]');
+    let filled = 0;
+    fields.forEach(f => { if (f.value.trim()) filled++; });
+    fill.style.width = Math.round((filled / fields.length) * 100) + '%';
+}
+form.querySelectorAll('input, textarea, select').forEach(el => {
+    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', updateProgress);
+});
+form.addEventListener('submit', () => {
+    document.getElementById('submit-btn').textContent = 'Submitting...';
+    document.getElementById('submit-btn').disabled = true;
+});
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'cover') {
+    document.getElementById('intake-form').style.display = 'none';
+    document.getElementById('success-screen').classList.add('visible');
+}
+</script>
+</body>
+</html>
