@@ -7,49 +7,69 @@
     <!-- Homepage -->
     <url>
         <loc>https://sonexial.com/</loc>
-        <lastmod>2025-12-03</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
 
-    <!-- Process Section -->
+    <!-- Products -->
     <url>
-        <loc>https://sonexial.com/#process</loc>
-        <lastmod>2025-12-03</lastmod>
+        <loc>https://sonexial.com/ad-copy-suite.html</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <!-- Kits Section -->
-    <url>
-        <loc>https://sonexial.com/#kits</loc>
-        <lastmod>2025-12-03</lastmod>
-        <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
-
-    <!-- Services Section -->
     <url>
-        <loc>https://sonexial.com/#services</loc>
-        <lastmod>2025-12-03</lastmod>
+        <loc>https://sonexial.com/metadata-kit.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/bisac-kit.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/website-seo-audit.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/cover-design-audit.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
-    <!-- Contact Section -->
+    <!-- Blog Hub -->
     <url>
-        <loc>https://sonexial.com/#contact</loc>
-        <lastmod>2025-12-03</lastmod>
+        <loc>https://sonexial.com/blog/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog Articles -->
+    <url>
+        <loc>https://sonexial.com/blog/optimize-amazon-book-metadata.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
-
-    <!-- Checklist Section -->
     <url>
-        <loc>https://sonexial.com/#checklist</loc>
-        <lastmod>2025-12-03</lastmod>
+        <loc>https://sonexial.com/blog/bisac-categories-explained.html</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/blog/amazon-algorithm-changes-2025.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/blog/indie-author-marketing-budget.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://sonexial.com/blog/book-keywords-that-work.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
     </url>
 
 </urlset>

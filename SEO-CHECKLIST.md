@@ -54,8 +54,8 @@
 - [ ] Monitor Core Web Vitals
 
 ### Content Marketing
-- [ ] Create blog section for content marketing
-- [ ] Write 5-10 SEO-optimized blog posts:
+- [x] Create blog section for content marketing
+- [x] Write 5-10 SEO-optimized blog posts:
   - "How to Optimize Amazon Book Metadata"
   - "BISAC Categories Explained for Authors"
   - "Amazon Algorithm Changes in 2025"
