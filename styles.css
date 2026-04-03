@@ -480,22 +480,154 @@ a { color: inherit; text-decoration: none; }
    LEAD MAGNET
    ============================================ */
 .lead-magnet {
-    padding: 4rem 0;
+    padding: 5rem 0;
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     background: var(--bg-1);
+    position: relative;
 }
 
-.lead-magnet-inner {
+.lead-magnet::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+}
+
+.lead-magnet-full {
     display: flex;
-    align-items: center;
-    gap: 4rem;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.lead-magnet-header { max-width: 720px; }
+.lead-magnet-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-bottom: 1rem; }
+
+.lead-magnet-sub {
+    font-size: 1.1rem;
+    color: var(--text-1);
+    line-height: 1.7;
+    max-width: 640px;
+}
+
+.lead-magnet-body {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 3rem;
+    align-items: start;
+}
+
+.lead-magnet-points {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.checklist-point {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+}
+
+.checklist-num {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    padding: 0.2rem 0.45rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    white-space: nowrap;
+}
+
+.checklist-point strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-0);
+    margin-bottom: 0.25rem;
+}
+
+.checklist-point p {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.lead-magnet-cta-block {
+    background: var(--bg-card);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: sticky;
+    top: 80px;
+}
+
+.lead-magnet-badge-stack {
+    display: flex;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.lead-magnet-text { flex: 1; min-width: 280px; }
-.lead-magnet-text h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+.lm-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+}
 
+.lead-magnet-cta-copy {
+    font-size: 0.9rem;
+    color: var(--text-1);
+    line-height: 1.65;
+    margin: 0;
+}
+
+.lead-form-full {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.lead-form-full input[type="email"] {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-0);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color var(--transition);
+}
+.lead-form-full input[type="email"]:focus { border-color: var(--accent-border); }
+.lead-form-full input[type="email"]::placeholder { color: var(--text-2); }
+.lead-form-full .btn-primary { width: 100%; justify-content: center; }
+
+.lead-magnet-fine {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-2);
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-align: center;
+}
+
+/* Keep old .lead-form for any other uses */
 .lead-form { flex: 1; min-width: 280px; }
 
 .form-row {
@@ -1049,6 +1181,8 @@ footer {
         transform: rotate(135deg);
     }
     .form-two-col { grid-template-columns: 1fr; }
+    .lead-magnet-body { grid-template-columns: 1fr; }
+    .lead-magnet-cta-block { position: static; }
     .lead-magnet-inner { flex-direction: column; gap: 2rem; }
     .dfy-band { flex-direction: column; gap: 1.5rem; }
 }

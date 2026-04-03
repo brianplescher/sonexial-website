@@ -104,6 +104,7 @@
         <nav class="main-nav" aria-label="Main navigation">
             <a href="#products">Products</a>
             <a href="#process">Process</a>
+            <a href="#checklist">Free Checklist</a>
             <a href="#faq">FAQ</a>
             <a href="#contact">Contact</a>
         </nav>
@@ -129,7 +130,7 @@
         </p>
         <div class="hero-actions" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 4rem;">
             <a href="#products" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Deploy Your Kits</a>
-            <a href="#process" class="btn-ghost" style="font-size: 1.1rem; padding: 1rem 2rem;">How it works</a>
+            <a href="#checklist" class="btn-ghost" style="font-size: 1.1rem; padding: 1rem 2rem;">Free Diagnostic ↓</a>
         </div>
         <div class="hero-stats" aria-label="Key statistics">
             <div class="stat">
@@ -178,19 +179,72 @@
 <!-- LEAD MAGNET -->
 <section class="lead-magnet" id="checklist" aria-labelledby="checklist-heading">
     <div class="container">
-        <div class="lead-magnet-inner">
-            <div class="lead-magnet-text">
-                <div class="section-label">FREE DIAGNOSTIC</div>
-                <h2 id="checklist-heading">Is your book invisible?</h2>
-                <p>Get the 10-Point Author Signal Checklist — a PDF that identifies the exact gaps in your metadata before you spend another dollar on ads.</p>
+        <div class="lead-magnet-full">
+            <div class="lead-magnet-header">
+                <div class="section-label">FREE DIAGNOSTIC — INSTANT DOWNLOAD</div>
+                <h2 id="checklist-heading">Is your book invisible to Amazon's algorithm?</h2>
+                <p class="lead-magnet-sub">Most indie authors are losing discoverability on 6 or more of these 10 signals — and have no idea. Get the checklist. Find out where you stand before you spend another dollar on ads.</p>
             </div>
-            <form class="lead-form" name="lead-magnet-form" method="POST" data-netlify="true" action="/checklist-download?success=true" aria-label="Checklist download form">
-                <input type="hidden" name="form-name" value="lead-magnet-form">
-                <div class="form-row">
-                    <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address">
-                    <button type="submit">Get the Checklist</button>
+            <div class="lead-magnet-body">
+                <div class="lead-magnet-points" aria-label="What the checklist covers">
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">01</span>
+                        <div>
+                            <strong>Keyword String Alignment</strong>
+                            <p>Are your 7 backend keywords structured as exact-match search strings, or are you wasting slots on single words?</p>
+                        </div>
+                    </div>
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">02</span>
+                        <div>
+                            <strong>Description HTML Architecture</strong>
+                            <p>Is your Amazon description using bold headers and bullet formatting — or is it a wall of text that readers skip?</p>
+                        </div>
+                    </div>
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">03</span>
+                        <div>
+                            <strong>BISAC Category Fit</strong>
+                            <p>Are you in the right categories to rank on the charts your readers actually browse?</p>
+                        </div>
+                    </div>
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">04</span>
+                        <div>
+                            <strong>Subtitle Discoverability Score</strong>
+                            <p>Does your subtitle contain a searchable keyword phrase — or is it just a tagline?</p>
+                        </div>
+                    </div>
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">05</span>
+                        <div>
+                            <strong>Cover Thumbnail Signal</strong>
+                            <p>Is your cover legible at 80px wide? Does it signal the right genre in under 2 seconds?</p>
+                        </div>
+                    </div>
+                    <div class="checklist-point">
+                        <span class="checklist-num" aria-hidden="true">06–10</span>
+                        <div>
+                            <strong>+ 5 More Critical Signals</strong>
+                            <p>Ad copy hook strength, author bio authority, series metadata linkage, pricing tier positioning, and A+ content readiness.</p>
+                        </div>
+                    </div>
                 </div>
-            </form>
+                <div class="lead-magnet-cta-block">
+                    <div class="lead-magnet-badge-stack" aria-hidden="true">
+                        <span class="lm-badge">FREE PDF</span>
+                        <span class="lm-badge">INSTANT ACCESS</span>
+                        <span class="lm-badge">NO SPAM</span>
+                    </div>
+                    <p class="lead-magnet-cta-copy">Enter your email and get the 10-Point Author Signal Checklist delivered immediately. No pitch sequence. Just the diagnostic.</p>
+                    <form class="lead-form-full" name="lead-magnet-form" method="POST" data-netlify="true" action="/checklist-download?success=true" aria-label="Checklist download form">
+                        <input type="hidden" name="form-name" value="lead-magnet-form">
+                        <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address">
+                        <button type="submit" class="btn-primary">Send Me the Checklist</button>
+                    </form>
+                    <p class="lead-magnet-fine">Used by indie authors across fiction and non-fiction. Takes 5 minutes to complete.</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
