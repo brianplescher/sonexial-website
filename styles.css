@@ -1323,3 +1323,214 @@ footer {
     font-size: 0.8rem;
     color: var(--text-2);
 }
+
+/* ============================================
+   ONGOING SUPPORT / SUBSCRIPTION SECTION
+   ============================================ */
+.ongoing-support {
+    padding: 6rem 0;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+/* Problem strip */
+.ongoing-problem-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 2.5rem 0 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.ongoing-problem-item {
+    flex: 1 1 200px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-1);
+    letter-spacing: 0.04em;
+    background: var(--bg-2);
+}
+
+.ongoing-problem-label {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.ongoing-problem-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+}
+
+.ongoing-bridge {
+    font-size: 1.05rem;
+    color: var(--text-1);
+    max-width: 640px;
+    margin-bottom: 3rem;
+    line-height: 1.7;
+}
+
+/* Tier cards grid */
+.ongoing-tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.ongoing-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    transition: border-color var(--transition);
+}
+
+.ongoing-card:hover {
+    border-color: var(--accent-border);
+}
+
+.ongoing-card--featured {
+    border-color: var(--accent-border);
+    background: var(--bg-2);
+}
+
+.ongoing-card-badge {
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--bg-0);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    padding: 0.2rem 0.75rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+    white-space: nowrap;
+}
+
+.ongoing-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ongoing-card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-0);
+    margin: 0;
+}
+
+.ongoing-card-desc {
+    font-size: 0.95rem;
+    color: var(--text-1);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.ongoing-best-for {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-2);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    padding: 0.6rem 0.75rem;
+    border-left: 2px solid var(--accent-border);
+    margin-top: 0.25rem;
+}
+
+.ongoing-card .deliverables {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ongoing-card .card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+    margin-top: auto;
+}
+
+.ongoing-card .dfy-price {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* Footer note */
+.ongoing-footer-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.ongoing-footer-note p {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-2);
+    letter-spacing: 0.06em;
+    margin: 0;
+}
+
+.btn-link-subtle {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-2);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+.btn-link-subtle:hover {
+    color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .ongoing-tiers {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .ongoing-problem-strip {
+        flex-direction: column;
+    }
+
+    .ongoing-problem-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .ongoing-footer-note {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
