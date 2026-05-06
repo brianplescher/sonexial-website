@@ -1382,7 +1382,8 @@ footer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
 }
 
 .ongoing-card {
@@ -1460,7 +1461,22 @@ footer {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0;
+}
+
+.ongoing-card .deliverables li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-1);
+    line-height: 1.5;
+}
+
+.ongoing-card .deliverables li:last-child {
+    border-bottom: none;
 }
 
 .ongoing-card .card-footer {
