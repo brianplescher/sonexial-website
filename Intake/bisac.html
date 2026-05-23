@@ -88,6 +88,8 @@
     <form id="intake-form" name="bisac-kit-intake" method="POST" data-netlify="true" action="/?success=bisac" novalidate>
         <input type="hidden" name="form-name" value="bisac-kit-intake">
         <input type="hidden" name="product" value="bisac-kit">
+        <input type="hidden" name="kit_type" value="bisac-kit">
+        <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
         <!-- SECTION 1: BOOK -->
         <div class="form-section">
@@ -242,6 +244,8 @@ form.addEventListener('submit', () => {
     document.getElementById('submit-btn').disabled = true;
 });
 const params = new URLSearchParams(window.location.search);
+const pd = params.get('purchase_date');
+if (pd) document.getElementById('purchase-date').value = pd;
 if (params.get('success') === 'bisac') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');

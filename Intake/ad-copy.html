@@ -317,6 +317,8 @@
     >
         <input type="hidden" name="form-name" value="ad-copy-suite-intake">
         <input type="hidden" name="product" value="ad-copy-suite">
+        <input type="hidden" name="kit_type" value="ad-copy-suite">
+        <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
         <!-- SECTION 1: THE BOOK -->
         <div class="form-section">
@@ -534,6 +536,8 @@ form.addEventListener('submit', function(e) {
 
 // Show success if redirected back
 const params = new URLSearchParams(window.location.search);
+const pd = params.get('purchase_date');
+if (pd) document.getElementById('purchase-date').value = pd;
 if (params.get('success') === 'ad-copy') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');

@@ -85,6 +85,8 @@
     <form id="intake-form" name="metadata-kit-intake" method="POST" data-netlify="true" action="/?success=metadata" novalidate>
         <input type="hidden" name="form-name" value="metadata-kit-intake">
         <input type="hidden" name="product" value="metadata-kit">
+        <input type="hidden" name="kit_type" value="metadata-kit">
+        <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
         <!-- SECTION 1: BOOK DETAILS -->
         <div class="form-section">
@@ -229,6 +231,8 @@ form.addEventListener('submit', () => {
     document.getElementById('submit-btn').disabled = true;
 });
 const params = new URLSearchParams(window.location.search);
+const pd = params.get('purchase_date');
+if (pd) document.getElementById('purchase-date').value = pd;
 if (params.get('success') === 'metadata') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');

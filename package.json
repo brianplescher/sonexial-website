@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "npx http-server -p 8080 -o",
-    "build": "npm run build:css && npm run build:js && npm run build:html",
+    "build": "node scripts/build.js",
     "build:css": "cleancss -o styles.min.css styles.css",
     "build:js": "terser script.js -o script.min.js -c -m",
     "build:html": "html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o index.min.html index.html",
@@ -20,8 +20,8 @@
     "test:links": "linkinator *.html --recurse",
     "optimize:images": "node scripts/optimize-images.js",
     "lighthouse": "lighthouse https://sonexial.com --view",
-    "deploy": "npm run build && netlify deploy --prod",
-    "deploy:preview": "npm run build && netlify deploy"
+    "deploy": "npm run build && npx netlify-cli deploy --prod",
+    "deploy:preview": "npm run build && npx netlify-cli deploy"
   },
   "watch": {
     "build:css": {
@@ -51,7 +51,6 @@
     "http-server": "^14.1.1",
     "lighthouse": "^12.2.1",
     "linkinator": "^6.1.2",
-    "netlify-cli": "^17.36.4",
     "npm-watch": "^0.13.0",
     "pa11y": "^8.0.0",
     "stylelint": "^16.10.0",
@@ -61,10 +60,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/sonexial-website.git"
+    "url": "https://github.com/brianplescher/sonexial-website.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/sonexial-website/issues"
+    "url": "https://github.com/brianplescher/sonexial-website/issues"
   },
   "homepage": "https://sonexial.com"
 }

@@ -90,6 +90,8 @@
     <form id="intake-form" name="cover-audit-intake" method="POST" data-netlify="true" action="/?success=cover" novalidate>
         <input type="hidden" name="form-name" value="cover-audit-intake">
         <input type="hidden" name="product" value="cover-signal-audit">
+        <input type="hidden" name="kit_type" value="cover-audit">
+        <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
         <!-- SECTION 1: THE COVER -->
         <div class="form-section">
@@ -250,6 +252,8 @@ form.addEventListener('submit', () => {
     document.getElementById('submit-btn').disabled = true;
 });
 const params = new URLSearchParams(window.location.search);
+const pd = params.get('purchase_date');
+if (pd) document.getElementById('purchase-date').value = pd;
 if (params.get('success') === 'cover') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');

@@ -88,6 +88,8 @@
     <form id="intake-form" name="website-seo-intake" method="POST" data-netlify="true" action="/?success=webseo" novalidate>
         <input type="hidden" name="form-name" value="website-seo-intake">
         <input type="hidden" name="product" value="website-seo-audit">
+        <input type="hidden" name="kit_type" value="website-seo-audit">
+        <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
         <!-- SECTION 1: YOUR SITE -->
         <div class="form-section">
@@ -254,6 +256,8 @@ form.addEventListener('submit', () => {
     document.getElementById('submit-btn').disabled = true;
 });
 const params = new URLSearchParams(window.location.search);
+const pd = params.get('purchase_date');
+if (pd) document.getElementById('purchase-date').value = pd;
 if (params.get('success') === 'webseo') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');

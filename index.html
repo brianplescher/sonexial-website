@@ -18,6 +18,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Sonexial | Author Infrastructure">
     <meta name="twitter:description" content="Data-driven author infrastructure. Ad copy, metadata, and Amazon discoverability tools built for the algorithmic era.">
+    <meta name="twitter:image" content="https://sonexial.com/Images/sonexial_logo.png">
 
     <title>Sonexial | Author Infrastructure</title>
     <link rel="icon" href="Images/favicon.png">
@@ -36,7 +37,7 @@
       gtag('js', new Date());
       gtag('config', 'G-PNZ96JWY7X');
     </script>
-    
+
     <!-- E-E-A-T & GEO Schema -->
     <script type="application/ld+json">
     {
@@ -97,8 +98,8 @@
 <!-- HEADER -->
 <header id="site-header">
     <div class="header-inner">
-        <a href="/" class="logo-link" style="display:flex; align-items:center; gap:0.75rem;">
-            <img src="/Images/sonexial_logo.png" alt="Sonexial" style="height: 90px; width: auto;">
+        <a href="/" class="logo-link home-logo-link">
+            <img src="/Images/sonexial_logo.png" alt="Sonexial" class="home-logo">
         </a>
         <nav class="main-nav" aria-label="Main navigation">
             <a href="#products">Products</a>
@@ -109,7 +110,7 @@
             <a href="#contact">Contact</a>
         </nav>
         <a href="#products" class="nav-cta">Get Started</a>
-        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -126,9 +127,9 @@
     <div class="cafe-content">
         <p class="cafe-question">Does your book make it from the cloud to the coffee shop?</p>
         <p class="cafe-sub">Every day, readers search Amazon for exactly what you wrote. Whether they find it depends entirely on signals most authors never think about.</p>
-        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-            <a href="#products" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Fix My Metadata</a>
-            <a href="#checklist" class="btn-ghost" style="font-size: 1.1rem; padding: 1rem 2rem;">Free Diagnostic ↓</a>
+        <div class="hero-actions">
+            <a href="#products" class="btn-primary btn-large">Fix My Metadata</a>
+            <a href="#checklist" class="btn-ghost btn-large">Free Diagnostic ↓</a>
         </div>
     </div>
 
@@ -139,7 +140,7 @@
     <div class="container">
         <div class="section-label">THE REAL ISSUE</div>
         <h2 id="problem-heading">Most indie authors don't struggle because their books are bad.</h2>
-        <p class="section-sub" style="max-width:680px;">They struggle because the algorithm can't read them clearly. Three structural gaps account for most of it.</p>
+        <p class="section-sub narrow-sub">They struggle because the algorithm can't read them clearly. Three structural gaps account for most of it.</p>
         <div class="problem-grid">
             <article class="problem-card">
                 <div class="problem-num" aria-hidden="true">01</div>
@@ -692,11 +693,11 @@
         <div class="modal-check" aria-hidden="true">✓</div>
         <h3 id="modal-title">Sent.</h3>
         <p id="modal-msg">We'll be in touch within 24 hours.</p>
-        <button id="modal-close" class="btn-primary">Close</button>
+        <button id="modal-close" class="btn-primary" type="button">Close</button>
     </div>
 </div>
 
-<button id="scroll-top" class="scroll-top" aria-label="Scroll to top">↑</button>
+<button id="scroll-top" class="scroll-top" type="button" aria-label="Scroll to top">↑</button>
 
 <script src="script.js" defer></script>
 </body>

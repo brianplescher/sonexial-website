@@ -111,6 +111,8 @@
         </header>
 
         <form name="optimization-kit-intake" method="POST" data-netlify="true" action="/index.html?success=true">
+            <input type="hidden" name="kit_type" value="optimization-kit">
+            <input type="hidden" name="purchase_date" value="" id="purchase-date">
 
             <!-- SECTION 1 -->
             <div class="form-section">
@@ -191,6 +193,10 @@
             <button type="submit">Submit Intake</button>
         </form>
     </main>
+    <script>
+        const pd = new URLSearchParams(window.location.search).get('purchase_date');
+        if (pd) document.getElementById('purchase-date').value = pd;
+    </script>
 </body>
 
 </html>
