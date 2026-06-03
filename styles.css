@@ -1642,3 +1642,174 @@ img.logo-mark {
         align-items: flex-start;
     }
 }
+
+
+/* ============================================
+   AVAILABILITY INDICATOR
+   ============================================ */
+.availability-bar {
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.availability-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--text-2);
+    text-transform: uppercase;
+}
+
+.avail-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    animation: avail-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes avail-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 5px rgba(0, 240, 255, 0); }
+}
+
+.avail-text { color: var(--text-2); }
+.avail-open { color: var(--accent); font-weight: 500; }
+
+/* ============================================
+   TESTIMONIALS
+   ============================================ */
+.testimonials {
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    padding: 5rem 0;
+}
+
+.testimonials h2 { margin-bottom: 2.5rem; }
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.testimonial-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--transition), transform var(--transition);
+}
+
+.testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.testimonial-card:hover {
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+}
+
+.testimonial-card:hover::before { opacity: 1; }
+
+.testimonial-quote {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text-1);
+    font-style: italic;
+    quotes: none;
+}
+
+.testimonial-attr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.testimonial-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-0);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.testimonial-detail {
+    font-size: 0.78rem;
+    color: var(--text-2);
+    letter-spacing: 0.04em;
+}
+
+/* ============================================
+   METHODOLOGY
+   ============================================ */
+.methodology {
+    background: var(--bg-0);
+    border-top: 1px solid var(--border);
+    padding: 5rem 0;
+}
+
+.methodology h2 { margin-bottom: 2rem; }
+
+.methodology-inner {
+    max-width: 680px;
+}
+
+.methodology-copy {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-1);
+    margin-bottom: 1.5rem;
+}
+
+.methodology-credit {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--text-2);
+    text-transform: uppercase;
+}
+
+/* ============================================
+   RESPONSIVE — NEW SECTIONS
+   ============================================ */
+@media (max-width: 768px) {
+    .availability-bar { padding: 0.6rem 1rem; }
+    .availability-inner { font-size: 0.65rem; letter-spacing: 0.06em; }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .testimonials { padding: 3rem 0; }
+    .methodology { padding: 3rem 0; }
+}
+
+@media (max-width: 375px) {
+    .avail-text { font-size: 0.6rem; }
+    .testimonial-card { padding: 1.5rem; }
+    .methodology-copy { font-size: 0.95rem; }
+}
