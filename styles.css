@@ -1551,6 +1551,7 @@ img.logo-mark {
 .home-logo {
     height: 90px;
     width: auto;
+    margin-left: -2rem;
 }
 
 .btn-large {
