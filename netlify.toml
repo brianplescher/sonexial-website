@@ -68,3 +68,12 @@
 # GOOGLE_ANALYTICS_ID
 # CLARITY_PROJECT_ID
 # GUMROAD_PRODUCT_ID
+
+[[plugins]]
+  package = "netlify-plugin-checklinks"
+
+  [plugins.inputs]
+    skipPatterns = [
+      "https://fonts\\.googleapis\\.com/.*",
+      "https://fonts\\.gstatic\\.com/.*"
+    ]
