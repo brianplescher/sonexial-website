@@ -11,3 +11,12 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 # Trailing slash consistency (optional - redirects /page to /page/)
 # Uncomment if needed:
 # /*/  /:splat  301
+
+# Pretty URL rewrites
+/about /about.html 200
+/ad-copy-suite /ad-copy-suite.html 200
+/bisac-kit /bisac-kit.html 200
+/calculator /calculator.html 200
+/cover-design-audit /cover-design-audit.html 200
+/metadata-kit /metadata-kit.html 200
+/website-seo-audit /website-seo-audit.html 200
