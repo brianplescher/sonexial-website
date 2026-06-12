@@ -9,6 +9,7 @@ const assetDirs = ['Images', 'assets', 'Audio', 'Intake'];
 const rootFiles = [
     '404.html',
     '_redirects',
+    'about.html',
     'ad-copy-suite.html',
     'bisac-kit.html',
     'calculator.html',
