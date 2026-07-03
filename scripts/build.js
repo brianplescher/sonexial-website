@@ -6,20 +6,10 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist');
 const assetDirs = ['Images', 'assets', 'Audio', 'Intake'];
-const rootFiles = [
-    '404.html',
-    '_redirects',
-    'about.html',
-    'ad-copy-suite.html',
-    'bisac-kit.html',
-    'calculator.html',
-    'cover-design-audit.html',
-    'index.html',
-    'metadata-kit.html',
-    'robots.txt',
-    'sitemap.xml',
-    'website-seo-audit.html'
-];
+const rootFiles = fs.readdirSync(root).filter(file => {
+    const ext = path.extname(file);
+    return file === '_redirects' || ['.html', '.txt', '.xml'].includes(ext);
+});
 const scriptFiles = ['calculator.js'];
 
 function removeDir(target) {
