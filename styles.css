@@ -1540,6 +1540,7 @@ footer {
 
 .home-logo-link {
     gap: 0.75rem;
+    margin-left: 0;
 }
 
 img.logo-mark {
@@ -1549,9 +1550,9 @@ img.logo-mark {
 }
 
 .home-logo {
-    height: 90px;
+    height: 81px;
     width: auto;
-    margin-left: -2rem;
+    margin-left: 0;
 }
 
 .btn-large {
