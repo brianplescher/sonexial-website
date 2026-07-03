@@ -1775,7 +1775,24 @@ img.logo-mark {
 .methodology h2 { margin-bottom: 2rem; }
 
 .methodology-inner {
-    max-width: 680px;
+    max-width: 100%;
+}
+
+.about-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.about-image {
+    flex: 0 0 320px;
+    max-width: 320px;
+}
+
+.about-body {
+    flex: 1 1 480px;
+    min-width: 320px;
 }
 
 .methodology-copy {
