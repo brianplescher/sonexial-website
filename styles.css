@@ -345,6 +345,22 @@ HERO
   max-width: 600px;
   margin: 0 auto 2.5rem auto;
 }
+.hero .cafe-sub {
+  margin-bottom: 1.5rem;
+}
+.cafe-cta-line {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cafe-cta-line strong {
+  color: var(--accent);
+  font-weight: 700;
+}
 .hero-stats-bar {
   position: relative;
   z-index: 2;
