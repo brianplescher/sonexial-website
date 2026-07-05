@@ -1,0 +1,33 @@
+# Sonexial
+
+> Sonexial helps indie authors improve Amazon discoverability, metadata quality, ad copy performance, category strategy, and author-site visibility through focused one-time kits, audits, and tools.
+
+Sonexial provides practical services for indie authors who publish on Amazon and want clearer metadata, better ad performance, stronger category alignment, and improved discoverability.
+
+## Main pages
+
+- [Home](https://sonexial.com/) - Overview of Sonexial services, subscriptions, process, FAQ, and contact information.
+- [Ad Copy Suite](https://sonexial.com/ad-copy-suite) - Amazon Sponsored Products and Facebook/Meta ad copy package for indie authors.
+- [Metadata & Amazon Optimization Kit](https://sonexial.com/metadata-kit) - Metadata optimization service including description, subtitle, keywords, and author bio.
+- [BISAC & Category Strategy Kit](https://sonexial.com/bisac-kit) - BISAC code and Amazon browse category strategy for better discoverability.
+- [Author Website SEO & AI Visibility Audit](https://sonexial.com/website-seo-audit) - Audit for author websites covering on-page SEO, keyword gaps, page structure, and AI visibility.
+- [Cover Design Signal Audit](https://sonexial.com/cover-design-audit) - Cover review focused on genre fit, thumbnail legibility, and competitive positioning.
+- [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
+- [About](https://sonexial.com/about) - Background on Sonexial and founder information.
+
+## Services
+
+- One-time infrastructure kits for metadata, ad copy, BISAC/category strategy, cover analysis, and SEO/AI visibility.
+- Ongoing support subscriptions for Amazon ranking changes, metadata maintenance, and title audits.
+- A done-for-you description overhaul for authors needing a deeper rewrite.
+
+## Audience
+
+- Indie authors publishing on Amazon.
+- Authors running Amazon ads and trying to improve CTR, conversion, or profitability.
+- Authors who need better metadata, category placement, or site visibility.
+
+## Contact
+
+- [Contact Sonexial](https://sonexial.com/#contact)
+- Email: brian@sonexial.com
