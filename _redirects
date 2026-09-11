@@ -19,6 +19,9 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /calculator /calculator.html 200
 /cover-design-audit /cover-design-audit.html 200
 /examples /examples.html 200
+/privacy /privacy.html 200
+/terms /terms.html 200
+/refund-policy /refund-policy.html 200
 /metadata-kit /metadata-kit.html 200
 /kits /kits.html 200
 /website-seo-audit /website-seo-audit.html 200

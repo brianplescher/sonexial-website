@@ -1,5 +1,5 @@
-# Sonexial Labs - Robots.txt
-# Allow all search engines to crawl the site
+# Sonexial - Robots.txt
+# Allow search engines and AI crawlers to crawl public pages
 
 User-agent: *
 Allow: /

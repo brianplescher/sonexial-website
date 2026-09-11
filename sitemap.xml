@@ -40,4 +40,26 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://sonexial.com/examples</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/kits</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/privacy</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/terms</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/refund-policy</loc>
+    <priority>0.3</priority>
+  </url>
 </urlset>

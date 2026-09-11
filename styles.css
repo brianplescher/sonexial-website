@@ -1424,6 +1424,30 @@ METHODOLOGY / ABOUT
   margin-bottom: 1.5rem;
 }
 
+.policy-content {
+  max-width: 760px;
+  margin-top: 2.5rem;
+}
+
+.policy-content h2 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.policy-content p,
+.policy-content li {
+  color: var(--text-1);
+  font-size: 0.95rem;
+}
+
+.policy-content ul {
+  margin: 1rem 0 1.5rem 1.5rem;
+}
+
+.policy-content a {
+  color: var(--accent);
+}
+
 .methodology-credit {
   font-family: var(--font-mono);
   font-size: 0.72rem;
