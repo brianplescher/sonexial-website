@@ -944,6 +944,28 @@ PRODUCTS
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
+.featured-card {
+  border-color: var(--accent-border);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.035) 0%, var(--bg-card) 100%);
+  box-shadow: 0 0 24px -6px rgba(0, 240, 255, 0.12);
+}
+
+.featured-card::before {
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.featured-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px -4px rgba(0, 240, 255, 0.22);
+}
+
+.featured-card .card-tag {
+  background: var(--accent);
+  color: var(--bg-0);
+  font-weight: 600;
+  border-color: var(--accent);
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -977,7 +999,22 @@ PRODUCTS
   font-size: 0.9rem;
   line-height: 1.65;
   color: var(--text-1);
-  flex-grow: 1;
+}
+
+.card-best-for {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-2);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.card-best-for strong {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .deliverables {
@@ -2045,6 +2082,7 @@ RESPONSIVE
   }
 
   .hero-actions .btn-primary,
+  .hero-actions .btn-secondary,
   .hero-actions .btn-ghost {
     width: 100%;
     justify-content: center;

@@ -198,6 +198,23 @@ function initTracking() {
 }
 
 // ============================================
+// SERVICE CTA SELECTION
+// ============================================
+function initServiceSelection() {
+    const select = document.getElementById('interest');
+    if (!select) return;
+
+    document.querySelectorAll('[data-service]').forEach(cta => {
+        cta.addEventListener('click', () => {
+            const service = cta.getAttribute('data-service');
+            if (service && select.querySelector(`option[value="${service}"]`)) {
+                select.value = service;
+            }
+        });
+    });
+}
+
+// ============================================
 // INIT
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -209,4 +226,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeaderScroll();
     initReveal();
     initTracking();
+    initServiceSelection();
 });

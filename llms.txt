@@ -1,6 +1,6 @@
 # Sonexial
 
-> Sonexial builds AI-ready author websites with Generative Engine Optimization for authors who want stronger discovery across search and AI answer engines.
+> Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
 
 Sonexial provides author website development, Generative Engine Optimization, author platform strategy, book landing pages, email capture setup, book description writing, and AI visibility monitoring.
 
