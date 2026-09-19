@@ -120,7 +120,14 @@ function initForms() {
 function validateEmail(input) {
     const val = input.value.trim();
     if (!val) { input.classList.remove('valid', 'invalid'); return true; }
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    // Simple structural check: one @, non-empty local and domain parts, no spaces.
+    // Avoids nested-quantifier backtracking present in patterns like [^\s@]+@[^\s@]+\.[^\s@]+
+    const atIdx = val.indexOf('@');
+    const ok = atIdx > 0 &&
+               atIdx === val.lastIndexOf('@') &&
+               atIdx < val.length - 2 &&
+               val.lastIndexOf('.') > atIdx + 1 &&
+               !val.includes(' ');
     input.classList.toggle('valid', ok);
     input.classList.toggle('invalid', !ok);
     return ok;
