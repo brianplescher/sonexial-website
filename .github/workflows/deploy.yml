@@ -13,36 +13,36 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '18'
           cache: ''
-      
+
       - name: Install dependencies
         run: |
-          npm install -g html-validate@8.24.1
-          npm install -g stylelint@16.10.0 stylelint-config-standard@36.0.1
-          npm install -g eslint@9.15.0
-      
+          npm install -g --ignore-scripts html-validate@8.24.1
+          npm install -g --ignore-scripts stylelint@16.10.0 stylelint-config-standard@36.0.1
+          npm install -g --ignore-scripts eslint@9.15.0
+
       - name: Validate HTML
         run: |
           html-validate "*.html" || echo "HTML validation warnings found"
-      
+
       - name: Lint CSS
         run: |
           echo "Linting CSS files..."
           # stylelint "*.css" || echo "CSS linting warnings found"
-      
+
       - name: Lint JavaScript
         run: |
           echo "Linting JavaScript files..."
           # eslint "*.js" || echo "JS linting warnings found"
-      
+
       - name: Check for broken links
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@2b973e86fc7b1f6b36a93795fe2c9c6ae1118621 # v1
         with:
           args: --verbose --no-progress '*.html' '*.md'
           fail: false
@@ -54,38 +54,38 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '18'
           cache: ''
-      
+
       - name: Install build tools
         run: |
-          npm install -g clean-css-cli@5.6.3
-          npm install -g uglify-js@3.19.3
-          npm install -g html-minifier@4.0.0
-      
+          npm install -g --ignore-scripts clean-css-cli@5.6.3
+          npm install -g --ignore-scripts uglify-js@3.19.3
+          npm install -g --ignore-scripts html-minifier@4.0.0
+
       - name: Minify CSS
         run: |
           cleancss -o styles.min.css styles.css
           echo "✓ CSS minified"
-      
+
       - name: Minify JavaScript
         run: |
           uglifyjs script.js -o script.min.js -c -m
           echo "✓ JavaScript minified"
-      
+
       - name: Minify HTML
         run: |
           html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o index.min.html index.html
           html-minifier --collapse-whitespace --remove-comments --minify-css --minify-js -o 404.min.html 404.html
           echo "✓ HTML minified"
-      
+
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: production-files
           path: |
@@ -106,15 +106,15 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: production-files
-      
+
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3
+        uses: nwtgck/actions-netlify@4cbaf4c08f1a7bfa537d6113472ef4424e4eb654 # v3
         with:
           publish-dir: '.'
           production-branch: main
@@ -135,10 +135,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - name: Run Lighthouse
-        uses: treosh/lighthouse-ci-action@v10
+        uses: treosh/lighthouse-ci-action@03becbfc543944dd6e7534f7ff768abb8a296826 # v10
         with:
           urls: |
             https://sonexial.com
@@ -154,7 +154,7 @@ jobs:
     steps:
       - name: Send Slack notification
         if: env.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
+        uses: 8398a7/action-slack@047b09b154480ed39076984b64f324fff010d703 # v3.9.3
         with:
           status: ${{ job.status }}
           text: 'Deployment completed!'
