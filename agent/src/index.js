@@ -36,6 +36,13 @@ app.post('/webhooks/netlify', async (req, res) => {
         if (NETLIFY_WEBHOOK_SECRET) {
             const signature = req.headers['x-webhook-signature'];
             if (!signature) return res.status(400).json({ error: 'Missing signature' });
+
+            const hmac = crypto.createHmac('sha256', NETLIFY_WEBHOOK_SECRET);
+            hmac.update(req.rawBody);
+            const expected = hmac.digest('hex');
+            if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+                return res.status(401).json({ error: 'Invalid signature' });
+            }
         }
         
         const payload = req.body;

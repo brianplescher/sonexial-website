@@ -1,7 +1,11 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
+if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY is required but not set');
+}
+
 const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY || 'dummy'
+    apiKey: process.env.ANTHROPIC_API_KEY
 });
 
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
@@ -65,11 +69,23 @@ Ensure the backend keyword lengths are accurate character counts. Do not output 
     });
 
     let draftContent = step2Response.content[0].text;
-    if (draftContent.startsWith('\`\`\`json')) {
-        draftContent = draftContent.replace(/\`\`\`json\n/g, '').replace(/\`\`\`/g, '');
+
+    // Extract JSON robustly — find outermost { } regardless of markdown fencing
+    const jsonStart = draftContent.indexOf('{');
+    const jsonEnd = draftContent.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+        console.error('Raw AI response (no JSON found):', draftContent);
+        throw new Error('AI response did not contain valid JSON');
     }
-    
-    const deliverables = JSON.parse(draftContent.trim());
+    draftContent = draftContent.slice(jsonStart, jsonEnd + 1);
+
+    let deliverables;
+    try {
+        deliverables = JSON.parse(draftContent);
+    } catch (parseErr) {
+        console.error('JSON parse failed. Raw extracted content:', draftContent);
+        throw new Error(`Failed to parse AI response as JSON: ${parseErr.message}`);
+    }
     console.log('Step 2 complete.');
     
     return {

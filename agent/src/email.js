@@ -8,7 +8,21 @@ async function sendDraftEmail(jobId, kitType, draft) {
         console.warn('RESEND_API_KEY not set, skipping draft email for job:', jobId);
         return;
     }
-    
+
+    // Map kit types to their intake form URLs
+    const intakeUrls = {
+        'metadata-kit':  'https://sonexial.com/Intake/metadata.html',
+        'KIT-01':        'https://sonexial.com/Intake/ad-copy.html',
+        'KIT-02':        'https://sonexial.com/Intake/metadata.html',
+        'KIT-03':        'https://sonexial.com/Intake/bisac.html',
+        'KIT-04':        'https://sonexial.com/Intake/website-seo.html',
+        'KIT-05':        'https://sonexial.com/Intake/cover-audit.html',
+    };
+    const intakeUrl = intakeUrls[kitType] || null;
+    const intakeSection = intakeUrl
+        ? `<p><strong>Intake form:</strong> <a href="${intakeUrl}">${intakeUrl}</a></p>`
+        : '';
+
     try {
         await resend.emails.send({
             from: 'agent@sonexial.com',
@@ -18,12 +32,13 @@ async function sendDraftEmail(jobId, kitType, draft) {
                 <h2>Draft Ready for Review</h2>
                 <p>Job ID: ${jobId}</p>
                 <p>Kit Type: ${kitType}</p>
+                ${intakeSection}
                 <hr />
                 <h3>Draft Content:</h3>
                 <pre style="white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px;">${JSON.stringify(draft, null, 2)}</pre>
             `
         });
-        console.log(\`Draft email sent for job \${jobId}\`);
+        console.log(`Draft email sent for job ${jobId}`);
     } catch (error) {
         console.error('Failed to send draft email:', error);
     }
