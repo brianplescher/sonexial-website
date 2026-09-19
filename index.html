@@ -197,6 +197,247 @@
         </div>
     </section>
 
+    <!-- GEO SCAN WIDGET -->
+    <section id="geo-scan-widget" class="py-16 bg-gray-50" style="padding: 4rem 1rem; background: #f9fafb;">
+      <div style="max-width: 4xl; margin: 0 auto; padding: 0 1rem;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">Free GEO Audit for Authors</h2>
+          <p style="color: #4b5563; max-width: 3xl; margin: 0 auto;">
+            Discover if AI engines like ChatGPT, Claude, and Perplexity can find your author website.
+            Get instant actionable recommendations.
+          </p>
+        </div>
+
+        <form id="geo-scan-form" style="max-width: 36rem; margin: 0 auto 2rem;">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <input
+              type="url"
+              id="author-url"
+              name="author-url"
+              placeholder="https://yourauthorwebsite.com"
+              required
+              style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; focus:ring: 2px focus:ring-blue-500;"
+            />
+            <button
+              type="submit"
+              id="scan-button"
+              style="padding: 0.75rem 1.5rem; background: #2563eb; color: white; font-weight: 600; border-radius: 0.5rem; border: none; cursor: pointer; transition: background 0.2s;"
+            >
+              Run Free Audit
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading State -->
+        <div id="scan-loading" style="display: none; text-align: center; padding: 2rem;">
+          <div style="animation: spin 1s linear infinite; width: 3rem; height: 3rem; border-radius: 50%; border-bottom: 2px solid #2563eb; margin: 0 auto 1rem;"></div>
+          <p style="color: #4b5563;">Scanning your website... This takes about 2 seconds</p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="scan-results" style="display: none;">
+          <!-- Dynamic content injected here -->
+        </div>
+
+        <!-- Error Container -->
+        <div id="scan-error" style="display: none; margin-top: 1.5rem; padding: 1rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem;">
+          <p style="color: #b91c1c;" id="error-message"></p>
+        </div>
+      </div>
+    </section>
+
+    <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    #geo-scan-widget input:focus,
+    #geo-scan-widget button:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    #geo-scan-widget button:hover {
+      background: #1d4ed8;
+    }
+    #geo-scan-widget button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    </style>
+
+    <script>
+    (function() {
+      const API_BASE_URL = 'http://localhost:8000'; // Update to production URL when deployed
+
+      const form = document.getElementById('geo-scan-form');
+      const urlInput = document.getElementById('author-url');
+      const scanButton = document.getElementById('scan-button');
+      const loadingDiv = document.getElementById('scan-loading');
+      const resultsDiv = document.getElementById('scan-results');
+      const errorDiv = document.getElementById('scan-error');
+      const errorMessage = document.getElementById('error-message');
+
+      function showLoading() {
+        loadingDiv.style.display = 'block';
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        scanButton.disabled = true;
+        scanButton.textContent = 'Scanning...';
+      }
+
+      function hideLoading() {
+        loadingDiv.style.display = 'none';
+        scanButton.disabled = false;
+        scanButton.textContent = 'Run Free Audit';
+      }
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorDiv.style.display = 'block';
+      }
+
+      function renderResults(report) {
+        const scoreColor = report.score >= 80 ? '#16a34a' : 
+                           report.score >= 60 ? '#ca8a04' : 
+                           report.score >= 40 ? '#ea580c' : '#dc2626';
+        
+        const gradeBg = report.geo_grade.includes('A') ? '#dcfce7' :
+                        report.geo_grade.includes('B') ? '#fef9c3' :
+                        report.geo_grade.includes('C') ? '#ffedd5' : '#fee2e2';
+        const gradeColor = report.geo_grade.includes('A') ? '#166534' :
+                          report.geo_grade.includes('B') ? '#854d0e' :
+                          report.geo_grade.includes('C') ? '#9a3412' : '#991b1b';
+
+        let html = `
+          <div style="background: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: ${scoreColor}; margin: 0;">GEO Score: ${report.score}/100</h3>
+                <p style="color: #6b7280; margin: 0.25rem 0 0;">${report.url}</p>
+              </div>
+              <span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; background: ${gradeBg}; color: ${gradeColor};">
+                ${report.geo_grade}
+              </span>
+            </div>
+
+            ${report.critical_failures && report.critical_failures.length > 0 ? `
+              <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-weight: 600; color: #dc2626; margin-bottom: 0.75rem; display: flex; align-items: center;">
+                  <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                  Critical Issues (${report.critical_failures.length})
+                </h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  ${report.critical_failures.map(failure => `
+                    <li style="display: flex; align-items: flex-start; color: #dc2626; margin-bottom: 0.5rem;">
+                      <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; flex-shrink: 0; margin-top: 0.125rem;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                      </svg>
+                      ${failure}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            ${report.recommendations && report.recommendations.length > 0 ? `
+              <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-weight: 600; color: #2563eb; margin-bottom: 0.75rem; display: flex; align-items: center;">
+                  <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"/>
+                  </svg>
+                  Recommendations (${report.recommendations.length})
+                </h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  ${report.recommendations.map(rec => `
+                    <li style="display: flex; align-items: flex-start; color: #374151; margin-bottom: 0.5rem;">
+                      <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; flex-shrink: 0; margin-top: 0.125rem; color: #3b82f6;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                      ${rec}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; margin-top: 1.5rem;">
+              <p style="color: #6b7280; margin-bottom: 1rem;">
+                ${report.score < 60 
+                  ? "Your website needs significant GEO optimization to be visible to AI engines."
+                  : report.score < 80
+                  ? "Your website has good foundations but needs some improvements for optimal AI visibility."
+                  : "Great job! Your website is well-optimized for AI discovery."
+                }
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <a 
+                  href="#contact" 
+                  style="flex: 1; text-align: center; padding: 0.75rem 1.5rem; background: #2563eb; color: white; font-weight: 600; border-radius: 0.5rem; text-decoration: none;"
+                >
+                  Get Help Fixing These Issues
+                </a>
+                <button 
+                  onclick="document.getElementById('geo-scan-widget').scrollIntoView({behavior: 'smooth'})"
+                  style="padding: 0.75rem 1.5rem; border: 1px solid #d1d5db; color: #374151; font-weight: 600; border-radius: 0.5rem; background: white; cursor: pointer;"
+                >
+                  Scan Another Site
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = 'block';
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const url = urlInput.value.trim();
+        if (!url) {
+          showError('Please enter a valid website URL');
+          return;
+        }
+
+        showLoading();
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/scan`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || `Scan failed with status ${response.status}`);
+          }
+
+          const report = await response.json();
+          renderResults(report);
+          
+        } catch (error) {
+          console.error('Scan error:', error);
+          showError(error.message || 'Failed to scan the website. Please try again.');
+        } finally {
+          hideLoading();
+        }
+      });
+
+      urlInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          form.dispatchEvent(new Event('submit'));
+        }
+      });
+    })();
+    </script>
+
     <!-- PROCESS -->
     <section class="how-it-works center-text" id="process">
         <h2>Your 15-Hour Headache. Solved.</h2>
