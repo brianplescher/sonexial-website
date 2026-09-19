@@ -197,15 +197,28 @@ function main() {
     const htmlReport = generateHTMLReport(data);
     
     // Save reports
-    const reportsDir = path.join(__dirname, '..', 'reports');
+    const reportsDir = path.resolve(path.join(__dirname, '..', 'reports'));
     if (!fs.existsSync(reportsDir)) {
         fs.mkdirSync(reportsDir);
     }
-    
+
     const timestamp = new Date().toISOString().split('T')[0];
-    const mdPath = path.join(reportsDir, `analytics-${period}-${timestamp}.md`);
-    const htmlPath = path.join(reportsDir, `analytics-${period}-${timestamp}.html`);
-    
+
+    // Sanitize period: must be an allowed literal before use in a file path
+    const safePeriod = ['weekly', 'monthly'].includes(period) ? period : null;
+    if (!safePeriod) {
+        throw new Error(`Invalid period value for file path: ${period}`);
+    }
+
+    const mdPath = path.resolve(reportsDir, `analytics-${safePeriod}-${timestamp}.md`);
+    const htmlPath = path.resolve(reportsDir, `analytics-${safePeriod}-${timestamp}.html`);
+
+    // Bounds-check: resolved paths must stay inside reportsDir
+    if (path.relative(reportsDir, mdPath).startsWith('..') ||
+        path.relative(reportsDir, htmlPath).startsWith('..')) {
+        throw new Error('Path traversal detected — aborting report write');
+    }
+
     fs.writeFileSync(mdPath, markdownReport);
     fs.writeFileSync(htmlPath, htmlReport);
     
