@@ -13,10 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     calculate(); // Initial run
 
     function calculate() {
-        const price = parseFloat(document.getElementById("bookPrice").value) || 0;
-        const royaltyPercent = parseFloat(document.getElementById("royalty").value) || 0;
-        const cpc = parseFloat(document.getElementById("cpc").value) || 0;
-        const clicks = parseFloat(document.getElementById("clicksToSale").value) || 0;
+        const price = Number.parseFloat(document.getElementById("bookPrice").value) || 0;
+        const royaltyPercent = Number.parseFloat(document.getElementById("royalty").value) || 0;
+        const cpc = Number.parseFloat(document.getElementById("cpc").value) || 0;
+        const clicks = Number.parseFloat(document.getElementById("clicksToSale").value) || 0;
 
         // 1. Calculate Royalty
         const estRoyalty = price * (royaltyPercent / 100);

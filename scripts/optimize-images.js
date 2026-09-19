@@ -12,10 +12,12 @@ const { execSync } = require('child_process');
 const IMAGES_DIR = path.join(__dirname, '..', 'Images');
 const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png'];
 
+// Pin PATH to known system binary locations before invoking any subprocess.
+// Prevents PATH-hijacking via ambient environment variables.
+process.env.PATH = '/usr/local/bin:/usr/bin:/bin';
 console.log('🖼️  Starting image optimization...\n');
 
-// Check if required tools are installed
-function checkDependencies() {
+// Check if required tools are installedfunction checkDependencies() {
     try {
         execSync('which cwebp', { stdio: 'ignore' });
         execSync('which optipng', { stdio: 'ignore' });
@@ -128,7 +130,7 @@ function main() {
     
     imageFiles.forEach(filePath => {
         const ext = path.extname(filePath).toLowerCase();
-        totalBefore += parseFloat(getFileSize(filePath));
+        totalBefore += Number.parseFloat(getFileSize(filePath));
         
         // Optimize original
         if (ext === '.png') {
@@ -149,7 +151,7 @@ function main() {
         .map(file => path.join(IMAGES_DIR, file));
     
     webpFiles.forEach(file => {
-        totalAfter += parseFloat(getFileSize(file));
+        totalAfter += Number.parseFloat(getFileSize(file));
     });
     
     console.log('━'.repeat(50));
