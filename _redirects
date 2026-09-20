@@ -25,3 +25,5 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /metadata-kit /metadata-kit.html 200
 /kits /kits.html 200
 /website-seo-audit /website-seo-audit.html 200
+/tools/author-geo-audit /tools/author-geo-audit/ 301
+/tools/author-geo-audit/ /tools/author-geo-audit/index.html 200

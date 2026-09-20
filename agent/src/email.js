@@ -1,6 +1,6 @@
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const OWNER_EMAIL = process.env.OWNER_EMAIL;
 
 async function sendDraftEmail(jobId, kitType, draft) {
@@ -64,7 +64,7 @@ async function sendErrorEmail(jobId, kitType, errorMsg) {
                 <pre style="white-space: pre-wrap; background: #ffeeee; padding: 10px; border-radius: 5px;">${errorMsg}</pre>
             `
         });
-        console.log(\`Error email sent for job \${jobId}\`);
+        console.log(`Error email sent for job ${jobId}`);
     } catch (error) {
         console.error('Failed to send error email:', error);
     }

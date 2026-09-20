@@ -62,4 +62,9 @@
     <loc>https://sonexial.com/refund-policy</loc>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://sonexial.com/tools/author-geo-audit/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

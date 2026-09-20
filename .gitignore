@@ -28,3 +28,8 @@ npm-debug.log*
 
 # Netlify
 .netlify/
+
+# Local databases & agent data
+*.sqlite
+*.db
+agent/data/

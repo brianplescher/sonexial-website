@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
+    "cheerio": "^1.2.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "resend": "^4.1.2",

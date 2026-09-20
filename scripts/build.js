@@ -5,7 +5,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist');
-const assetDirs = ['Images', 'assets', 'Audio', 'Intake'];
+const assetDirs = ['Images', 'assets', 'Audio', 'Intake', 'blog', 'tools'];
 const rootFiles = fs.readdirSync(root).filter(file => {
     const ext = path.extname(file);
     return file === '_redirects' || ['.html', '.txt', '.xml'].includes(ext);
@@ -26,6 +26,22 @@ function rewriteHtml(filePath) {
     html = html.replace(/href="\/?styles\.css"/g, 'href="/styles.min.css"');
     html = html.replace(/src="\/?script\.js"/g, 'src="/script.min.js"');
     fs.writeFileSync(filePath, html);
+}
+
+function getAllHtmlFiles(dir) {
+    let results = [];
+    if (!fs.existsSync(dir)) return results;
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+        const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+            results = results.concat(getAllHtmlFiles(fullPath));
+        } else if (file.endsWith('.html')) {
+            results.push(fullPath);
+        }
+    }
+    return results;
 }
 
 removeDir(dist);
@@ -49,9 +65,8 @@ copyPath(path.join(root, 'script.js'), path.join(dist, 'script.min.js'));
 copyPath(path.join(root, 'styles.css'), path.join(dist, 'styles.css'));
 copyPath(path.join(root, 'script.js'), path.join(dist, 'script.js'));
 
-const htmlFiles = fs.readdirSync(dist).filter(file => file.endsWith('.html'));
-for (const file of htmlFiles) {
-    const htmlPath = path.join(dist, file);
+const htmlFiles = getAllHtmlFiles(dist);
+for (const htmlPath of htmlFiles) {
     rewriteHtml(htmlPath);
 }
 
