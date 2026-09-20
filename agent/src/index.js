@@ -5,6 +5,7 @@ const db = require('./db');
 const pipeline = require('./pipeline');
 
 const app = express();
+app.disable('x-powered-by'); // Prevent Express version disclosure in response headers
 const PORT = process.env.PORT || 3000;
 const NETLIFY_WEBHOOK_SECRET = process.env.NETLIFY_WEBHOOK_SECRET;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;

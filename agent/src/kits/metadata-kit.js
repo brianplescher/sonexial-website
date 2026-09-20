@@ -10,6 +10,12 @@ const anthropic = new Anthropic({
 
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
 
+// Sanitize a value before interpolating into log output — strips newlines/control chars
+// that could be used to forge fake log lines.
+function sanitizeLog(val) {
+    return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
+}
+
 async function processMetadataKit(payload) {
     console.log('Starting KIT-02 processing...');
     
@@ -74,7 +80,7 @@ Ensure the backend keyword lengths are accurate character counts. Do not output 
     const jsonStart = draftContent.indexOf('{');
     const jsonEnd = draftContent.lastIndexOf('}');
     if (jsonStart === -1 || jsonEnd === -1) {
-        console.error('Raw AI response (no JSON found):', draftContent);
+        console.error('Raw AI response (no JSON found):', sanitizeLog(draftContent));
         throw new Error('AI response did not contain valid JSON');
     }
     draftContent = draftContent.slice(jsonStart, jsonEnd + 1);
@@ -83,7 +89,7 @@ Ensure the backend keyword lengths are accurate character counts. Do not output 
     try {
         deliverables = JSON.parse(draftContent);
     } catch (parseErr) {
-        console.error('JSON parse failed. Raw extracted content:', draftContent);
+        console.error('JSON parse failed. Raw extracted content:', sanitizeLog(draftContent));
         throw new Error(`Failed to parse AI response as JSON: ${parseErr.message}`);
     }
     console.log('Step 2 complete.');
