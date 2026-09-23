@@ -5,6 +5,7 @@ const db = require('./db');
 const pipeline = require('./pipeline');
 const scanner = require('./scanner');
 const pitch = require('./pitch');
+const mailer = require('./email');
 
 const app = express();
 app.disable('x-powered-by'); // Prevent Express version disclosure in response headers
@@ -69,10 +70,33 @@ function rateLimiter(req, res, next) {
     next();
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function isValidEmail(value) {
+    return typeof value === 'string' && value.length <= 254 && EMAIL_PATTERN.test(value.trim());
+}
+
+// Free tier of the report: score, grade, and the three worst failures. The rest is emailed.
+const FREE_FAILURES = 3;
+
+function toFreeReport(report) {
+    return {
+        url: report.url,
+        status: report.status,
+        score: report.score,
+        geo_grade: report.geo_grade,
+        execution_time: report.execution_time,
+        critical_failures: report.critical_failures.slice(0, FREE_FAILURES),
+        locked_failures: Math.max(0, report.critical_failures.length - FREE_FAILURES),
+        locked_recommendations: report.recommendations.length,
+        locked: true
+    };
+}
+
 // Admin middleware
 const requireAdmin = (req, res, next) => {
     const auth = req.headers.authorization;
-    if (!auth || auth !== `Bearer ${ADMIN_TOKEN}`) {
+    if (!ADMIN_TOKEN || !auth || auth !== `Bearer ${ADMIN_TOKEN}`) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     next();
@@ -82,7 +106,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
-// Public GEO Scanner endpoint (synchronous, stateless, no DB or email coupling)
+// Public GEO Scanner endpoint (synchronous, stateless, no DB or email coupling).
+// Returns the free tier only; the full breakdown is unlocked by POST /api/scan/report.
 app.post('/api/scan', rateLimiter, async (req, res) => {
     try {
         const { url } = req.body || {};
@@ -91,7 +116,7 @@ app.post('/api/scan', rateLimiter, async (req, res) => {
         }
 
         const report = await scanner.runScan(url);
-        res.status(200).json(report);
+        res.status(200).json(toFreeReport(report));
     } catch (err) {
         console.error('Scan error:', err.message);
         const isClientError = err.message.includes('SSRF') ||
@@ -103,22 +128,65 @@ app.post('/api/scan', rateLimiter, async (req, res) => {
     }
 });
 
-// Public Pitch Generation endpoint (synchronous, stateless, Anthropic Claude)
-app.post('/api/scan/pitch', rateLimiter, async (req, res) => {
+// Email gate: exchanges an email address for the full report.
+// The scan itself is free; /api/scan returns the score and critical failures, and this route is
+// what unlocks the detailed breakdown, mails a copy, and records the lead.
+app.post('/api/scan/report', rateLimiter, async (req, res) => {
     try {
-        const payload = req.body || {};
-        const scanReport = payload.scanReport || payload;
-        const authorName = payload.author_name || payload.authorName || 'Author';
+        const { email, name, honeypot, scanReport } = req.body || {};
 
-        if (!scanReport || (!scanReport.url && !scanReport.critical_failures && !scanReport.score)) {
-            return res.status(400).json({ error: 'Missing scan report data.' });
+        // Honeypot field is hidden from humans; any value means a bot filled the form.
+        if (honeypot) {
+            return res.status(200).json({ ok: true });
         }
 
-        const pitchDraft = await pitch.generatePitch(scanReport, authorName);
-        res.status(200).json(pitchDraft);
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ error: 'A valid email address is required.' });
+        }
+
+        if (!scanReport || !scanReport.url || typeof scanReport.score !== 'number') {
+            return res.status(400).json({ error: 'Run a scan before requesting the full report.' });
+        }
+
+        // Re-run the scan server-side: the client-supplied report is untrusted and may be stale.
+        const report = await scanner.runScan(scanReport.url);
+        const lead = {
+            email: email.trim().toLowerCase(),
+            name: typeof name === 'string' ? name.trim().slice(0, 120) : null,
+            scannedUrl: report.url,
+            score: report.score,
+            geoGrade: report.geo_grade,
+            report
+        };
+
+        await db.createLead(crypto.randomUUID(), lead);
+
+        // Delivery must not block the unlock; a Resend outage should still reveal the report.
+        Promise.allSettled([
+            mailer.sendScanReportEmail(lead.email, lead.name, report),
+            mailer.sendLeadNotification(lead)
+        ]).then(results => {
+            results.filter(r => r.status === 'rejected')
+                .forEach(r => console.error('Lead email failed:', r.reason?.message || r.reason));
+        });
+
+        let pitchDraft = null;
+        if (process.env.ANTHROPIC_API_KEY) {
+            try {
+                pitchDraft = await pitch.generatePitch(report, lead.name || 'Author');
+            } catch (err) {
+                console.error('Pitch generation error:', err.message);
+            }
+        }
+
+        res.status(200).json({
+            ok: true,
+            report,
+            pitch: pitchDraft
+        });
     } catch (err) {
-        console.error('Pitch generation error:', err.message);
-        res.status(500).json({ error: err.message });
+        console.error('Report unlock error:', err.message);
+        res.status(500).json({ error: 'Could not generate your report. Please try again.' });
     }
 });
 
@@ -158,6 +226,14 @@ app.get('/jobs', requireAdmin, async (req, res) => {
     try {
         const jobs = await db.getRecentJobs();
         res.json(jobs);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/leads', requireAdmin, async (req, res) => {
+    try {
+        res.json(await db.getRecentLeads());
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

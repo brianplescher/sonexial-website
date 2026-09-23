@@ -2,6 +2,7 @@ const { Resend } = require('resend');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const OWNER_EMAIL = process.env.OWNER_EMAIL;
+const SCANNER_FROM = process.env.SCANNER_FROM_EMAIL || 'reports@sonexial.com';
 
 async function sendDraftEmail(jobId, kitType, draft) {
     if (!process.env.RESEND_API_KEY) {
@@ -70,7 +71,85 @@ async function sendErrorEmail(jobId, kitType, errorMsg) {
     }
 }
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[ch]));
+}
+
+function buildReportHtml(name, report) {
+    const failures = (report.critical_failures || [])
+        .map(f => `<li style="margin-bottom:6px;">${escapeHtml(f)}</li>`).join('');
+    const recommendations = (report.recommendations || [])
+        .map(r => `<li style="margin-bottom:10px;">${escapeHtml(r)}</li>`).join('');
+
+    return `
+        <div style="font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; color:#111; max-width:640px;">
+            <p>${name ? `${escapeHtml(name)},` : 'Hi,'}</p>
+            <p>Here is the full AI visibility report for <strong>${escapeHtml(report.url)}</strong>.</p>
+            <p style="font-size:20px; margin:24px 0;">
+                <strong>Score: ${escapeHtml(report.score)}/100</strong> &nbsp;&mdash;&nbsp; ${escapeHtml(report.geo_grade)}
+            </p>
+            ${failures ? `<h3>Critical failures</h3><ul>${failures}</ul>` : '<p>No critical failures detected.</p>'}
+            ${recommendations ? `<h3>Every fix, in priority order</h3><ol>${recommendations}</ol>` : ''}
+            <p style="margin-top:32px;">
+                Want these fixed for you? The
+                <a href="https://sonexial.com/kits">Sonexial kits</a> cover metadata, schema, and full author platforms.
+            </p>
+            <p style="color:#666; font-size:13px; margin-top:32px;">
+                You received this because you requested a scan at
+                <a href="https://sonexial.com/tools/author-geo-audit/">sonexial.com</a>.
+            </p>
+        </div>`;
+}
+
+/**
+ * Sends the full scan report to the person who requested it.
+ */
+async function sendScanReportEmail(toEmail, name, report) {
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('RESEND_API_KEY not set, skipping scan report email for:', toEmail);
+        return;
+    }
+
+    await resend.emails.send({
+        from: SCANNER_FROM,
+        to: toEmail,
+        subject: `Your AI visibility report: ${report.score}/100 for ${report.url}`,
+        html: buildReportHtml(name, report)
+    });
+}
+
+/**
+ * Notifies the owner of a new scanner lead. Keeps a durable copy of the lead outside SQLite.
+ */
+async function sendLeadNotification(lead) {
+    if (!process.env.RESEND_API_KEY || !OWNER_EMAIL) {
+        console.warn('RESEND_API_KEY or OWNER_EMAIL not set, skipping lead notification');
+        return;
+    }
+
+    await resend.emails.send({
+        from: SCANNER_FROM,
+        to: OWNER_EMAIL,
+        subject: `[Lead] ${lead.email} scanned ${lead.scannedUrl} (${lead.score}/100)`,
+        html: `
+            <h2>New scanner lead</h2>
+            <p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>
+            <p><strong>Name:</strong> ${escapeHtml(lead.name || '—')}</p>
+            <p><strong>Site:</strong> ${escapeHtml(lead.scannedUrl)}</p>
+            <p><strong>Score:</strong> ${escapeHtml(lead.score)} (${escapeHtml(lead.geoGrade)})</p>
+        `
+    });
+}
+
 module.exports = {
     sendDraftEmail,
-    sendErrorEmail
+    sendErrorEmail,
+    sendScanReportEmail,
+    sendLeadNotification
 };

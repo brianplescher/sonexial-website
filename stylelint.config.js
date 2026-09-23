@@ -14,6 +14,7 @@ module.exports = {
         'rule-empty-line-before': null,
         'shorthand-property-no-redundant-values': null,
         'keyframes-name-pattern': null,
-        'media-feature-range-notation': null
+        'media-feature-range-notation': null,
+        'property-no-vendor-prefix': [true, { ignoreProperties: ['backdrop-filter'] }]
     }
 };

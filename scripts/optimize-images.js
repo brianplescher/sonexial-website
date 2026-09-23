@@ -17,7 +17,8 @@ const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png'];
 process.env.PATH = '/usr/local/bin:/usr/bin:/bin';
 console.log('🖼️  Starting image optimization...\n');
 
-// Check if required tools are installedfunction checkDependencies() {
+// Check if required tools are installed
+function checkDependencies() {
     try {
         execSync('which cwebp', { stdio: 'ignore' });
         execSync('which optipng', { stdio: 'ignore' });
