@@ -425,13 +425,25 @@
             }
         }
 
-        // Returns the gate to its pre-unlock state so a second scan cannot show the first report's detail.
+        const GATE_HEADING_DEFAULT = document.getElementById('gate-heading').textContent.trim();
+        const GATE_COPY_DEFAULT = document.getElementById('gate-copy').textContent.trim();
+
+        // Returns the gate to its pre-unlock state so a second scan cannot show the first report's
+        // detail. Hidden nodes are emptied too, not just hidden.
         function resetGate() {
-            document.getElementById('breakdown-grid').style.display = 'none';
+            const breakdown = document.getElementById('breakdown-grid');
+            breakdown.style.display = 'none';
+            breakdown.querySelectorAll('[id^="check-"]').forEach(el => { el.textContent = ''; });
+
             document.getElementById('full-recommendations-box').style.display = 'none';
+            document.getElementById('full-recommendations-list').innerHTML = '';
+
             document.getElementById('pitch-result-box').style.display = 'none';
+            document.getElementById('pitch-email-text').textContent = '';
+
             document.getElementById('pitch-capture-form').style.display = 'block';
-            document.getElementById('gate-heading').textContent = 'Unlock Your Full AI Visibility Report';
+            document.getElementById('gate-heading').textContent = GATE_HEADING_DEFAULT;
+            document.getElementById('gate-copy').textContent = GATE_COPY_DEFAULT;
         }
 
         function renderScanResults(report) {
