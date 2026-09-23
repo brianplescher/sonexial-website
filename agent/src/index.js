@@ -70,10 +70,25 @@ function rateLimiter(req, res, next) {
     next();
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
+// Parsed rather than pattern-matched: an email regex with adjacent unbounded character
+// classes backtracks quadratically on crafted input.
 function isValidEmail(value) {
-    return typeof value === 'string' && value.length <= 254 && EMAIL_PATTERN.test(value.trim());
+    if (typeof value !== 'string') return false;
+
+    const email = value.trim();
+    if (!email || email.length > 254 || /\s/.test(email)) return false;
+
+    const at = email.indexOf('@');
+    if (at < 1 || at !== email.lastIndexOf('@')) return false;
+
+    const domain = email.slice(at + 1);
+    const dot = domain.lastIndexOf('.');
+    return dot > 0 && domain.length - dot - 1 >= 2;
+}
+
+// Strip control characters before logging so error text cannot forge log lines.
+function sanitizeLog(val) {
+    return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
 }
 
 // Free tier of the report: score, grade, and the three worst failures. The rest is emailed.
@@ -167,7 +182,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
             mailer.sendLeadNotification(lead)
         ]).then(results => {
             results.filter(r => r.status === 'rejected')
-                .forEach(r => console.error('Lead email failed:', r.reason?.message || r.reason));
+                .forEach(r => console.error('Lead email failed:', sanitizeLog(r.reason?.message || r.reason)));
         });
 
         let pitchDraft = null;
@@ -175,7 +190,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
             try {
                 pitchDraft = await pitch.generatePitch(report, lead.name || 'Author');
             } catch (err) {
-                console.error('Pitch generation error:', err.message);
+                console.error('Pitch generation error:', sanitizeLog(err.message));
             }
         }
 
@@ -185,7 +200,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
             pitch: pitchDraft
         });
     } catch (err) {
-        console.error('Report unlock error:', err.message);
+        console.error('Report unlock error:', sanitizeLog(err.message));
         res.status(500).json({ error: 'Could not generate your report. Please try again.' });
     }
 });

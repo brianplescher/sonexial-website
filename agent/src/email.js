@@ -112,7 +112,7 @@ function buildReportHtml(name, report) {
  */
 async function sendScanReportEmail(toEmail, name, report) {
     if (!process.env.RESEND_API_KEY) {
-        console.warn('RESEND_API_KEY not set, skipping scan report email for:', toEmail);
+        console.warn('RESEND_API_KEY not set, skipping scan report email');
         return;
     }
 
