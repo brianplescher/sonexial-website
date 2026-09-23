@@ -1,10 +1,5 @@
 const llm = require('../llm');
-
-// Sanitize a value before interpolating into log output — strips newlines/control chars
-// that could be used to forge fake log lines.
-function sanitizeLog(val) {
-    return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
-}
+const { sanitizeLog } = require('../ai-utils');
 
 async function processMetadataKit(payload) {
     console.log('Starting KIT-02 processing...');
