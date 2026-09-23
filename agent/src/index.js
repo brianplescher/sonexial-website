@@ -5,6 +5,7 @@ const db = require('./db');
 const pipeline = require('./pipeline');
 const scanner = require('./scanner');
 const pitch = require('./pitch');
+const llm = require('./llm');
 const mailer = require('./email');
 
 const app = express();
@@ -186,7 +187,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
         });
 
         let pitchDraft = null;
-        if (process.env.ANTHROPIC_API_KEY) {
+        if (llm.isConfigured()) {
             try {
                 pitchDraft = await pitch.generatePitch(report, lead.name || 'Author');
             } catch (err) {

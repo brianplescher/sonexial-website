@@ -1,11 +1,4 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
-if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is required but not set');
-}
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+const llm = require('../llm');
 
 function parseJson(raw, label) {
     const start = raw.indexOf('{');
@@ -39,13 +32,9 @@ Produce a Category Analysis Brief containing:
 5. Platform Differences — any notable differences in category strategy between Amazon KDP, IngramSpark/Kobo/Apple if relevant
 `;
 
-    const step1Res = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: step1Prompt }]
-    });
+    const step1Text = await llm.complete(step1Prompt, { maxTokens: 1500 });
 
-    const categoryBrief = step1Res.content[0].text;
+    const categoryBrief = step1Text;
     console.log('BISAC step 1 complete.');
 
     // Step 2 — Deliverables
@@ -102,13 +91,9 @@ Output valid JSON ONLY — no markdown fences, no commentary:
 }
 `;
 
-    const step2Res = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 2500,
-        messages: [{ role: 'user', content: step2Prompt }]
-    });
+    const step2Text = await llm.complete(step2Prompt, { maxTokens: 2500 });
 
-    const deliverables = parseJson(step2Res.content[0].text, 'bisac deliverables');
+    const deliverables = parseJson(step2Text, 'bisac deliverables');
     console.log('BISAC step 2 complete.');
 
     return { categoryBrief, deliverables };

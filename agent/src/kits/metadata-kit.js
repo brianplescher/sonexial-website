@@ -1,14 +1,4 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
-if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is required but not set');
-}
-
-const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY
-});
-
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+const llm = require('../llm');
 
 // Sanitize a value before interpolating into log output — strips newlines/control chars
 // that could be used to forge fake log lines.
@@ -31,13 +21,9 @@ Create a Positioning Brief containing:
 4. Tone Calibration (What tone should the description and subtitles strike?)
 `;
 
-    const step1Response = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: step1Prompt }]
-    });
+    const step1Text = await llm.complete(step1Prompt, { maxTokens: 1500 });
     
-    const positioningBrief = step1Response.content[0].text;
+    const positioningBrief = step1Text;
     console.log('Step 1 complete.');
 
     const step2Prompt = `
@@ -68,13 +54,9 @@ Please provide exactly the following deliverables in valid JSON format ONLY, wit
 Ensure the backend keyword lengths are accurate character counts. Do not output anything except the JSON.
 `;
 
-    const step2Response = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 2500,
-        messages: [{ role: 'user', content: step2Prompt }]
-    });
+    const step2Text = await llm.complete(step2Prompt, { maxTokens: 2500 });
 
-    let draftContent = step2Response.content[0].text;
+    let draftContent = step2Text;
 
     // Extract JSON robustly — find outermost { } regardless of markdown fencing
     const jsonStart = draftContent.indexOf('{');
