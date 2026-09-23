@@ -1,0 +1,112 @@
+name: SEO Monitoring
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  seo-check:
+    name: SEO Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Check meta tags
+        run: |
+          echo "# SEO Report - $(date)" > seo-report.md
+          echo "" >> seo-report.md
+          
+          # Check for title tag
+          if grep -q "<title>" index.html; then
+            echo "✓ Title tag present" >> seo-report.md
+          else
+            echo "✗ Title tag missing" >> seo-report.md
+          fi
+          
+          # Check for meta description
+          if grep -q 'name="description"' index.html; then
+            echo "✓ Meta description present" >> seo-report.md
+          else
+            echo "✗ Meta description missing" >> seo-report.md
+          fi
+          
+          # Check for Open Graph tags
+          if grep -q 'property="og:' index.html; then
+            echo "✓ Open Graph tags present" >> seo-report.md
+          else
+            echo "✗ Open Graph tags missing" >> seo-report.md
+          fi
+          
+          # Check for canonical URL
+          if grep -q 'rel="canonical"' index.html; then
+            echo "✓ Canonical URL present" >> seo-report.md
+          else
+            echo "✗ Canonical URL missing" >> seo-report.md
+          fi
+      
+      - name: Validate sitemap
+        run: |
+          echo "" >> seo-report.md
+          echo "## Sitemap Validation" >> seo-report.md
+          
+          if [ -f "sitemap.xml" ]; then
+            echo "✓ Sitemap exists" >> seo-report.md
+            # Check if sitemap is valid XML
+            xmllint --noout sitemap.xml 2>&1 && echo "✓ Sitemap is valid XML" >> seo-report.md || echo "✗ Sitemap has XML errors" >> seo-report.md
+          else
+            echo "✗ Sitemap missing" >> seo-report.md
+          fi
+      
+      - name: Check robots.txt
+        run: |
+          echo "" >> seo-report.md
+          echo "## Robots.txt Check" >> seo-report.md
+          
+          if [ -f "robots.txt" ]; then
+            echo "✓ robots.txt exists" >> seo-report.md
+            if grep -q "Sitemap:" robots.txt; then
+              echo "✓ Sitemap referenced in robots.txt" >> seo-report.md
+            else
+              echo "✗ Sitemap not referenced in robots.txt" >> seo-report.md
+            fi
+          else
+            echo "✗ robots.txt missing" >> seo-report.md
+          fi
+      
+      - name: Check structured data
+        run: |
+          echo "" >> seo-report.md
+          echo "## Structured Data" >> seo-report.md
+          
+          if grep -q 'application/ld+json' index.html; then
+            echo "✓ JSON-LD structured data present" >> seo-report.md
+          else
+            echo "✗ No structured data found" >> seo-report.md
+          fi
+      
+      - name: Upload SEO report
+        uses: actions/upload-artifact@v3
+        with:
+          name: seo-report
+          path: seo-report.md
+      
+      - name: Comment on commit (if issues found)
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: '⚠️ SEO issues detected. Check the SEO report artifact for details.'
+            })

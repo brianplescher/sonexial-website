@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const root = path.join(__dirname, '..');
+const dist = path.join(root, 'dist');
+const assetDirs = ['Images', 'assets', 'Audio', 'Intake', 'blog', 'tools'];
+const rootFiles = fs.readdirSync(root).filter(file => {
+    const ext = path.extname(file);
+    return file === '_redirects' || ['.html', '.txt', '.xml'].includes(ext);
+});
+const scriptFiles = ['calculator.js'];
+
+function removeDir(target) {
+    fs.rmSync(target, { recursive: true, force: true });
+}
+
+function copyPath(from, to) {
+    if (!fs.existsSync(from)) return;
+    fs.cpSync(from, to, { recursive: true });
+}
+
+function rewriteHtml(filePath) {
+    let html = fs.readFileSync(filePath, 'utf8');
+    html = html.replace(/href="\/?styles\.css"/g, 'href="/styles.min.css"');
+    html = html.replace(/src="\/?script\.js"/g, 'src="/script.min.js"');
+    fs.writeFileSync(filePath, html);
+}
+
+function getAllHtmlFiles(dir) {
+    let results = [];
+    if (!fs.existsSync(dir)) return results;
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+        const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+            results = results.concat(getAllHtmlFiles(fullPath));
+        } else if (file.endsWith('.html')) {
+            results.push(fullPath);
+        }
+    }
+    return results;
+}
+
+removeDir(dist);
+fs.mkdirSync(dist, { recursive: true });
+
+for (const file of rootFiles) {
+    copyPath(path.join(root, file), path.join(dist, file));
+}
+
+for (const dir of assetDirs) {
+    copyPath(path.join(root, dir), path.join(dist, dir));
+}
+
+fs.mkdirSync(path.join(dist, 'scripts'), { recursive: true });
+for (const file of scriptFiles) {
+    copyPath(path.join(root, 'scripts', file), path.join(dist, 'scripts', file));
+}
+
+copyPath(path.join(root, 'styles.css'), path.join(dist, 'styles.min.css'));
+copyPath(path.join(root, 'script.js'), path.join(dist, 'script.min.js'));
+copyPath(path.join(root, 'styles.css'), path.join(dist, 'styles.css'));
+copyPath(path.join(root, 'script.js'), path.join(dist, 'script.js'));
+
+const htmlFiles = getAllHtmlFiles(dist);
+for (const htmlPath of htmlFiles) {
+    rewriteHtml(htmlPath);
+}
+
+console.log(`Built ${dist}`);

@@ -1,0 +1,32 @@
+# Netlify Redirects Configuration
+# Canonical URL enforcement: force HTTPS non-www
+
+# Redirect www to non-www
+https://www.sonexial.com/* https://sonexial.com/:splat 301!
+http://www.sonexial.com/* https://sonexial.com/:splat 301!
+
+# Redirect HTTP to HTTPS
+http://sonexial.com/* https://sonexial.com/:splat 301!
+
+# Trailing slash consistency (optional - redirects /page to /page/)
+# Uncomment if needed:
+# /*/  /:splat  301
+
+# Proxy scanner API calls to the Railway agent service
+/api/* https://sonexial-website-production.up.railway.app/api/:splat 200
+
+# Pretty URL rewrites
+/about /about.html 200
+/ad-copy-suite / 301
+/bisac-kit /metadata-kit 301
+/calculator /calculator.html 200
+/cover-design-audit /tools/author-geo-audit/ 301
+/examples /examples.html 200
+/privacy /privacy.html 200
+/terms /terms.html 200
+/refund-policy /refund-policy.html 200
+/metadata-kit /metadata-kit.html 200
+/kits /kits.html 200
+/website-seo-audit /tools/author-geo-audit/ 301
+/tools/author-geo-audit /tools/author-geo-audit/ 301
+/tools/author-geo-audit/ /tools/author-geo-audit/index.html 200

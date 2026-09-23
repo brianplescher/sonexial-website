@@ -1,0 +1,43 @@
+# Sonexial - Robots.txt
+# Allow search engines and AI crawlers to crawl public pages
+
+User-agent: *
+Allow: /
+
+# GEO Pivot: Explicitly Invite AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://sonexial.com/sitemap.xml
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 1
+
+# Disallow specific file types if needed
+Disallow: /*.pdf$
+
+# Allow the checklist PDF explicitly (used in /checklist-download redirect)
+Allow: /assets/The_Author_Signal_Checklist.pdf
+
+# Block other assets directory
+Disallow: /assets/
+
+# Allow important pages
+Allow: /index.html
+Allow: /Images/

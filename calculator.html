@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Is your Amazon book ad actually profitable? Enter your book price, royalty rate, CPC, and clicks-to-sale. Instant calculation. Free.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sonexial.com/calculator">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sonexial.com/calculator">
+    <meta property="og:title" content="Amazon Book Ad Profit Calculator | Free Tool by Sonexial">
+    <meta property="og:description" content="Is your Amazon book ad actually profitable? Enter your book price, royalty rate, CPC, and clicks-to-sale. Instant calculation. Free.">
+    <meta property="og:image" content="https://sonexial.com/Images/og-image.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Amazon Book Ad Profit Calculator | Free Tool by Sonexial">
+    <meta name="twitter:description" content="Is your Amazon book ad actually profitable? Enter your book price, royalty rate, CPC, and clicks-to-sale. Instant calculation. Free.">
+    <meta name="twitter:image" content="https://sonexial.com/Images/og-image.jpg">
+
+    <title>Amazon Book Ad Profit Calculator | Free Tool by Sonexial</title>
+    <link rel="icon" href="Images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PNZ96JWY7X"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PNZ96JWY7X');
+    </script>    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Amazon Book Ad Profit Calculator",
+      "url": "https://sonexial.com/calculator",
+      "description": "Free calculator to determine whether Amazon book ads are profitable after royalties, cost per click, and clicks to sale.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Web",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "provider": {"@type": "Organization", "name": "Sonexial", "url": "https://sonexial.com"}
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://sonexial.com/"},
+        {"@type": "ListItem", "position": 2, "name": "Amazon Book Ad Profit Calculator", "item": "https://sonexial.com/calculator"}
+      ]
+    }
+    </script>
+</head>
+<body>
+<header id="site-header">
+    <div class="header-inner">
+        <a href="/" class="logo-link home-logo-link">
+            <img src="/Images/sonexial_logo.png" alt="Sonexial" class="home-logo">
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="/#products">Products</a>
+            <a href="/#process">Process</a>
+            <a href="/#faq">FAQ</a>
+            <a href="/#contact">Contact</a>
+        </nav>
+        <a href="/#products" class="nav-cta">Get Started</a>
+        <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+<main id="main-content">
+    <section class="problem" style="padding-top: 8rem; padding-bottom: 4rem;" aria-labelledby="calculator-heading">
+        <div class="container">
+            <div class="section-label">FREE TOOL</div>
+            <h1 id="calculator-heading">Amazon Book Ad Profit Calculator</h1>
+            <p class="section-sub" style="font-size: 1.2rem; margin-top: 1rem;">Estimate whether your ads are profitable after royalties, cost per click, and average clicks to sale.</p>
+        </div>
+    </section>
+    <section class="product-detail" aria-label="Calculator">
+        <div class="container">
+            <div class="product-detail-grid">
+                <div class="product-card" aria-label="Ad profit calculator inputs">
+                    <label for="bookPrice">Book Price</label>
+                    <input id="bookPrice" type="number" min="0" step="0.01" value="4.99">
+                    <label for="royalty">Royalty Percentage</label>
+                    <input id="royalty" type="number" min="0" max="100" step="1" value="70">
+                    <label for="cpc">Average Cost Per Click</label>
+                    <input id="cpc" type="number" min="0" step="0.01" value="0.45">
+                    <label for="clicksToSale">Average Clicks To Sale</label>
+                    <input id="clicksToSale" type="number" min="0" step="1" value="12">
+                </div>
+                <aside class="product-card" aria-label="Calculator results">
+                    <div class="section-label">RESULTS</div>
+                    <p>Estimated royalty: <strong id="royaltyVal" class="result-value">$0.00</strong></p>
+                    <p>Cost per acquisition: <strong id="cpaVal" class="result-value">$0.00</strong></p>
+                    <p>Net profit per sale: <strong id="profitVal" class="result-value">$0.00</strong></p>
+                    <div class="meter-track" aria-hidden="true">
+                        <div id="squeezeMeter" class="meter-fill"></div>
+                    </div>
+                    <p id="squeezeText" class="section-sub">Calculating...</p>
+                    <div id="optimization-kit" hidden>
+                        <a href="/metadata-kit" class="btn-primary">Fix the Signal Under Your Ads</a>
+                    </div>
+                    <div id="share-buttons" style="display:none;">
+                        <button type="button" id="btn-twitter" class="btn-secondary">Share on X</button>
+                        <button type="button" id="btn-linkedin" class="btn-secondary">Share on LinkedIn</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>
+<footer>
+    <div class="container">
+        <div class="footer-bottom">
+            <p>© 2026 Sonexial. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+<script src="script.js" defer></script>
+<script src="scripts/calculator.js" defer></script>
+</body>
+</html>

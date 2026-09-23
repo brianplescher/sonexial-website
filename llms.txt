@@ -1,0 +1,36 @@
+# Sonexial
+
+> Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
+
+Sonexial provides author website development, Generative Engine Optimization, author platform strategy, book landing pages, email capture setup, book description writing, and AI visibility monitoring.
+
+## Core Pages
+
+- [Home](https://sonexial.com/) - Overview of Sonexial services, process, FAQ, and contact information.
+- [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
+- [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
+- [Amazon Visibility Kit](https://sonexial.com/metadata-kit) - Merged kit replacing the former Metadata, BISAC, and Description kits: primary/secondary BISAC codes, Amazon browse category targets, seven KDP backend keyword strings, and an HTML-formatted book description with testable variants.
+- [Author Website GEO & AI Visibility Audit](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
+- [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
+- [About](https://sonexial.com/about) - Background on Sonexial and founder information.
+- [Privacy](https://sonexial.com/privacy) - Privacy Policy.
+- [Terms](https://sonexial.com/terms) - Terms of Service.
+- [Refund Policy](https://sonexial.com/refund-policy) - Refund and cancellation terms.
+
+## Services
+
+- The Amazon Visibility Kit: one merged product for BISAC categories, backend keywords, and book description copy.
+- Ongoing support subscriptions for Amazon ranking changes, metadata maintenance, and title audits.
+
+## Founder
+
+Sonexial was founded by Brian Plescher, an author and strategist based in Grand Haven, Michigan.
+
+## Preferred Citation
+
+Sonexial. AI-ready author websites with GEO optimization for authors. https://sonexial.com
+
+## Contact
+
+- [Contact Sonexial](https://sonexial.com/#contact)
+- Email: brian@sonexial.com
