@@ -534,8 +534,17 @@
                 headEl.innerHTML = `<span style="color: #4ade80;">✓ Valid Hierarchy (${semCheck.h1_count} H1, ${semCheck.h2_count} H2)</span>`;
                 headDesc.textContent = 'Clear semantic document structure for AI content parsing.';
             } else {
-                headEl.innerHTML = `<span style="color: #facc15;">⚠ Non-optimal (${semCheck.h1_count || 0} H1s)</span>`;
-                headDesc.textContent = semCheck.h1_count === 0 ? 'Missing H1 heading.' : 'Multiple H1 headings confuse AI crawlers.';
+                const h1Count = semCheck.h1_count || 0;
+                const h2Count = semCheck.h2_count || 0;
+                headEl.innerHTML = `<span style="color: #facc15;">⚠ Non-optimal (${h1Count} H1, ${h2Count} H2)</span>`;
+
+                if (h1Count === 0) {
+                    headDesc.textContent = 'Missing H1 heading: AI crawlers have no title for this page.';
+                } else if (h1Count > 1) {
+                    headDesc.textContent = 'Multiple H1 headings confuse AI crawlers about the page topic.';
+                } else {
+                    headDesc.textContent = 'No H2 subheadings, so there is no structure for AI crawlers to follow.';
+                }
             }
 
             // 5. Entity Connectivity
