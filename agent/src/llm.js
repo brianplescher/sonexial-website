@@ -19,7 +19,9 @@ function getModel() {
 }
 
 function getBaseUrl() {
-    return (process.env.LLM_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, '');
+    let base = process.env.LLM_BASE_URL || DEFAULT_BASE_URL;
+    while (base.endsWith('/')) base = base.slice(0, -1);
+    return base;
 }
 
 /**
