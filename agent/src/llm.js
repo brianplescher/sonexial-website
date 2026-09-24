@@ -3,7 +3,7 @@
 // OpenAI-compatible provider to switch.
 
 const DEFAULT_BASE_URL = 'https://api.together.ai/v1';
-const DEFAULT_MODEL = 'Qwen/Qwen3.8-Flash';
+const DEFAULT_MODEL = 'Qwen/Qwen3.5-9B';
 const REQUEST_TIMEOUT_MS = 120000;
 
 function getApiKey() {
@@ -24,6 +24,15 @@ function getBaseUrl() {
     return base;
 }
 
+// Qwen3 models reason before answering and spend the token budget doing it,
+// which leaves `content` empty. Together accepts the template switch that turns
+// it off; other providers reject unknown fields, so only send it there.
+function thinkingOverride() {
+    if (process.env.LLM_ENABLE_THINKING === '1') return null;
+    if (!getBaseUrl().includes('together.')) return null;
+    return { enable_thinking: false };
+}
+
 /**
  * Sends a single-turn prompt and returns the assistant's text.
  * @param {string} prompt
@@ -36,6 +45,7 @@ async function complete(prompt, options = {}) {
         throw new Error('LLM_API_KEY (or TOGETHER_API_KEY) is required but not set');
     }
 
+    const thinking = thinkingOverride();
     const res = await fetch(`${getBaseUrl()}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -46,7 +56,8 @@ async function complete(prompt, options = {}) {
             model: getModel(),
             max_tokens: options.maxTokens || 1500,
             temperature: options.temperature ?? 0.7,
-            messages: [{ role: 'user', content: prompt }]
+            messages: [{ role: 'user', content: prompt }],
+            ...(thinking ? { chat_template_kwargs: thinking } : {})
         }),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
     });
