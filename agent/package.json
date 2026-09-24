@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Agent service for Sonexial Metadata Kit",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "scripts": {
     "start": "node src/index.js",
     "test": "node --test 'test/**/*.test.js'",
