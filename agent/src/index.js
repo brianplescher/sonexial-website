@@ -288,4 +288,5 @@ app.post('/jobs/:id/retry', requireAdmin, async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Agent service listening on port ${PORT}`);
+    console.log(`Config: llm=${llm.isConfigured() ? llm.getModel() : 'off'} resend=${process.env.RESEND_API_KEY ? 'on' : 'off'} owner=${process.env.OWNER_EMAIL ? 'set' : 'unset'} from=${process.env.SCANNER_FROM_EMAIL || 'reports@sonexial.com'}`);
 });
