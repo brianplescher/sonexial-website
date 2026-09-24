@@ -13,7 +13,7 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 # /*/  /:splat  301
 
 # Proxy scanner API calls to the Railway agent service
-/api/* https://sonexial-website-production.up.railway.app/api/:splat 200
+/api/* https://sonexial-agent-production.up.railway.app/api/:splat 200
 
 # Pretty URL rewrites
 /about /about.html 200
