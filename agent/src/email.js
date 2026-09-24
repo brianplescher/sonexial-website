@@ -4,6 +4,16 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const OWNER_EMAIL = process.env.OWNER_EMAIL;
 const SCANNER_FROM = process.env.SCANNER_FROM_EMAIL || 'reports@sonexial.com';
 
+// The Resend SDK resolves with `{ data, error }` instead of rejecting, so an unverified
+// sender or bad key looks like a success to callers unless the error is rethrown.
+async function send(payload) {
+    const { data, error } = await resend.emails.send(payload);
+    if (error) {
+        throw new Error(`Resend rejected ${payload.subject}: ${error.name || error.statusCode}: ${error.message}`);
+    }
+    return data;
+}
+
 async function sendDraftEmail(jobId, kitType, draft) {
     if (!process.env.RESEND_API_KEY) {
         console.warn('RESEND_API_KEY not set, skipping draft email for job:', jobId);
@@ -116,7 +126,7 @@ async function sendScanReportEmail(toEmail, name, report) {
         return;
     }
 
-    await resend.emails.send({
+    await send({
         from: SCANNER_FROM,
         to: toEmail,
         subject: `Your AI visibility report: ${report.score}/100 for ${report.url}`,
@@ -133,7 +143,7 @@ async function sendLeadNotification(lead) {
         return;
     }
 
-    await resend.emails.send({
+    await send({
         from: SCANNER_FROM,
         to: OWNER_EMAIL,
         subject: `[Lead] ${lead.email} scanned ${lead.scannedUrl} (${lead.score}/100)`,
