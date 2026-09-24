@@ -8,6 +8,7 @@ async function testEndpoints() {
     const { runScan } = require('../src/scanner');
     const { generatePitch } = require('../src/pitch');
     const llm = require('../src/llm');
+    const { sanitizeLog } = require('../src/ai-utils');
 
     console.log('1. Testing runScan on https://sonexial.com ...');
     const report = await runScan('https://sonexial.com');
@@ -20,12 +21,12 @@ async function testEndpoints() {
     });
 
     if (llm.isConfigured()) {
-        console.log(`\n2. Testing generatePitch with ${llm.getModel()} ...`);
+        console.log(`\n2. Testing generatePitch with ${sanitizeLog(llm.getModel())} ...`);
         try {
             const pitchResult = await generatePitch(report, 'Brian Plescher');
             console.log('Pitch Result:', JSON.stringify(pitchResult, null, 2));
         } catch (err) {
-            console.error('Pitch generation error:', err.message);
+            console.error('Pitch generation error:', sanitizeLog(err.message));
         }
     } else {
         console.log('\n2. Skipping pitch test (LLM_API_KEY not in local .env)');
