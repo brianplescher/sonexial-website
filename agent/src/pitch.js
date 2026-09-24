@@ -1,36 +1,5 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
-let anthropicClient = null;
-function getAnthropicClient() {
-    if (!anthropicClient) {
-        if (!process.env.ANTHROPIC_API_KEY) {
-            throw new Error('ANTHROPIC_API_KEY is required but not set');
-        }
-        anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    }
-    return anthropicClient;
-}
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
-
-// Sanitize a value before logging
-function sanitizeLog(val) {
-    return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
-}
-
-function parseJson(raw, label) {
-    const start = raw.indexOf('{');
-    const end = raw.lastIndexOf('}');
-    if (start === -1 || end === -1) {
-        console.error(`Raw AI response (no JSON found) [${sanitizeLog(label)}]:`, sanitizeLog(raw));
-        throw new Error(`AI response for ${label} did not contain valid JSON`);
-    }
-    try {
-        return JSON.parse(raw.slice(start, end + 1));
-    } catch (err) {
-        console.error(`JSON parse failed [${sanitizeLog(label)}]:`, sanitizeLog(raw.slice(start, end + 1)));
-        throw new Error(`Failed to parse AI response for ${label}: ${err.message}`);
-    }
-}
+const llm = require('./llm');
+const { sanitizeLog, parseJson } = require('./ai-utils');
 
 /**
  * Generates an agentic pitch and outreach draft from scan report findings.
@@ -64,13 +33,7 @@ Analyze these audit results and formulate an outreach strategy:
 4. What tone will resonate best with this author (empathetic, authoritative, peer-to-peer author-to-author, direct)?
 `;
 
-    const step1Res = await getAnthropicClient().messages.create({
-        model: MODEL,
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: step1Prompt }]
-    });
-
-    const positioningBrief = step1Res.content[0].text;
+    const positioningBrief = await llm.complete(step1Prompt, { maxTokens: 1500 });
     console.log('Pitch generation step 1 complete.');
 
     // Step 2 — Structured Pitch Deliverables
@@ -101,13 +64,8 @@ Output valid JSON ONLY — no markdown fences, no commentary:
 }
 `;
 
-    const step2Res = await getAnthropicClient().messages.create({
-        model: MODEL,
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: step2Prompt }]
-    });
-
-    const deliverables = parseJson(step2Res.content[0].text, 'scan pitch deliverables');
+    const step2Text = await llm.complete(step2Prompt, { maxTokens: 1500 });
+    const deliverables = parseJson(step2Text, 'scan pitch deliverables');
     console.log('Pitch generation step 2 complete.');
 
     return {

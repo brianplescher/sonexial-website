@@ -1,32 +1,5 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
-if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is required but not set');
-}
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
-
-// Sanitize a value before interpolating into log output — strips newlines/control chars
-// that could be used to forge fake log lines.
-function sanitizeLog(val) {
-    return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
-}
-
-function parseJson(raw, label) {
-    const start = raw.indexOf('{');
-    const end = raw.lastIndexOf('}');
-    if (start === -1 || end === -1) {
-        console.error(`Raw AI response (no JSON found) [${sanitizeLog(label)}]:`, sanitizeLog(raw));
-        throw new Error(`AI response for ${label} did not contain valid JSON`);
-    }
-    try {
-        return JSON.parse(raw.slice(start, end + 1));
-    } catch (err) {
-        console.error(`JSON parse failed [${sanitizeLog(label)}]:`, sanitizeLog(raw.slice(start, end + 1)));
-        throw new Error(`Failed to parse AI response for ${label}: ${err.message}`);
-    }
-}
+const llm = require('../llm');
+const { parseJson } = require('../ai-utils');
 
 async function processWebsiteSeoKit(payload) {
     console.log('Starting website-seo-audit processing...');
@@ -47,13 +20,9 @@ Produce a Strategy Brief covering:
 5. Priority Signal — given their stated primary goal (${payload.primary_goal || 'not specified'}), what is the single highest-leverage change they could make this week
 `;
 
-    const step1Res = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: step1Prompt }]
-    });
+    const step1Text = await llm.complete(step1Prompt, { maxTokens: 1500 });
 
-    const strategyBrief = step1Res.content[0].text;
+    const strategyBrief = step1Text;
     console.log('Website SEO step 1 complete.');
 
     // Step 2 — Audit Deliverables
@@ -140,13 +109,9 @@ Output valid JSON ONLY — no markdown fences, no commentary:
 }
 `;
 
-    const step2Res = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 3000,
-        messages: [{ role: 'user', content: step2Prompt }]
-    });
+    const step2Text = await llm.complete(step2Prompt, { maxTokens: 3000 });
 
-    const deliverables = parseJson(step2Res.content[0].text, 'website-seo deliverables');
+    const deliverables = parseJson(step2Text, 'website-seo deliverables');
     console.log('Website SEO step 2 complete.');
 
     return { strategyBrief, deliverables };
