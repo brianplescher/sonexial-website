@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "test": "node --test 'test/**/*.test.js'",
     "test:pipeline": "node scripts/test-pipeline.js"
   },
   "dependencies": {

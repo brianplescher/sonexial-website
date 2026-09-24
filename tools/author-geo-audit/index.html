@@ -114,7 +114,7 @@
                                     Scan AI Visibility
                                 </button>
                             </div>
-                            <span style="font-size: 0.8rem; color: var(--color-text-dim, #64748b);">
+                            <span style="font-size: 0.8rem; color: var(--color-text-dim, #94a3b8);">
                                 Concurrently tests JSON-LD schema, semantic hierarchy, outbound entity links, llms.txt roadmap, and robots.txt bot rules.
                             </span>
                         </div>
@@ -166,10 +166,13 @@
                             <ul id="critical-failures-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
                             </ul>
                         </div>
+
+                        <p id="locked-summary" style="display: none; margin-top: 1.5rem; margin-bottom: 0; font-size: 0.95rem; color: #94a3b8;">
+                        </p>
                     </div>
 
-                    <!-- Category Breakdown Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                    <!-- Category Breakdown Grid (unlocked by the email gate) -->
+                    <div id="breakdown-grid" style="display: none; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
                             <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">1. JSON-LD SCHEMA</div>
                             <div id="check-schema-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
@@ -205,38 +208,57 @@
                             <div id="check-og-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-og-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
+
+                        <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
+                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">7. CRAWL &amp; IDENTITY SIGNALS</div>
+                            <div id="check-crawl-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
+                            <p id="check-crawl-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
+                        </div>
                     </div>
 
-                    <!-- Gated Action Plan / Pitch Generation -->
+                    <!-- Email gate: unlocks the full breakdown and mails a copy of the report -->
                     <div id="action-plan-gate" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
-                        <h2 style="font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 0.75rem; color: #fff;">
-                            Get Your Tailored AI Visibility Fix Blueprint
+                        <h2 id="gate-heading" style="font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 0.75rem; color: #fff;">
+                            Unlock Your Full AI Visibility Report
                         </h2>
-                        <p style="color: #cbd5e1; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
-                            Unlock an instant, AI-generated diagnosis outlining the exact steps and package recommendation to make your author platform visible across ChatGPT and Perplexity.
+                        <p id="gate-copy" style="color: #cbd5e1; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                            See every check we ran, the complete prioritized fix list, and a tailored diagnosis of what is keeping your books out of ChatGPT and Perplexity. We will email you a copy to keep.
                         </p>
 
-                        <form id="pitch-capture-form" onsubmit="handlePitchSubmit(event)">
+                        <form id="pitch-capture-form" onsubmit="handleUnlockSubmit(event)">
                             <!-- Honeypot field (bots will fill, humans will not) -->
                             <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                                <label for="b_url_honey">Leave this field empty</label>
                                 <input type="text" name="b_url_honey" id="b_url_honey" tabindex="-1" value="" autocomplete="off">
                             </div>
 
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                                <input type="text" id="author-name-input" placeholder="Your Name or Pen Name" required
+                                <input type="text" id="author-name-input" aria-label="Your name or pen name" placeholder="Your Name or Pen Name" autocomplete="name" required
                                     style="flex: 1 1 200px; padding: 0.85rem 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;">
-                                <input type="email" id="author-email-input" placeholder="Your Email Address" required
+                                <input type="email" id="author-email-input" aria-label="Your email address" placeholder="Your Email Address" autocomplete="email" required
                                     style="flex: 1 1 250px; padding: 0.85rem 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;">
                                 <button type="submit" id="pitch-submit-btn" class="btn-primary" style="padding: 0.85rem 2rem; cursor: pointer; white-space: nowrap;">
-                                    Generate Action Plan
+                                    Email My Full Report
                                 </button>
                             </div>
+                            <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.85rem; margin-bottom: 0;">
+                                One email with your report. Unsubscribe any time.
+                            </p>
                         </form>
 
                         <div id="pitch-loading" style="display: none; margin-top: 1.5rem; text-align: center;">
                             <p style="font-family: 'DM Mono', monospace; font-size: 0.9rem; color: #a5b4fc;">
-                                Analyzing scan data with Claude and generating custom blueprint...
+                                Compiling your full report and emailing you a copy...
                             </p>
+                        </div>
+
+                        <!-- Full prioritized fix list, revealed after unlock -->
+                        <div id="full-recommendations-box" style="display: none; margin-top: 2rem;">
+                            <h3 style="font-family: 'DM Mono', monospace; font-size: 0.85rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                                Every Fix, In Priority Order
+                            </h3>
+                            <ol id="full-recommendations-list" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; padding-left: 1.25rem; margin: 0; display: flex; flex-direction: column; gap: 0.6rem;">
+                            </ol>
                         </div>
 
                         <!-- Pitch Result Box -->
@@ -345,6 +367,19 @@
         // Can be overridden via window.SONEXIAL_API_URL
         const API_BASE = window.SONEXIAL_API_URL || '/api';
 
+        // The API returns JSON, but a misrouted proxy returns an HTML error page. Parsing that
+        // blindly surfaces "Unexpected end of JSON input" instead of the real status.
+        async function readJson(res) {
+            const body = await res.text();
+            try {
+                return JSON.parse(body);
+            } catch {
+                throw new Error(res.ok
+                    ? 'The scanner returned an unexpected response. Please try again.'
+                    : `The scanner is temporarily unavailable (HTTP ${res.status}). Please try again shortly.`);
+            }
+        }
+
         async function handleScanSubmit(e) {
             e.preventDefault();
             const urlInput = document.getElementById('scan-url');
@@ -371,13 +406,14 @@
                     body: JSON.stringify({ url })
                 });
 
-                const data = await res.json();
+                const data = await readJson(res);
 
                 if (!res.ok) {
                     throw new Error(data.error || 'Scan failed. Please check the URL and try again.');
                 }
 
                 currentScanReport = data;
+                resetGate();
                 renderScanResults(data);
                 resultsBox.style.display = 'block';
             } catch (err) {
@@ -389,20 +425,40 @@
             }
         }
 
+        const GATE_HEADING_DEFAULT = document.getElementById('gate-heading').textContent.trim();
+        const GATE_COPY_DEFAULT = document.getElementById('gate-copy').textContent.trim();
+
+        // Returns the gate to its pre-unlock state so a second scan cannot show the first report's
+        // detail. Hidden nodes are emptied too, not just hidden.
+        function resetGate() {
+            const breakdown = document.getElementById('breakdown-grid');
+            breakdown.style.display = 'none';
+            breakdown.querySelectorAll('[id^="check-"]').forEach(el => { el.textContent = ''; });
+
+            document.getElementById('full-recommendations-box').style.display = 'none';
+            document.getElementById('full-recommendations-list').innerHTML = '';
+
+            document.getElementById('pitch-result-box').style.display = 'none';
+            document.getElementById('pitch-email-text').textContent = '';
+
+            document.getElementById('pitch-capture-form').style.display = 'block';
+            document.getElementById('gate-heading').textContent = GATE_HEADING_DEFAULT;
+            document.getElementById('gate-copy').textContent = GATE_COPY_DEFAULT;
+        }
+
         function renderScanResults(report) {
             document.getElementById('score-value').textContent = report.score;
             document.getElementById('score-grade').textContent = report.geo_grade;
             document.getElementById('scan-time').textContent = `Execution: ${report.execution_time}`;
 
-            // Critical Failures
+            // Critical Failures (the free tier: the API sends only the worst three)
             const critBox = document.getElementById('critical-failures-box');
             const critList = document.getElementById('critical-failures-list');
             critList.innerHTML = '';
 
             if (report.critical_failures && report.critical_failures.length > 0) {
                 critBox.style.display = 'block';
-                // Show top 3 critical failures
-                report.critical_failures.slice(0, 3).forEach(fail => {
+                report.critical_failures.forEach(fail => {
                     const li = document.createElement('li');
                     li.style.cssText = 'color: #fca5a5; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 0.5rem;';
                     li.innerHTML = `<span style="color: #ef4444;">✕</span> ${escapeHtml(fail)}`;
@@ -411,6 +467,23 @@
             } else {
                 critBox.style.display = 'none';
             }
+
+            const lockedEl = document.getElementById('locked-summary');
+            const lockedFailures = report.locked_failures || 0;
+            const lockedFixes = report.locked_recommendations || 0;
+            if (report.locked && (lockedFailures > 0 || lockedFixes > 0)) {
+                const parts = [];
+                if (lockedFailures > 0) parts.push(`${lockedFailures} more critical failure${lockedFailures === 1 ? '' : 's'}`);
+                if (lockedFixes > 0) parts.push(`${lockedFixes} prioritized fix${lockedFixes === 1 ? '' : 'es'}`);
+                lockedEl.textContent = `🔒 ${parts.join(' and ')} are in your full report below.`;
+                lockedEl.style.display = 'block';
+            } else {
+                lockedEl.style.display = 'none';
+            }
+        }
+
+        function renderFullReport(report) {
+            document.getElementById('breakdown-grid').style.display = 'grid';
 
             // 1. Schema
             const schemaCheck = report.checks?.schema_markup || {};
@@ -461,8 +534,17 @@
                 headEl.innerHTML = `<span style="color: #4ade80;">✓ Valid Hierarchy (${semCheck.h1_count} H1, ${semCheck.h2_count} H2)</span>`;
                 headDesc.textContent = 'Clear semantic document structure for AI content parsing.';
             } else {
-                headEl.innerHTML = `<span style="color: #facc15;">⚠ Non-optimal (${semCheck.h1_count || 0} H1s)</span>`;
-                headDesc.textContent = semCheck.h1_count === 0 ? 'Missing H1 heading.' : 'Multiple H1 headings confuse AI crawlers.';
+                const h1Count = semCheck.h1_count || 0;
+                const h2Count = semCheck.h2_count || 0;
+                headEl.innerHTML = `<span style="color: #facc15;">⚠ Non-optimal (${h1Count} H1, ${h2Count} H2)</span>`;
+
+                if (h1Count === 0) {
+                    headDesc.textContent = 'Missing H1 heading: AI crawlers have no title for this page.';
+                } else if (h1Count > 1) {
+                    headDesc.textContent = 'Multiple H1 headings confuse AI crawlers about the page topic.';
+                } else {
+                    headDesc.textContent = 'No H2 subheadings, so there is no structure for AI crawlers to follow.';
+                }
             }
 
             // 5. Entity Connectivity
@@ -487,20 +569,44 @@
                 ogEl.innerHTML = '<span style="color: #facc15;">⚠ Missing Open Graph</span>';
                 ogDesc.textContent = 'Missing complete og:title, og:description, or og:image tags.';
             }
-        }
 
-        async function handlePitchSubmit(e) {
-            e.preventDefault();
-            // Honeypot check
-            const honey = document.getElementById('b_url_honey');
-            if (honey && honey.value) {
-                console.warn('Bot submission blocked via honeypot.');
-                return;
+            // 7. Crawl & identity signals
+            const crawlEl = document.getElementById('check-crawl-status');
+            const crawlDesc = document.getElementById('check-crawl-desc');
+            const checks = report.checks || {};
+            const crawlGaps = [];
+            if (!checks.has_sitemap) crawlGaps.push('no sitemap');
+            if (!checks.canonical_correct) crawlGaps.push('no valid canonical');
+            if (!checks.sameas_count) crawlGaps.push('no sameAs identity links');
+            if (checks.thin_content_flag) crawlGaps.push(`thin content (${checks.word_count} words)`);
+
+            if (crawlGaps.length === 0) {
+                crawlEl.innerHTML = '<span style="color: #4ade80;">✓ Sitemap, Canonical &amp; Identity Set</span>';
+                crawlDesc.textContent = `Sitemap found, canonical resolves on-site, and ${checks.sameas_count} sameAs identity links are declared.`;
+            } else {
+                crawlEl.innerHTML = `<span style="color: #facc15;">⚠ ${crawlGaps.length} Signal Gap${crawlGaps.length === 1 ? '' : 's'}</span>`;
+                crawlDesc.textContent = `Missing: ${crawlGaps.join(', ')}.`;
             }
 
+            // Full prioritized fix list
+            const recBox = document.getElementById('full-recommendations-box');
+            const recList = document.getElementById('full-recommendations-list');
+            recList.innerHTML = '';
+            (report.recommendations || []).forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recList.appendChild(li);
+            });
+            recBox.style.display = recList.childElementCount > 0 ? 'block' : 'none';
+        }
+
+        async function handleUnlockSubmit(e) {
+            e.preventDefault();
+
+            const honey = document.getElementById('b_url_honey');
             const authorName = document.getElementById('author-name-input').value.trim();
             const authorEmail = document.getElementById('author-email-input').value.trim();
-            const pitchBtn = document.getElementById('pitch-submit-btn');
+            const unlockBtn = document.getElementById('pitch-submit-btn');
             const loadingEl = document.getElementById('pitch-loading');
             const resultBox = document.getElementById('pitch-result-box');
             const pkgBadge = document.getElementById('pitch-pkg-badge');
@@ -511,33 +617,46 @@
                 return;
             }
 
-            pitchBtn.disabled = true;
+            unlockBtn.disabled = true;
             loadingEl.style.display = 'block';
 
             try {
-                const res = await fetch(`${API_BASE}/scan/pitch`, {
+                const res = await fetch(`${API_BASE}/scan/report`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         scanReport: currentScanReport,
-                        author_name: authorName,
-                        author_email: authorEmail
+                        name: authorName,
+                        email: authorEmail,
+                        honeypot: honey ? honey.value : ''
                     })
                 });
 
-                const data = await res.json();
+                const data = await readJson(res);
                 if (!res.ok) {
-                    throw new Error(data.error || 'Failed to generate action plan.');
+                    throw new Error(data.error || 'Failed to unlock your report.');
                 }
 
-                pkgBadge.textContent = data.recommended_package || 'Recommended Fixes';
-                emailText.textContent = data.email_draft || 'Analysis ready.';
-                resultBox.style.display = 'block';
+                if (data.report) {
+                    currentScanReport = data.report;
+                    renderFullReport(data.report);
+                    document.getElementById('locked-summary').style.display = 'none';
+                }
+
+                if (data.pitch) {
+                    pkgBadge.textContent = data.pitch.recommended_package || 'Recommended Fixes';
+                    emailText.textContent = data.pitch.email_draft || 'Analysis ready.';
+                    resultBox.style.display = 'block';
+                }
+
+                document.getElementById('pitch-capture-form').style.display = 'none';
+                document.getElementById('gate-heading').textContent = `Report unlocked — a copy is on its way to ${authorEmail}`;
+                document.getElementById('gate-copy').textContent = 'Every check below is now visible. Check your inbox for the same report in writing.';
             } catch (err) {
-                alert(`Error generating diagnosis: ${err.message}`);
+                alert(`Error unlocking your report: ${err.message}`);
             } finally {
                 loadingEl.style.display = 'none';
-                pitchBtn.disabled = false;
+                unlockBtn.disabled = false;
             }
         }
 

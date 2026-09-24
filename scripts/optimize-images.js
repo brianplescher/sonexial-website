@@ -17,19 +17,24 @@ const SUPPORTED_FORMATS = ['.jpg', '.jpeg', '.png'];
 process.env.PATH = '/usr/local/bin:/usr/bin:/bin';
 console.log('🖼️  Starting image optimization...\n');
 
-// Check if required tools are installedfunction checkDependencies() {
-    try {
-        execSync('which cwebp', { stdio: 'ignore' });
-        execSync('which optipng', { stdio: 'ignore' });
-        execSync('which jpegoptim', { stdio: 'ignore' });
+const BIN_DIRS = process.env.PATH.split(':');
+
+// Resolve against the pinned directories rather than shelling out to `which`.
+function isInstalled(binary) {
+    return BIN_DIRS.some(dir => fs.existsSync(path.join(dir, binary)));
+}
+
+// Check if required tools are installed
+function checkDependencies() {
+    if (['cwebp', 'optipng', 'jpegoptim'].every(isInstalled)) {
         return true;
-    } catch (error) {
-        console.error('❌ Missing dependencies. Please install:');
-        console.error('   brew install webp optipng jpegoptim');
-        console.error('   or');
-        console.error('   apt-get install webp optipng jpegoptim');
-        return false;
     }
+
+    console.error('❌ Missing dependencies. Please install:');
+    console.error('   brew install webp optipng jpegoptim');
+    console.error('   or');
+    console.error('   apt-get install webp optipng jpegoptim');
+    return false;
 }
 
 // Get all image files

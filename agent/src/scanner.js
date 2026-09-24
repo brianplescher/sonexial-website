@@ -1,9 +1,32 @@
 const dns = require('dns').promises;
 const cheerio = require('cheerio');
 
+// Pages below this word count are flagged as thin: too little text for an AI engine to quote.
+const THIN_CONTENT_WORDS = 300;
+
+// AI crawlers whose robots.txt access is reported by the scanner.
+const AI_BOTS = ['gptbot', 'claudebot', 'perplexitybot', 'anthropic-ai', 'google-extended'];
+
 // Sanitize a value before logging
 function sanitizeLog(val) {
     return String(val).replace(/[\r\n\t\x00-\x1f\x7f]/g, ' ').slice(0, 200);
+}
+
+/**
+ * A canonical tag is correct when it resolves and points at the same host as the page it sits on.
+ */
+function isCanonicalCorrect(canonicalHref, pageUrl) {
+    if (!canonicalHref || !pageUrl) return false;
+
+    const stripWww = host => host.replace(/^www\./, '');
+
+    try {
+        const canonical = new URL(canonicalHref, pageUrl);
+        const page = new URL(pageUrl);
+        return stripWww(canonical.hostname.toLowerCase()) === stripWww(page.hostname.toLowerCase());
+    } catch {
+        return false;
+    }
 }
 
 /**
@@ -202,18 +225,21 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
 
 /**
  * Analyzes target page HTML for schema, headings, entity connectivity, and Open Graph tags.
+ * @param {string} htmlText - Raw HTML of the scanned page.
+ * @param {string} [pageUrl] - URL the HTML was fetched from, used to validate the canonical tag.
  */
-function analyzeHtml(htmlText) {
+function analyzeHtml(htmlText, pageUrl) {
     const $ = cheerio.load(htmlText || '');
     const checks = {};
     let score = 0;
     const critical_failures = [];
     const recommendations = [];
 
-    // 1. JSON-LD Schema (Book, Person, FAQPage)
+    // 1. JSON-LD Schema (Book, Person, FAQPage) and sameAs entity references
     let hasBook = false;
     let hasPerson = false;
     let hasFaq = false;
+    const sameAsUrls = new Set();
 
     $('script[type="application/ld+json"]').each((_, el) => {
         try {
@@ -221,22 +247,27 @@ function analyzeHtml(htmlText) {
             const data = JSON.parse(content);
             const items = [];
 
-            function extractTypes(obj) {
+            function walk(obj) {
                 if (!obj) return;
                 if (Array.isArray(obj)) {
-                    obj.forEach(extractTypes);
+                    obj.forEach(walk);
                 } else if (typeof obj === 'object') {
                     if (obj['@type']) {
                         const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
                         items.push(...types);
                     }
-                    if (obj['@graph']) {
-                        extractTypes(obj['@graph']);
+                    if (obj.sameAs) {
+                        const refs = Array.isArray(obj.sameAs) ? obj.sameAs : [obj.sameAs];
+                        refs.filter(r => typeof r === 'string' && r.trim())
+                            .forEach(r => sameAsUrls.add(r.trim().toLowerCase()));
                     }
+                    Object.values(obj).forEach(v => {
+                        if (v && typeof v === 'object') walk(v);
+                    });
                 }
             }
 
-            extractTypes(data);
+            walk(data);
 
             if (items.includes('Book')) hasBook = true;
             if (items.includes('Person')) hasPerson = true;
@@ -247,6 +278,7 @@ function analyzeHtml(htmlText) {
     });
 
     checks.schema_markup = { book: hasBook, person: hasPerson, faq: hasFaq };
+    checks.sameas_count = sameAsUrls.size;
 
     if (hasBook && hasPerson) {
         score += 30;
@@ -256,6 +288,10 @@ function analyzeHtml(htmlText) {
     } else {
         critical_failures.push("Missing core JSON-LD Schema (Person/Book).");
         recommendations.push("Add 'Person' and 'Book' JSON-LD schema to define your author entity for AI discovery.");
+    }
+
+    if (sameAsUrls.size === 0) {
+        recommendations.push("Add 'sameAs' links (Amazon author page, Goodreads, Wikipedia, social profiles) to your schema so AI engines resolve your profiles to one identity.");
     }
 
     // 2. Semantic HTML Hierarchy
@@ -313,13 +349,99 @@ function analyzeHtml(htmlText) {
         recommendations.push("Add Open Graph meta tags (og:title, og:description, og:image) for rich AI and social previews.");
     }
 
+    // 5. Canonical URL (diagnostic only, not scored)
+    const canonicalHref = $('link[rel="canonical"]').first().attr('href');
+    checks.canonical_correct = isCanonicalCorrect(canonicalHref, pageUrl);
+
+    if (!canonicalHref) {
+        recommendations.push("Add a <link rel=\"canonical\"> tag so AI crawlers consolidate duplicate URLs into one authoritative page.");
+    } else if (!checks.canonical_correct) {
+        recommendations.push("Your canonical tag points to a different site or an unresolvable URL, which tells AI crawlers to credit another page.");
+    }
+
+    // 6. Content depth (diagnostic only, not scored)
+    const bodyText = $('body').clone().find('script, style, noscript, template').remove().end().text();
+    const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+    checks.word_count = wordCount;
+    checks.thin_content_flag = wordCount < THIN_CONTENT_WORDS;
+
+    if (checks.thin_content_flag) {
+        recommendations.push(`This page has roughly ${wordCount} words. AI engines need substantive text to quote you; aim for at least ${THIN_CONTENT_WORDS}.`);
+    }
+
     return { score, checks, critical_failures, recommendations };
 }
 
 /**
- * Analyzes llms.txt and robots.txt (AI bot rules for GPTBot, ClaudeBot, PerplexityBot, Anthropic-ai).
+ * Parses robots.txt into per-user-agent directive groups.
+ *
+ * A group is a run of consecutive User-agent lines followed by its directives. The first
+ * non-User-agent line closes the agent list, so the next User-agent line opens a new group
+ * and its directives apply only to that group.
+ *
+ * @param {string} content - Raw robots.txt body.
+ * @returns {{groups: Record<string, Array<{action: string, path: string}>>, sitemaps: string[]}}
  */
-function analyzeFiles(llmsRes, robotsRes) {
+function parseRobots(content) {
+    const groups = {};
+    const sitemaps = [];
+
+    let currentAgents = [];
+    let collectingAgents = true;
+
+    for (const rawLine of String(content || '').split(/\r?\n/)) {
+        const line = rawLine.split('#')[0].trim();
+        if (!line) continue;
+
+        const colonIdx = line.indexOf(':');
+        if (colonIdx === -1) continue;
+
+        const key = line.slice(0, colonIdx).trim().toLowerCase();
+        const val = line.slice(colonIdx + 1).trim();
+
+        if (key === 'user-agent') {
+            if (!collectingAgents) {
+                currentAgents = [];
+                collectingAgents = true;
+            }
+            currentAgents.push(val.toLowerCase());
+            continue;
+        }
+
+        collectingAgents = false;
+
+        if (key === 'sitemap') {
+            sitemaps.push(val);
+        } else if (key === 'disallow' || key === 'allow') {
+            for (const agent of currentAgents) {
+                if (!groups[agent]) groups[agent] = [];
+                groups[agent].push({ action: key, path: val.toLowerCase() });
+            }
+        }
+    }
+
+    return { groups, sitemaps };
+}
+
+/**
+ * Resolves whether a directive group grants a crawler access to the site root.
+ * @returns {'blocked'|'allowed'|'partial'}
+ */
+function evaluateRootAccess(rules) {
+    const disallowsRoot = rules.some(r => r.action === 'disallow' && (r.path === '/' || r.path === '/*'));
+    const allowsRoot = rules.some(r => r.action === 'allow' && (r.path === '/' || r.path === '/*'));
+    // "Disallow:" with an empty value is the canonical way to grant full access.
+    const emptyDisallow = rules.some(r => r.action === 'disallow' && r.path === '');
+
+    if (disallowsRoot && !allowsRoot) return 'blocked';
+    if (allowsRoot || emptyDisallow) return 'allowed';
+    return 'partial';
+}
+
+/**
+ * Analyzes llms.txt, robots.txt (AI bot rules), and sitemap availability.
+ */
+function analyzeFiles(llmsRes, robotsRes, sitemapRes) {
     let score = 0;
     const checks = {};
     const critical_failures = [];
@@ -339,59 +461,25 @@ function analyzeFiles(llmsRes, robotsRes) {
     const blockedBots = [];
     const allowedBots = [];
     let hasExplicitAiRules = false;
+    let robotsSitemaps = [];
 
     if (robotsRes && robotsRes.ok && robotsRes.text) {
-        const content = robotsRes.text;
-        const lines = content.split('\n').map(l => l.trim());
-        const aiBots = ['gptbot', 'claudebot', 'perplexitybot', 'anthropic-ai', 'google-extended'];
+        const { groups, sitemaps } = parseRobots(robotsRes.text);
+        robotsSitemaps = sitemaps;
 
-        let currentUserAgents = [];
-        const botDirectives = {};
-
-        for (const line of lines) {
-            if (!line || line.startsWith('#')) continue;
-
-            const colonIdx = line.indexOf(':');
-            if (colonIdx === -1) continue;
-
-            const key = line.slice(0, colonIdx).trim().toLowerCase();
-            const val = line.slice(colonIdx + 1).trim().toLowerCase();
-
-            if (key === 'user-agent') {
-                currentUserAgents.push(val);
-            } else if (key === 'disallow' || key === 'allow') {
-                if (currentUserAgents.length > 0) {
-                    for (const ua of currentUserAgents) {
-                        if (!botDirectives[ua]) botDirectives[ua] = [];
-                        botDirectives[ua].push({ action: key, path: val });
-                    }
-                }
-            } else {
-                // Other directive resets current agent group if blank line wasn't used
-            }
-        }
-
-        // Check each AI bot for blocking or explicit allow
-        for (const bot of aiBots) {
-            const specificRules = botDirectives[bot] || [];
-            const globalRules = botDirectives['*'] || [];
+        for (const bot of AI_BOTS) {
+            const specificRules = groups[bot] || [];
+            const globalRules = groups['*'] || [];
 
             if (specificRules.length > 0) {
                 hasExplicitAiRules = true;
-                const isBlocked = specificRules.some(r => r.action === 'disallow' && (r.path === '/' || r.path === '/*'));
-                const isAllowed = specificRules.some(r => r.action === 'allow' && (r.path === '/' || r.path === '/*'));
-
-                if (isBlocked && !isAllowed) {
-                    blockedBots.push(bot);
-                } else if (isAllowed) {
-                    allowedBots.push(bot);
-                }
+                const access = evaluateRootAccess(specificRules);
+                if (access === 'blocked') blockedBots.push(bot);
+                else if (access === 'allowed') allowedBots.push(bot);
             } else if (globalRules.length > 0) {
-                const isBlocked = globalRules.some(r => r.action === 'disallow' && (r.path === '/' || r.path === '/*'));
-                const isAllowed = globalRules.some(r => r.action === 'allow' && (r.path === '/' || r.path === '/*'));
-                if (isBlocked && !isAllowed) {
-                    blockedBots.push(bot);
-                }
+                // No bot-specific group: the wildcard group governs, but only blocking is reported
+                // since a permissive wildcard is not evidence of deliberate AI optimization.
+                if (evaluateRootAccess(globalRules) === 'blocked') blockedBots.push(bot);
             }
         }
 
@@ -415,6 +503,15 @@ function analyzeFiles(llmsRes, robotsRes) {
             has_explicit_ai_rules: false
         };
         recommendations.push("Add a robots.txt file with explicit allow rules for AI bots (GPTBot, ClaudeBot, PerplexityBot).");
+    }
+
+    // Sitemap (diagnostic only, not scored)
+    const sitemapBody = sitemapRes && sitemapRes.ok ? sitemapRes.text || '' : '';
+    const servesSitemap = sitemapBody.includes('<urlset') || sitemapBody.includes('<sitemapindex');
+    checks.has_sitemap = servesSitemap || robotsSitemaps.length > 0;
+
+    if (!checks.has_sitemap) {
+        recommendations.push("Publish a sitemap.xml and reference it from robots.txt so crawlers can enumerate every book and series page.");
     }
 
     return { score, checks, critical_failures, recommendations };
@@ -442,12 +539,14 @@ async function runScan(inputUrl) {
     const baseUrl = `${parsed.protocol}//${parsed.host}`;
     const llmsUrl = `${baseUrl}/llms.txt`;
     const robotsUrl = `${baseUrl}/robots.txt`;
+    const sitemapUrl = `${baseUrl}/sitemap.xml`;
 
     // Concurrent fetching with Promise.all
-    const [htmlRes, llmsRes, robotsRes] = await Promise.all([
+    const [htmlRes, llmsRes, robotsRes, sitemapRes] = await Promise.all([
         safeFetch(urlToScan),
         safeFetch(llmsUrl),
-        safeFetch(robotsUrl)
+        safeFetch(robotsUrl),
+        safeFetch(sitemapUrl)
     ]);
 
     if (!htmlRes.ok && !htmlRes.text) {
@@ -455,10 +554,10 @@ async function runScan(inputUrl) {
     }
 
     // Analyze HTML
-    const htmlAnalysis = analyzeHtml(htmlRes.text);
+    const htmlAnalysis = analyzeHtml(htmlRes.text, urlToScan);
 
-    // Analyze llms.txt & robots.txt
-    const fileAnalysis = analyzeFiles(llmsRes, robotsRes);
+    // Analyze llms.txt, robots.txt & sitemap.xml
+    const fileAnalysis = analyzeFiles(llmsRes, robotsRes, sitemapRes);
 
     // Aggregate Score & Grade
     const rawScore = htmlAnalysis.score + fileAnalysis.score;
@@ -489,5 +588,12 @@ async function runScan(inputUrl) {
 module.exports = {
     runScan,
     validateSSRF,
-    isPrivateOrReservedIP
+    isPrivateOrReservedIP,
+    parseRobots,
+    evaluateRootAccess,
+    analyzeHtml,
+    analyzeFiles,
+    isCanonicalCorrect,
+    AI_BOTS,
+    THIN_CONTENT_WORDS
 };

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -21,10 +22,16 @@ function copyPath(from, to) {
     fs.cpSync(from, to, { recursive: true });
 }
 
-function rewriteHtml(filePath) {
+function contentHash(filePath) {
+    return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex').slice(0, 10);
+}
+
+// Hashed filenames let Netlify serve CSS/JS with a one-year immutable cache without
+// stranding visitors on a stale build.
+function rewriteHtml(filePath, assets) {
     let html = fs.readFileSync(filePath, 'utf8');
-    html = html.replace(/href="\/?styles\.css"/g, 'href="/styles.min.css"');
-    html = html.replace(/src="\/?script\.js"/g, 'src="/script.min.js"');
+    html = html.replace(/href="(?:\.\.\/|\/)?styles\.css"/g, `href="/${assets.css}"`);
+    html = html.replace(/src="(?:\.\.\/|\/)?script\.js"/g, `src="/${assets.js}"`);
     fs.writeFileSync(filePath, html);
 }
 
@@ -60,14 +67,19 @@ for (const file of scriptFiles) {
     copyPath(path.join(root, 'scripts', file), path.join(dist, 'scripts', file));
 }
 
-copyPath(path.join(root, 'styles.css'), path.join(dist, 'styles.min.css'));
-copyPath(path.join(root, 'script.js'), path.join(dist, 'script.min.js'));
-copyPath(path.join(root, 'styles.css'), path.join(dist, 'styles.css'));
-copyPath(path.join(root, 'script.js'), path.join(dist, 'script.js'));
+// Hashed bundles live under /static/ so Netlify can cache that one prefix immutably.
+fs.mkdirSync(path.join(dist, 'static'), { recursive: true });
+const assets = {
+    css: `static/styles.${contentHash(path.join(root, 'styles.css'))}.css`,
+    js: `static/script.${contentHash(path.join(root, 'script.js'))}.js`
+};
+
+copyPath(path.join(root, 'styles.css'), path.join(dist, assets.css));
+copyPath(path.join(root, 'script.js'), path.join(dist, assets.js));
 
 const htmlFiles = getAllHtmlFiles(dist);
 for (const htmlPath of htmlFiles) {
-    rewriteHtml(htmlPath);
+    rewriteHtml(htmlPath, assets);
 }
 
-console.log(`Built ${dist}`);
+console.log(`Built ${dist} (${assets.css}, ${assets.js})`);
