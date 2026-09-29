@@ -3,7 +3,7 @@ const pipeline = require('../src/pipeline');
 const crypto = require('crypto');
 
 const mockPayload = {
-    form_name: "metadata-kit-intake",
+    form_name: "amazon-visibility-kit-intake",
     title: "The Silent Orbit",
     author: "Jane Doe",
     genre: "Science Fiction",
@@ -18,7 +18,7 @@ async function runTest() {
     console.log(`Job ID: ${jobId}`);
     
     try {
-        await pipeline.processJob(jobId, 'KIT-02', mockPayload);
+        await pipeline.processJob(jobId, 'amazon-visibility-kit', mockPayload);
         console.log('Test completed successfully.');
     } catch (e) {
         console.error('Test failed:', e);

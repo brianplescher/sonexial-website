@@ -2,10 +2,10 @@ const llm = require('../llm');
 const { sanitizeLog } = require('../ai-utils');
 
 async function processMetadataKit(payload) {
-    console.log('Starting KIT-02 processing...');
+    console.log('Starting metadata-kit processing...');
     
     const step1Prompt = `
-You are an expert book marketing strategist. We are preparing a Metadata Kit (KIT-02) for a book.
+You are an expert book marketing strategist. We are preparing a Metadata Kit for a book.
 Analyze the following book details provided by the author:
 ${JSON.stringify(payload, null, 2)}
 

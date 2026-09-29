@@ -6,27 +6,7 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://sonexial.com/ad-copy-suite</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sonexial.com/metadata-kit</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sonexial.com/bisac-kit</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sonexial.com/website-seo-audit</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sonexial.com/cover-design-audit</loc>
+    <loc>https://sonexial.com/amazon-visibility-kit</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

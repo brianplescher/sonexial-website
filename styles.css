@@ -227,6 +227,11 @@ BUTTONS
   transform: translateY(-1px);
 }
 
+.btn-secondary.is-unavailable {
+  color: var(--text-2);
+  border-color: var(--border);
+}
+
 .btn-ghost {
   display: inline-flex;
   align-items: center;
