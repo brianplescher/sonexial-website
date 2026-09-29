@@ -2,19 +2,15 @@
 
 > Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
 
-Sonexial provides author website development, Generative Engine Optimization, author platform strategy, book landing pages, email capture setup, book description writing, and AI visibility monitoring.
+Sonexial provides a free author website GEO audit, Amazon listing optimization, author website development, Generative Engine Optimization, author platform strategy, and ongoing AI visibility monitoring.
 
 ## Core Pages
 
 - [Home](https://sonexial.com/) - Overview of Sonexial services, process, FAQ, and contact information.
 - [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
 - [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
-- [Ad Copy Suite](https://sonexial.com/ad-copy-suite) - Amazon Sponsored Products and Facebook/Meta ad copy package for indie authors.
-- [Metadata & Amazon Optimization Kit](https://sonexial.com/metadata-kit) - Metadata optimization service including description, subtitle, keywords, and author bio.
-- [BISAC & Category Strategy Kit](https://sonexial.com/bisac-kit) - BISAC code and Amazon browse category strategy for better discoverability.
-- [Author Website SEO & AI Visibility Audit](https://sonexial.com/website-seo-audit) - Audit for author websites covering on-page SEO, keyword gaps, page structure, and AI visibility.
+- [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description in one deliverable.
 - [Author Website GEO & AI Visibility Audit](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
-- [Cover Design Signal Audit](https://sonexial.com/cover-design-audit) - Cover review focused on genre fit, thumbnail legibility, and competitive positioning.
 - [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
 - [About](https://sonexial.com/about) - Background on Sonexial and founder information.
 - [Privacy](https://sonexial.com/privacy) - Privacy Policy.
@@ -23,9 +19,10 @@ Sonexial provides author website development, Generative Engine Optimization, au
 
 ## Services
 
-- One-time infrastructure kits for metadata, ad copy, BISAC/category strategy, cover analysis, and SEO/AI visibility.
-- Ongoing support subscriptions for Amazon ranking changes, metadata maintenance, and title audits.
-- A done-for-you description overhaul for authors needing a deeper rewrite.
+- A free Author GEO Audit scanning any author website for AI discoverability failures.
+- The Amazon Visibility Kit, a one-time kit covering BISAC categories, Amazon keywords, and book description.
+- Author website builds: Author Starter and Author Platform.
+- A monthly GEO Retainer tracking how AI answer engines cite an author and their books.
 
 ## Founder
 

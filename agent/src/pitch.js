@@ -29,7 +29,7 @@ Audit Findings:
 Analyze these audit results and formulate an outreach strategy:
 1. What is the core reason AI engines (ChatGPT, Perplexity, Claude, Google AI Overviews) are struggling to recommend or cite this author?
 2. What are the specific high-leverage fixes needed (e.g. llms.txt roadmap, JSON-LD Schema entity mapping, semantic heading hierarchy)?
-3. Which Sonexial package is the natural solution (Author Foundation for $1,500 or Author Platform for $3,000)?
+3. Which Sonexial package is the natural solution (GEO Diagnostic for $297, Author Starter for $497, or Author Platform for $3,000)?
 4. What tone will resonate best with this author (empathetic, authoritative, peer-to-peer author-to-author, direct)?
 `;
 
@@ -59,7 +59,7 @@ Output valid JSON ONLY — no markdown fences, no commentary:
 {
   "subject": "Quick note regarding your AI discoverability (GEO Audit)",
   "email_draft": "The full text of the personalized outreach email (under 200 words).",
-  "recommended_package": "Author Foundation ($1,500) or Author Platform ($3,000)",
+  "recommended_package": "GEO Diagnostic ($297), Author Starter ($497), or Author Platform ($3,000)",
   "key_findings_summary": ["Point 1", "Point 2", "Point 3"]
 }
 `;

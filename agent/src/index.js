@@ -223,7 +223,7 @@ app.post('/webhooks/netlify', async (req, res) => {
         }
         
         const payload = req.body;
-        const kitType = payload.form_name || 'metadata-kit';
+        const kitType = payload.form_name || 'amazon-visibility-kit';
         const jobId = crypto.randomUUID();
         
         await db.createJob(jobId, kitType, payload);

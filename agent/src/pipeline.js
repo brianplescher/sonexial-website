@@ -1,30 +1,18 @@
 const db = require('./db');
 const email = require('./email');
-const metadataKit = require('./kits/metadata-kit');
-const adCopyKit = require('./kits/ad-copy-kit');
-const bisacKit = require('./kits/bisac-kit');
-const coverAuditKit = require('./kits/cover-audit-kit');
-const websiteSeoKit = require('./kits/website-seo-kit');
-const positioningKit = require('./kits/positioning-kit');
+const amazonVisibilityKit = require('./kits/amazon-visibility-kit');
 
 // Maps every kit_type value sent by intake forms to its processor.
 // Intake form hidden fields use these exact values:
-//   metadata-kit        → Intake/metadata.html
-//   ad-copy-suite       → Intake/ad-copy.html
-//   bisac-kit           → Intake/bisac.html
-//   cover-audit         → Intake/cover-audit.html
-//   website-seo-audit   → Intake/website-seo.html
-//   optimization-kit    → Intake/optimization-intake.html (legacy)
+//   amazon-visibility-kit → Intake/amazon-visibility.html
+// Legacy values from kits retired in the Phase 1.5 consolidation (metadata-kit,
+// bisac-kit, optimization-kit) still resolve to the merged kit so in-flight
+// submissions are not dropped.
 const KIT_PROCESSORS = {
-    'metadata-kit':      metadataKit.processMetadataKit,
-    'optimization-kit':  metadataKit.processMetadataKit,
-    'ad-copy-suite':     adCopyKit.processAdCopyKit,
-    'bisac-kit':         bisacKit.processBisacKit,
-    'cover-audit':       coverAuditKit.processCoverAuditKit,
-    'website-seo-audit': websiteSeoKit.processWebsiteSeoKit,
-
-    // Positioning Kit (no intake form yet)
-    'positioning-kit':   positioningKit.processPositioningKit,
+    'amazon-visibility-kit': amazonVisibilityKit.processAmazonVisibilityKit,
+    'metadata-kit':          amazonVisibilityKit.processAmazonVisibilityKit,
+    'bisac-kit':             amazonVisibilityKit.processAmazonVisibilityKit,
+    'optimization-kit':      amazonVisibilityKit.processAmazonVisibilityKit,
 };
 
 async function processJob(jobId, kitType, payload) {
