@@ -18,7 +18,7 @@ async function runTest() {
     console.log(`Job ID: ${jobId}`);
     
     try {
-        await pipeline.processJob(jobId, 'KIT-02', mockPayload);
+        await pipeline.processJob(jobId, 'metadata-kit', mockPayload);
         console.log('Test completed successfully.');
     } catch (e) {
         console.error('Test failed:', e);

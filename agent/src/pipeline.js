@@ -9,37 +9,22 @@ const positioningKit = require('./kits/positioning-kit');
 
 // Maps every kit_type value sent by intake forms to its processor.
 // Intake form hidden fields use these exact values:
-//   metadata-kit        → Intake/metadata.html        (KIT-02)
-//   ad-copy-suite       → Intake/ad-copy.html          (KIT-01)
-//   bisac-kit           → Intake/bisac.html             (KIT-03)
-//   cover-audit         → Intake/cover-audit.html       (KIT-05)
-//   website-seo-audit   → Intake/website-seo.html       (KIT-04)
+//   metadata-kit        → Intake/metadata.html
+//   ad-copy-suite       → Intake/ad-copy.html
+//   bisac-kit           → Intake/bisac.html
+//   cover-audit         → Intake/cover-audit.html
+//   website-seo-audit   → Intake/website-seo.html
 //   optimization-kit    → Intake/optimization-intake.html (legacy)
 const KIT_PROCESSORS = {
-    // Metadata Kit — primary and legacy aliases
     'metadata-kit':      metadataKit.processMetadataKit,
-    'KIT-02':            metadataKit.processMetadataKit,
     'optimization-kit':  metadataKit.processMetadataKit,
-
-    // Ad Copy Suite
     'ad-copy-suite':     adCopyKit.processAdCopyKit,
-    'KIT-01':            adCopyKit.processAdCopyKit,
-
-    // BISAC & Category Strategy Kit
     'bisac-kit':         bisacKit.processBisacKit,
-    'KIT-03':            bisacKit.processBisacKit,
-
-    // Cover Design Signal Audit
     'cover-audit':       coverAuditKit.processCoverAuditKit,
-    'KIT-05':            coverAuditKit.processCoverAuditKit,
-
-    // Website SEO & GEO Audit
     'website-seo-audit': websiteSeoKit.processWebsiteSeoKit,
-    'KIT-04':            websiteSeoKit.processWebsiteSeoKit,
 
-    // Positioning Kit (future intake form)
+    // Positioning Kit (no intake form yet)
     'positioning-kit':   positioningKit.processPositioningKit,
-    'KIT-06':            positioningKit.processPositioningKit,
 };
 
 async function processJob(jobId, kitType, payload) {
