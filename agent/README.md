@@ -18,6 +18,22 @@ have enabled third-party data sharing (otherwise it returns HTTP 403).
 Without a key the service still starts and the scanner, email gate, lead capture and
 report emails all work; only AI generation is skipped.
 
+## GEO Diagnostic ($297)
+
+`src/diagnostic/` crawls up to 30 same-site pages (homepage + sitemap, SSRF-safe via
+`scanner.safeFetch`), runs ~35 checks per page, ranks every issue by impact vs. effort, drafts
+ready-to-paste fixes (Person/Book JSON-LD, llms.txt, robots.txt), and writes the narrative with the
+LLM (template fallback without a key). The result is one self-contained HTML document.
+
+- `POST /webhooks/stripe` — `checkout.session.completed` for a Payment Link listed in
+  `STRIPE_DIAGNOSTIC_PAYMENT_LINKS`. Signature is verified against `req.rawBody`. The site URL comes
+  from a Payment Link custom text field keyed `websiteurl` (or a lead ID in `client_reference_id`).
+  `stripe_session_id` is unique, so retries never re-run fulfillment.
+- `GET /api/diagnostic/:token` — the hosted report (unguessable 48-hex token, `noindex`).
+- `POST /diagnostics` (admin) — `{ "url", "email"?, "name"? }` runs one without a purchase.
+- `GET /diagnostics/:id`, `POST /diagnostics/:id/retry` (admin) — status and re-run (`{ "url" }` to
+  fill in a missing URL).
+
 ## Setup
 
 1. Copy `.env.example` to `.env` and fill in the values.
