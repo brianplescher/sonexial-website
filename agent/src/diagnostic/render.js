@@ -64,7 +64,7 @@ function renderBots(bots) {
         <td>${b.kind === 'search' ? 'AI search / answers' : 'Model training'}</td>
         <td class="${b.access === 'blocked' ? (b.kind === 'search' ? 'bad' : 'mid') : 'good'}">${b.access === 'blocked' ? 'Blocked' : 'Allowed'}</td>
       </tr>`).join('');
-    return `<table><thead><tr><th>Crawler</th><th>Feeds</th><th>Purpose</th><th>Access</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<div class="table-wrap"><table><thead><tr><th>Crawler</th><th>Feeds</th><th>Purpose</th><th>Access</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function renderPlan(plan) {
@@ -85,7 +85,7 @@ function renderInventory(pages) {
         <td>${esc((p.schema || []).join(', ') || '—')}</td>
         <td>${esc(p.issueCount)}</td>
       </tr>`).join('');
-    return `<table class="inventory"><thead><tr><th>Page</th><th>Status</th><th>Words</th><th>Clicks from home</th><th>Schema</th><th>Issues</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<div class="table-wrap"><table class="inventory"><thead><tr><th>Page</th><th>Status</th><th>Words</th><th>Clicks from home</th><th>Schema</th><th>Issues</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function codeBlock(title, filename, body, note) {
@@ -121,7 +121,7 @@ h2{font-size:24px;margin:0 0 16px}h3{font-size:17px;margin:0 0 6px}
 .tags{margin:6px 0 10px}.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:3px;padding:1px 8px;margin:0 4px 4px 0;text-transform:capitalize}
 .sev-error .tag.sev{background:var(--bad);color:#fff;border-color:var(--bad)}.sev-warning .tag.sev{background:var(--mid);color:#fff;border-color:var(--mid)}.sev-notice .tag.sev{background:var(--accent);color:#fff;border-color:var(--accent)}
 .pages{margin:8px 0 0;padding-left:20px;font-size:14px}code{font:13px ui-monospace,Menlo,monospace;word-break:break-all}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse;font-size:14px}.inventory{min-width:640px}td code{word-break:normal;overflow-wrap:anywhere}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 pre{background:#0d1117;color:#e6edf3;padding:16px;border-radius:4px;overflow:auto;font-size:13px;line-height:1.5}
 .filename{font:600 13px ui-monospace,Menlo,monospace;margin:8px 0 4px}.artifact{margin-bottom:28px}
 .week{margin-bottom:16px}.cta{background:#000;color:#fff}.cta a{color:#00f0ff}.cta .muted{color:#b3b3b3}
