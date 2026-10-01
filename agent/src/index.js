@@ -7,12 +7,15 @@ const scanner = require('./scanner');
 const pitch = require('./pitch');
 const llm = require('./llm');
 const mailer = require('./email');
+const stripe = require('./stripe');
+const diagnostics = require('./diagnostic/fulfill');
 
 const app = express();
 app.disable('x-powered-by'); // Prevent Express version disclosure in response headers
 const PORT = process.env.PORT || 3000;
 const NETLIFY_WEBHOOK_SECRET = process.env.NETLIFY_WEBHOOK_SECRET;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 // Raw body parser for webhook signature verification and standard JSON body parsing
 app.use(express.json({
@@ -178,7 +181,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
         await db.createLead(crypto.randomUUID(), lead);
 
         // Delivery must not block the unlock; a Resend outage should still reveal the report.
-        Promise.allSettled([
+        void Promise.allSettled([
             mailer.sendScanReportEmail(lead.email, lead.name, report),
             mailer.sendLeadNotification(lead)
         ]).then(results => {
@@ -229,11 +232,147 @@ app.post('/webhooks/netlify', async (req, res) => {
         await db.createJob(jobId, kitType, payload);
         res.status(202).json({ message: 'Accepted', jobId });
         
-        pipeline.processJob(jobId, kitType, payload);
+        void pipeline.processJob(jobId, kitType, payload);
         
     } catch (error) {
         console.error('Webhook error:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Stripe fulfillment for the GEO Diagnostic. Verified against req.rawBody (captured by the global JSON parser).
+app.post('/webhooks/stripe', async (req, res) => {
+    if (!STRIPE_WEBHOOK_SECRET) {
+        return res.status(503).json({ error: 'Stripe webhook not configured' });
+    }
+
+    let event;
+    try {
+        event = stripe.verifyStripeSignature(req.rawBody, req.headers['stripe-signature'], STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+        console.error('Stripe signature rejected:', sanitizeLog(err.message));
+        return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    const fulfillable = ['checkout.session.completed', 'checkout.session.async_payment_succeeded'];
+    const session = event.data && event.data.object;
+    if (!fulfillable.includes(event.type) || !stripe.isDiagnosticSession(session)) {
+        return res.status(200).json({ received: true, ignored: true });
+    }
+
+    try {
+        const order = stripe.extractOrder(session);
+        if (!order.paid) {
+            return res.status(200).json({ received: true, pending: true });
+        }
+
+        if ((!order.siteUrl || !order.email) && order.leadId) {
+            const lead = await db.getLead(order.leadId).catch(() => null);
+            if (lead) {
+                order.siteUrl = order.siteUrl || stripe.normalizeSiteUrl(lead.scanned_url);
+                order.email = order.email || lead.email;
+                order.name = order.name || lead.name;
+            }
+        }
+
+        const record = await diagnostics.createOrder({
+            stripeSessionId: order.sessionId,
+            email: order.email,
+            name: order.name,
+            siteUrl: order.siteUrl,
+            source: 'stripe'
+        });
+        if (!record) {
+            return res.status(200).json({ received: true, duplicate: true });
+        }
+
+        res.status(200).json({ received: true });
+
+        if (record.status === 'needs_url') {
+            mailer.sendDiagnosticOwnerNotice(`Needs a URL: ${order.email || order.sessionId}`, [
+                `Stripe session: ${order.sessionId}`,
+                `Buyer: ${order.email || '(unknown)'}`,
+                `Order: ${record.id}`,
+                'No website URL on the checkout. Ask the buyer, then POST /diagnostics/:id/retry with {"url": "..."}.'
+            ]).catch(err => console.error('Diagnostic owner notice failed:', sanitizeLog(err.message)));
+            return;
+        }
+        void diagnostics.fulfillOrder(record);
+    } catch (err) {
+        console.error('Stripe webhook error:', sanitizeLog(err.message));
+        if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Hosted diagnostic report. The token is the only credential, so it is long and random.
+app.get('/api/diagnostic/:token', async (req, res) => {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.setHeader('Cache-Control', 'private, no-store');
+    if (!/^[a-f0-9]{48}$/.test(req.params.token)) {
+        return res.status(404).send('Not found');
+    }
+    try {
+        const row = await db.getDiagnosticByToken(req.params.token);
+        if (!row) return res.status(404).send('Not found');
+        if (row.html) return res.status(200).type('html').send(row.html);
+        if (row.status === 'failed') {
+            return res.status(200).type('html').send('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>GEO Diagnostic</title></head><body style="font-family:sans-serif;max-width:600px;margin:60px auto;"><h1>We hit a problem generating your diagnostic.</h1><p>We have been notified and will email you as soon as it is ready.</p></body></html>');
+        }
+        res.status(200).type('html').send('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="15"><title>GEO Diagnostic</title></head><body style="font-family:sans-serif;max-width:600px;margin:60px auto;"><h1>Your diagnostic is being generated.</h1><p>This usually takes a minute or two. This page refreshes automatically, and we will also email you when it is ready.</p></body></html>');
+    } catch (err) {
+        console.error('Diagnostic page error:', sanitizeLog(err.message));
+        res.status(500).send('Error');
+    }
+});
+
+// Admin: run a diagnostic without a Stripe purchase (comps, previews, manual orders).
+app.post('/diagnostics', requireAdmin, async (req, res) => {
+    try {
+        const { url, email, name } = req.body || {};
+        const siteUrl = stripe.normalizeSiteUrl(url);
+        if (!siteUrl) return res.status(400).json({ error: 'A valid "url" is required.' });
+        if (email !== undefined && !isValidEmail(email)) {
+            return res.status(400).json({ error: '"email" is not a valid address.' });
+        }
+
+        const record = await diagnostics.createOrder({
+            stripeSessionId: null,
+            email: email ? email.trim().toLowerCase() : null,
+            name: typeof name === 'string' ? name.trim().slice(0, 120) : null,
+            siteUrl,
+            source: 'admin'
+        });
+        res.status(202).json({ id: record.id, reportUrl: diagnostics.publicReportUrl(record.token) });
+        void diagnostics.fulfillOrder(record);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/diagnostics/:id', requireAdmin, async (req, res) => {
+    try {
+        const row = await db.getDiagnostic(req.params.id);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        const { token, ...rest } = row;
+        res.json({ ...rest, reportUrl: diagnostics.publicReportUrl(token) });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/diagnostics/:id/retry', requireAdmin, async (req, res) => {
+    try {
+        const row = await db.getDiagnostic(req.params.id);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        const siteUrl = req.body && req.body.url ? stripe.normalizeSiteUrl(req.body.url) : row.site_url;
+        if (!siteUrl) return res.status(400).json({ error: 'This order has no URL; pass {"url": "..."}.' });
+
+        await db.updateDiagnostic(row.id, { status: 'queued', siteUrl });
+        const order = { id: row.id, token: row.token, email: row.email, name: row.name, siteUrl };
+        res.status(202).json({ id: row.id, reportUrl: diagnostics.publicReportUrl(row.token) });
+        void diagnostics.fulfillOrder(order);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -279,7 +418,7 @@ app.post('/jobs/:id/retry', requireAdmin, async (req, res) => {
         
         res.status(202).json({ message: 'Retry accepted', jobId: job.id });
         
-        pipeline.processJob(job.id, job.kit_type, payload);
+        void pipeline.processJob(job.id, job.kit_type, payload);
         
     } catch (err) {
         res.status(500).json({ error: err.message });

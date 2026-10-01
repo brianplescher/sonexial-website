@@ -155,7 +155,68 @@ async function sendLeadNotification(lead) {
     });
 }
 
+/**
+ * Delivers the paid GEO Diagnostic: a summary in the body, the full report as an HTML attachment, and a hosted link.
+ */
+async function sendDiagnosticEmail(toEmail, name, diag, html, reportUrl) {
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('RESEND_API_KEY not set, skipping diagnostic email');
+        return false;
+    }
+
+    const quickWins = diag.issues.filter(i => i.quadrant === 'Quick win').slice(0, 5)
+        .map(i => `<li style="margin-bottom:6px;">${escapeHtml(i.title)}</li>`).join('');
+
+    await send({
+        from: SCANNER_FROM,
+        to: toEmail,
+        reply_to: OWNER_EMAIL || undefined,
+        subject: `Your GEO Diagnostic for ${diag.url} is ready`,
+        html: `
+            <div style="font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; color:#111; max-width:640px;">
+                <p>${name ? `${escapeHtml(name)},` : 'Hi,'}</p>
+                <p>Your GEO Diagnostic for <strong>${escapeHtml(diag.url)}</strong> is ready.</p>
+                <p style="font-size:18px; margin:20px 0;">
+                    <strong>AI Readiness: ${escapeHtml(diag.scores.aiReadiness)}/100</strong> &nbsp;&middot;&nbsp;
+                    Site Health: ${escapeHtml(diag.scores.siteHealth)}% &nbsp;&middot;&nbsp;
+                    ${escapeHtml(diag.issues.length)} issues across ${escapeHtml(diag.pagesCrawled)} pages
+                </p>
+                <p>${escapeHtml(diag.writeup.executive_summary)}</p>
+                ${quickWins ? `<h3>Start with these quick wins</h3><ol>${quickWins}</ol>` : ''}
+                <p style="margin:28px 0;">
+                    <a href="${escapeHtml(reportUrl)}" style="background:#000; color:#00f0ff; padding:12px 20px; text-decoration:none; border-radius:3px;">Open the full diagnostic</a>
+                </p>
+                <p>The complete report is also attached as an HTML file you can keep, print to PDF, or forward to whoever manages your site.</p>
+                <p style="color:#666; font-size:13px; margin-top:32px;">Questions? Reply to this email.</p>
+            </div>`,
+        attachments: [{
+            filename: 'Sonexial-GEO-Diagnostic.html',
+            content: Buffer.from(html, 'utf8')
+        }]
+    });
+    return true;
+}
+
+/**
+ * Tells the owner about a diagnostic order or a fulfillment problem that needs a manual look.
+ */
+async function sendDiagnosticOwnerNotice(subject, lines) {
+    if (!process.env.RESEND_API_KEY || !OWNER_EMAIL) {
+        console.warn('RESEND_API_KEY or OWNER_EMAIL not set, skipping diagnostic owner notice');
+        return;
+    }
+
+    await send({
+        from: SCANNER_FROM,
+        to: OWNER_EMAIL,
+        subject: `[Diagnostic] ${subject}`,
+        html: `<ul>${lines.map(l => `<li>${escapeHtml(l)}</li>`).join('')}</ul>`
+    });
+}
+
 module.exports = {
+    sendDiagnosticEmail,
+    sendDiagnosticOwnerNotice,
     sendDraftEmail,
     sendErrorEmail,
     sendScanReportEmail,
