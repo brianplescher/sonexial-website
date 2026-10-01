@@ -181,7 +181,7 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
         await db.createLead(crypto.randomUUID(), lead);
 
         // Delivery must not block the unlock; a Resend outage should still reveal the report.
-        Promise.allSettled([
+        void Promise.allSettled([
             mailer.sendScanReportEmail(lead.email, lead.name, report),
             mailer.sendLeadNotification(lead)
         ]).then(results => {
@@ -232,7 +232,7 @@ app.post('/webhooks/netlify', async (req, res) => {
         await db.createJob(jobId, kitType, payload);
         res.status(202).json({ message: 'Accepted', jobId });
         
-        pipeline.processJob(jobId, kitType, payload);
+        void pipeline.processJob(jobId, kitType, payload);
         
     } catch (error) {
         console.error('Webhook error:', error);
@@ -297,7 +297,7 @@ app.post('/webhooks/stripe', async (req, res) => {
             ]).catch(err => console.error('Diagnostic owner notice failed:', sanitizeLog(err.message)));
             return;
         }
-        diagnostics.fulfillOrder(record);
+        void diagnostics.fulfillOrder(record);
     } catch (err) {
         console.error('Stripe webhook error:', sanitizeLog(err.message));
         if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
@@ -343,7 +343,7 @@ app.post('/diagnostics', requireAdmin, async (req, res) => {
             source: 'admin'
         });
         res.status(202).json({ id: record.id, reportUrl: diagnostics.publicReportUrl(record.token) });
-        diagnostics.fulfillOrder(record);
+        void diagnostics.fulfillOrder(record);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -370,7 +370,7 @@ app.post('/diagnostics/:id/retry', requireAdmin, async (req, res) => {
         await db.updateDiagnostic(row.id, { status: 'queued', siteUrl });
         const order = { id: row.id, token: row.token, email: row.email, name: row.name, siteUrl };
         res.status(202).json({ id: row.id, reportUrl: diagnostics.publicReportUrl(row.token) });
-        diagnostics.fulfillOrder(order);
+        void diagnostics.fulfillOrder(order);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -418,7 +418,7 @@ app.post('/jobs/:id/retry', requireAdmin, async (req, res) => {
         
         res.status(202).json({ message: 'Retry accepted', jobId: job.id });
         
-        pipeline.processJob(job.id, job.kit_type, payload);
+        void pipeline.processJob(job.id, job.kit_type, payload);
         
     } catch (err) {
         res.status(500).json({ error: err.message });
