@@ -11,6 +11,18 @@ function topIssues(issues, n) {
     }));
 }
 
+const BLOCK_WORDS = /\b((un)?block(s|ed|ing)?|ignor(e|es|ed|ing)|shut(s|ting)? out|lock(s|ed|ing)? out)\b/i;
+const CRAWLER_WORDS = /\b(crawl\w*|bots?|AI|discover\w*)\b/i;
+
+/**
+ * Whether text claims AI crawlers are blocked or told to ignore the site.
+ * Small models conflate noindex with crawler blocking; this keeps that claim out when robots.txt allows every bot.
+ */
+function claimsCrawlerBlocking(text) {
+    return String(text || '').split(/(?<=[.!?])\s+/)
+        .some(sentence => BLOCK_WORDS.test(sentence) && CRAWLER_WORDS.test(sentence));
+}
+
 /**
  * Deterministic write-up used when no LLM is configured or the model call fails.
  */
@@ -38,11 +50,27 @@ function fallbackWriteup(diag) {
 }
 
 /**
+ * Replaces any LLM section that contradicts the crawl data with its template equivalent.
+ */
+function guardWriteup(writeup, fallback, blockedBots) {
+    if (blockedBots.length) return writeup;
+    const guarded = { ...writeup };
+    for (const key of ['executive_summary', 'why_ai_misses_you']) {
+        if (claimsCrawlerBlocking(guarded[key])) guarded[key] = fallback[key];
+    }
+    if (claimsCrawlerBlocking(guarded.thirty_day_plan.map(w => [w.focus, ...(w.tasks || [])].join('. ')).join('. '))) {
+        guarded.thirty_day_plan = fallback.thirty_day_plan;
+    }
+    return guarded;
+}
+
+/**
  * Narrative layer of the diagnostic. Optional: falls back to a template when the LLM is off or fails.
  */
 async function generateWriteup(diag) {
     const fallback = fallbackWriteup(diag);
     if (!llm.isConfigured()) return fallback;
+    const blocked = diag.bots.filter(b => b.access === 'blocked').map(b => b.label);
 
     const prompt = `
 You are a Generative Engine Optimization (GEO) consultant writing a paid diagnostic for an author's website.
@@ -54,7 +82,7 @@ Pages crawled: ${diag.pagesCrawled}
 AI readiness: ${diag.scores.aiReadiness}/100, Site health: ${diag.scores.siteHealth}%
 Issue counts: ${JSON.stringify(diag.scores.counts)}
 Top issues (highest priority first): ${JSON.stringify(topIssues(diag.issues, 12))}
-AI crawlers blocked: ${JSON.stringify(diag.bots.filter(b => b.access === 'blocked').map(b => b.label))}
+AI crawlers blocked by robots.txt: ${JSON.stringify(blocked)}${blocked.length ? '' : ` (none: all ${diag.bots.length} AI crawlers are allowed)`}
 Profiles found: ${JSON.stringify(Object.keys(diag.profiles))}
 Homepage description: ${JSON.stringify(diag.homepageDescription || '')}
 
@@ -78,7 +106,7 @@ Output valid JSON ONLY, no markdown fences:
     try {
         const raw = await llm.complete(prompt, { maxTokens: 1800, temperature: 0.4 });
         const parsed = parseJson(raw, 'diagnostic writeup');
-        return {
+        return guardWriteup({
             executive_summary: parsed.executive_summary || fallback.executive_summary,
             why_ai_misses_you: parsed.why_ai_misses_you || fallback.why_ai_misses_you,
             thirty_day_plan: Array.isArray(parsed.thirty_day_plan) && parsed.thirty_day_plan.length ? parsed.thirty_day_plan : fallback.thirty_day_plan,
@@ -87,11 +115,11 @@ Output valid JSON ONLY, no markdown fences:
                 entity_statement: parsed.positioning?.entity_statement || fallback.positioning.entity_statement
             },
             generated_by: 'llm'
-        };
+        }, fallback, blocked);
     } catch (err) {
         console.error('Diagnostic writeup error:', sanitizeLog(err.message));
         return fallback;
     }
 }
 
-module.exports = { generateWriteup, fallbackWriteup };
+module.exports = { generateWriteup, fallbackWriteup, guardWriteup, claimsCrawlerBlocking };

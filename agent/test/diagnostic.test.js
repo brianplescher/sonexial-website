@@ -7,7 +7,7 @@ const { analyzePage, detectProfiles } = require('../src/diagnostic/page-facts');
 const { buildIssues, computeScores, evaluateBots, quadrant, llmsTxtProblems } = require('../src/diagnostic/issues');
 const { normalizeLink, parseSitemapUrls } = require('../src/diagnostic/crawler');
 const { buildArtifacts } = require('../src/diagnostic/artifacts');
-const { fallbackWriteup } = require('../src/diagnostic/writeup');
+const { fallbackWriteup, guardWriteup, claimsCrawlerBlocking } = require('../src/diagnostic/writeup');
 const { renderDiagnosticHtml } = require('../src/diagnostic/render');
 
 const SECRET = 'whsec_test_secret';
@@ -190,4 +190,22 @@ test('rendered diagnostic escapes site content and includes the ready-to-paste f
     assert.ok(html.includes('&lt;b&gt;Jane&lt;/b&gt;'));
     assert.ok(html.includes('Ready-to-paste fixes'));
     assert.ok(html.includes('noindex, nofollow'));
+});
+
+test('guardWriteup drops LLM claims of crawler blocking when robots.txt allows every bot', () => {
+    assert.equal(claimsCrawlerBlocking('The noindex tag explicitly tells AI crawlers to ignore them.'), true);
+    assert.equal(claimsCrawlerBlocking('Intentional blocking prevents AI from discovering your content.'), true);
+    assert.equal(claimsCrawlerBlocking('Two pages are marked noindex. Add Book schema.'), false);
+
+    const fallback = { executive_summary: 'template summary', why_ai_misses_you: 'template why', thirty_day_plan: [{ week: 'Week 1', focus: 'Quick wins', tasks: ['a'] }] };
+    const llmOut = {
+        executive_summary: 'Intentional blocking prevents AI from discovering your content entirely.',
+        why_ai_misses_you: 'Without Book schema, engines cannot confirm your bibliography.',
+        thirty_day_plan: [{ week: 'Week 1', focus: 'Unblock AI crawlers', tasks: ['x'] }]
+    };
+    const guarded = guardWriteup(llmOut, fallback, []);
+    assert.equal(guarded.executive_summary, 'template summary');
+    assert.equal(guarded.why_ai_misses_you, llmOut.why_ai_misses_you);
+    assert.equal(guarded.thirty_day_plan, fallback.thirty_day_plan);
+    assert.equal(guardWriteup(llmOut, fallback, ['GPTBot']).executive_summary, llmOut.executive_summary);
 });
