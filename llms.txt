@@ -9,7 +9,7 @@ Sonexial provides author website development, Generative Engine Optimization, au
 - [Home](https://sonexial.com/) - Overview of Sonexial services, process, FAQ, and contact information.
 - [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
 - [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
-- [Amazon Visibility Kit](https://sonexial.com/metadata-kit) - Merged kit replacing the former Metadata, BISAC, and Description kits: primary/secondary BISAC codes, Amazon browse category targets, seven KDP backend keyword strings, and an HTML-formatted book description with testable variants.
+- [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - Merged kit replacing the former Metadata, BISAC, and Description kits: primary/secondary BISAC codes, Amazon browse category targets, seven KDP backend keyword strings, and an HTML-formatted book description with testable variants.
 - [Author Website GEO & AI Visibility Audit](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
 - [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
 - [About](https://sonexial.com/about) - Background on Sonexial and founder information.
