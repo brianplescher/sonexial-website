@@ -87,6 +87,7 @@
         <input type="hidden" name="product" value="amazon-visibility-kit">
         <input type="hidden" name="kit_type" value="amazon-visibility-kit">
         <input type="hidden" name="purchase_date" value="" id="purchase-date">
+        <input type="hidden" name="stripe_session_id" value="" id="stripe-session-id">
 
         <!-- SECTION 1: BOOK DETAILS -->
         <div class="form-section">
@@ -252,7 +253,9 @@ form.addEventListener('submit', () => {
 });
 const params = new URLSearchParams(window.location.search);
 const pd = params.get('purchase_date');
-if (pd) document.getElementById('purchase-date').value = pd;
+document.getElementById('purchase-date').value = pd || new Date().toISOString().slice(0, 10);
+const sid = params.get('session_id');
+if (sid && /^cs_(live|test)_[A-Za-z0-9]+$/.test(sid)) document.getElementById('stripe-session-id').value = sid;
 if (params.get('success') === 'amazon-visibility') {
     document.getElementById('intake-form').style.display = 'none';
     document.getElementById('success-screen').classList.add('visible');
