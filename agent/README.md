@@ -27,8 +27,11 @@ LLM (template fallback without a key). The result is one self-contained HTML doc
 
 - `POST /webhooks/stripe` — `checkout.session.completed` for a Payment Link listed in
   `STRIPE_DIAGNOSTIC_PAYMENT_LINKS`. Signature is verified against `req.rawBody`. The site URL comes
-  from a Payment Link custom text field keyed `websiteurl` (or a lead ID in `client_reference_id`).
-  `stripe_session_id` is unique, so retries never re-run fulfillment.
+  from a Payment Link custom text field keyed `websiteurl` when present; otherwise the order waits in
+  `needs_url` for the buyer. `stripe_session_id` is unique, so retries never re-run fulfillment.
+- `POST /api/diagnostic/start` — public, rate-limited. `{ "sessionId", "url" }` from the post-payment
+  page (`/diagnostic/start/?session_id=…`). Claims a `needs_url` order exactly once and starts it;
+  later calls just return the report URL. Buyers who never submit are emailed that link after 10 min.
 - `GET /api/diagnostic/:token` — the hosted report (unguessable 48-hex token, `noindex`).
 - `POST /diagnostics` (admin) — `{ "url", "email"?, "name"? }` runs one without a purchase.
 - `GET /diagnostics/:id`, `POST /diagnostics/:id/retry` (admin) — status and re-run (`{ "url" }` to

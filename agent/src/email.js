@@ -198,6 +198,34 @@ async function sendDiagnosticEmail(toEmail, name, diag, html, reportUrl) {
 }
 
 /**
+ * Asks a diagnostic buyer for their website URL when checkout did not collect one.
+ */
+async function sendDiagnosticUrlRequest(toEmail, name, startUrl) {
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('RESEND_API_KEY not set, skipping diagnostic URL request');
+        return false;
+    }
+
+    await send({
+        from: SCANNER_FROM,
+        to: toEmail,
+        reply_to: OWNER_EMAIL || undefined,
+        subject: 'One step left: tell us which site to diagnose',
+        html: `
+            <div style="font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; color:#111; max-width:640px;">
+                <p>${name ? `${escapeHtml(name)},` : 'Hi,'}</p>
+                <p>Thanks for buying the Sonexial GEO Diagnostic. We just need the address of your author website to start.</p>
+                <p style="margin:28px 0;">
+                    <a href="${escapeHtml(startUrl)}" style="background:#000; color:#00f0ff; padding:12px 20px; text-decoration:none; border-radius:3px;">Enter your website</a>
+                </p>
+                <p>Your diagnostic starts the moment you submit it and usually arrives within a few minutes.</p>
+                <p style="color:#666; font-size:13px; margin-top:32px;">Questions? Reply to this email.</p>
+            </div>`
+    });
+    return true;
+}
+
+/**
  * Tells the owner about a diagnostic order or a fulfillment problem that needs a manual look.
  */
 async function sendDiagnosticOwnerNotice(subject, lines) {
@@ -216,6 +244,7 @@ async function sendDiagnosticOwnerNotice(subject, lines) {
 
 module.exports = {
     sendDiagnosticEmail,
+    sendDiagnosticUrlRequest,
     sendDiagnosticOwnerNotice,
     sendDraftEmail,
     sendErrorEmail,

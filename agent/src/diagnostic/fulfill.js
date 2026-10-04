@@ -5,9 +5,19 @@ const { sanitizeLog } = require('../ai-utils');
 const { runDiagnostic } = require('./index');
 const { renderDiagnosticHtml } = require('./render');
 
+function publicBaseUrl() {
+    return (process.env.PUBLIC_BASE_URL || 'https://sonexial.com').replace(/\/+$/, '');
+}
+
 function publicReportUrl(token) {
-    const base = (process.env.PUBLIC_BASE_URL || 'https://sonexial.com').replace(/\/+$/, '');
-    return `${base}/api/diagnostic/${token}`;
+    return `${publicBaseUrl()}/api/diagnostic/${token}`;
+}
+
+/**
+ * Where a buyer whose checkout had no website URL enters one. Stripe's post-payment redirect lands here too.
+ */
+function publicStartUrl(stripeSessionId) {
+    return `${publicBaseUrl()}/diagnostic/start/?session_id=${encodeURIComponent(stripeSessionId)}`;
 }
 
 function newToken() {
@@ -65,4 +75,4 @@ async function fulfillOrder(order) {
     }
 }
 
-module.exports = { createOrder, fulfillOrder, publicReportUrl };
+module.exports = { createOrder, fulfillOrder, publicReportUrl, publicStartUrl };

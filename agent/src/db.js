@@ -176,6 +176,32 @@ const getDiagnostic = (id) => {
     });
 };
 
+const getDiagnosticBySession = (stripeSessionId) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT id, token, email, name, site_url, status FROM diagnostics WHERE stripe_session_id = ?', [stripeSessionId], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
+
+/**
+ * Sets the site URL on an order still waiting for one. Resolves false when another request already claimed it.
+ */
+const claimDiagnosticUrl = (id, siteUrl) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE diagnostics SET site_url = ?, status = 'queued', updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND status = 'needs_url'`,
+            [siteUrl, id],
+            function (err) {
+                if (err) reject(err);
+                else resolve(this.changes > 0);
+            }
+        );
+    });
+};
+
 const getDiagnosticByToken = (token) => {
     return new Promise((resolve, reject) => {
         db.get('SELECT id, status, site_url, html FROM diagnostics WHERE token = ?', [token], (err, row) => {
@@ -191,6 +217,8 @@ module.exports = {
     createDiagnostic,
     updateDiagnostic,
     getDiagnostic,
+    getDiagnosticBySession,
+    claimDiagnosticUrl,
     getDiagnosticByToken,
     getJob,
     createJob,

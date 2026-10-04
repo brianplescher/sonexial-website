@@ -61,6 +61,10 @@ function normalizeSiteUrl(value) {
     }
 }
 
+function isCheckoutSessionId(value) {
+    return typeof value === 'string' && /^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(value);
+}
+
 /**
  * Pulls the buyer, site URL, and lead reference out of a Checkout Session.
  * The URL comes from a Payment Link custom text field whose key mentions url/website/site.
@@ -77,4 +81,4 @@ function extractOrder(session) {
     };
 }
 
-module.exports = { verifyStripeSignature, isDiagnosticSession, extractOrder, normalizeSiteUrl, configuredIds };
+module.exports = { verifyStripeSignature, isDiagnosticSession, extractOrder, normalizeSiteUrl, isCheckoutSessionId, configuredIds };

@@ -26,10 +26,12 @@ One self-contained HTML document: hosted at an unguessable URL and attached to t
 
 ## Fulfillment
 
-Stripe Payment Link (with a required custom text field keyed `websiteurl`) →
-`checkout.session.completed` → `POST /webhooks/stripe` (signature verified on `req.rawBody`) →
-idempotent insert keyed by Checkout Session ID → crawl + checks + write-up → email + owner notice.
-Missing URL or failures notify the owner; admins re-run with `POST /diagnostics/:id/retry`.
+Stripe Payment Link → `checkout.session.completed` → `POST /webhooks/stripe` (signature verified on
+`req.rawBody`) → idempotent insert keyed by Checkout Session ID. The Payment Link's after-payment
+redirect is `https://sonexial.com/diagnostic/start/?session_id={CHECKOUT_SESSION_ID}`, where the buyer
+enters their site; `POST /api/diagnostic/start` claims the order once → crawl + checks + write-up →
+email. Buyers who close the tab get that link by email after 10 minutes, and the owner is notified.
+Failures notify the owner; admins re-run with `POST /diagnostics/:id/retry`.
 
 ## Not in v1
 

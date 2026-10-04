@@ -16,6 +16,8 @@ const PORT = process.env.PORT || 3000;
 const NETLIFY_WEBHOOK_SECRET = process.env.NETLIFY_WEBHOOK_SECRET;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+// Buyers normally enter their URL on the post-payment page within seconds; only chase the ones who don't.
+const URL_REMINDER_DELAY_MS = 10 * 60 * 1000;
 
 // Raw body parser for webhook signature verification and standard JSON body parsing
 app.use(express.json({
@@ -289,18 +291,67 @@ app.post('/webhooks/stripe', async (req, res) => {
         res.status(200).json({ received: true });
 
         if (record.status === 'needs_url') {
-            mailer.sendDiagnosticOwnerNotice(`Needs a URL: ${order.email || order.sessionId}`, [
-                `Stripe session: ${order.sessionId}`,
-                `Buyer: ${order.email || '(unknown)'}`,
-                `Order: ${record.id}`,
-                'No website URL on the checkout. Ask the buyer, then POST /diagnostics/:id/retry with {"url": "..."}.'
-            ]).catch(err => console.error('Diagnostic owner notice failed:', sanitizeLog(err.message)));
+            setTimeout(() => { void remindMissingUrl(record); }, URL_REMINDER_DELAY_MS).unref();
             return;
         }
         void diagnostics.fulfillOrder(record);
     } catch (err) {
         console.error('Stripe webhook error:', sanitizeLog(err.message));
         if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+async function remindMissingUrl(record) {
+    try {
+        const row = await db.getDiagnostic(record.id);
+        if (!row || row.status !== 'needs_url') return;
+        const startUrl = diagnostics.publicStartUrl(row.stripe_session_id);
+        const emailed = row.email
+            ? await mailer.sendDiagnosticUrlRequest(row.email, row.name, startUrl).catch(err => {
+                console.error('Diagnostic URL request failed:', sanitizeLog(err.message));
+                return false;
+            })
+            : false;
+        await mailer.sendDiagnosticOwnerNotice(`Waiting on a URL: ${row.email || row.stripe_session_id}`, [
+            `Order: ${row.id}`,
+            `Buyer: ${row.email || '(unknown)'}`,
+            emailed ? `Buyer was emailed the start link: ${startUrl}` : `Could not email the buyer. Send them: ${startUrl}`,
+            'Or set it yourself: POST /diagnostics/:id/retry with {"url": "..."}.'
+        ]);
+    } catch (err) {
+        console.error('Diagnostic URL reminder failed:', sanitizeLog(err.message));
+    }
+}
+
+// Post-payment step: the buyer names the site for an order whose checkout did not collect one.
+// The Checkout Session ID arrives via the Payment Link redirect and is only known to the buyer.
+app.post('/api/diagnostic/start', rateLimiter, async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const { sessionId, url } = req.body || {};
+    if (!stripe.isCheckoutSessionId(sessionId)) {
+        return res.status(400).json({ error: 'This link is missing a valid checkout reference. Reply to your receipt email and we will sort it out.' });
+    }
+    try {
+        const row = await db.getDiagnosticBySession(sessionId);
+        if (!row) {
+            return res.status(404).json({ error: 'We have not received payment confirmation from Stripe yet.', retry: true });
+        }
+        const reportUrl = diagnostics.publicReportUrl(row.token);
+        if (row.status !== 'needs_url') {
+            return res.status(200).json({ status: row.status, reportUrl });
+        }
+        const siteUrl = stripe.normalizeSiteUrl(url);
+        if (!siteUrl) {
+            return res.status(400).json({ error: 'Enter your website address, for example yourname.com.' });
+        }
+        if (!await db.claimDiagnosticUrl(row.id, siteUrl)) {
+            return res.status(200).json({ status: 'queued', reportUrl });
+        }
+        res.status(202).json({ status: 'queued', reportUrl });
+        void diagnostics.fulfillOrder({ id: row.id, token: row.token, email: row.email, name: row.name, siteUrl });
+    } catch (err) {
+        console.error('Diagnostic start error:', sanitizeLog(err.message));
+        if (!res.headersSent) res.status(500).json({ error: 'Something went wrong. Please try again.' });
     }
 });
 

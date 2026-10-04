@@ -2,7 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-const { verifyStripeSignature, isDiagnosticSession, extractOrder, normalizeSiteUrl } = require('../src/stripe');
+const { verifyStripeSignature, isDiagnosticSession, extractOrder, normalizeSiteUrl, isCheckoutSessionId } = require('../src/stripe');
+const { publicStartUrl } = require('../src/diagnostic/fulfill');
 const { analyzePage, detectProfiles } = require('../src/diagnostic/page-facts');
 const { buildIssues, computeScores, evaluateBots, quadrant, llmsTxtProblems } = require('../src/diagnostic/issues');
 const { normalizeLink, parseSitemapUrls } = require('../src/diagnostic/crawler');
@@ -208,4 +209,23 @@ test('guardWriteup drops LLM claims of crawler blocking when robots.txt allows e
     assert.equal(guarded.why_ai_misses_you, llmOut.why_ai_misses_you);
     assert.equal(guarded.thirty_day_plan, fallback.thirty_day_plan);
     assert.equal(guardWriteup(llmOut, fallback, ['GPTBot']).executive_summary, llmOut.executive_summary);
+});
+
+test('isCheckoutSessionId accepts Stripe Checkout Session IDs only', () => {
+    assert.equal(isCheckoutSessionId('cs_live_a1B2c3D4e5F6g7H8i9J0'), true);
+    assert.equal(isCheckoutSessionId('cs_test_a1B2c3D4e5F6g7H8i9J0'), true);
+    for (const bad of [undefined, '', 'cs_live_short', 'pi_live_a1B2c3D4e5F6g7H8i9J0', 'cs_live_a1B2c3D4e5F6g7H8\' OR 1=1', 42]) {
+        assert.equal(isCheckoutSessionId(bad), false, String(bad));
+    }
+});
+
+test('publicStartUrl points the buyer at the post-payment page for their session', () => {
+    const prev = process.env.PUBLIC_BASE_URL;
+    process.env.PUBLIC_BASE_URL = 'https://example.test/';
+    try {
+        assert.equal(publicStartUrl('cs_live_abc123DEF456'), 'https://example.test/diagnostic/start/?session_id=cs_live_abc123DEF456');
+    } finally {
+        if (prev === undefined) delete process.env.PUBLIC_BASE_URL;
+        else process.env.PUBLIC_BASE_URL = prev;
+    }
 });
