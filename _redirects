@@ -28,16 +28,21 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 # Retired kits (Phase 1.5 consolidation) — BISAC, Metadata and Description
 # merged into the Amazon Visibility Kit; the rest are no longer sold.
 /metadata-kit /amazon-visibility-kit 301!
+/metadata-kit.html /amazon-visibility-kit 301!
 /bisac-kit /amazon-visibility-kit 301!
+/bisac-kit.html /amazon-visibility-kit 301!
 /ad-copy-suite /kits 301!
-/cover-design-audit /kits 301!
-/website-seo-audit /kits 301!
+/ad-copy-suite.html /kits 301!
+/cover-design-audit /tools/author-geo-audit/ 301!
+/cover-design-audit.html /tools/author-geo-audit/ 301!
+/website-seo-audit /tools/author-geo-audit/ 301!
+/website-seo-audit.html /tools/author-geo-audit/ 301!
 /Intake/metadata.html /Intake/amazon-visibility.html 301!
 /Intake/bisac.html /Intake/amazon-visibility.html 301!
 /Intake/optimization-intake.html /Intake/amazon-visibility.html 301!
 /Intake/ad-copy.html /kits 301!
-/Intake/cover-audit.html /kits 301!
-/Intake/website-seo.html /kits 301!
+/Intake/cover-audit.html /tools/author-geo-audit/ 301!
+/Intake/website-seo.html /tools/author-geo-audit/ 301!
 /tools/author-geo-audit /tools/author-geo-audit/ 301
 /tools/author-geo-audit/ /tools/author-geo-audit/index.html 200
 /diagnostic/start /diagnostic/start/ 301

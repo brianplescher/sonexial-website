@@ -9,11 +9,9 @@ Sonexial-Website/
 ├── index.html
 ├── 404.html
 ├── calculator.html
-├── ad-copy-suite.html
-├── bisac-kit.html
-├── cover-design-audit.html
-├── metadata-kit.html
-├── website-seo-audit.html
+├── amazon-visibility-kit.html
+├── kits.html
+├── about.html
 ├── styles.css
 ├── script.js
 ├── netlify.toml
@@ -23,6 +21,8 @@ Sonexial-Website/
 ├── Images/
 ├── assets/
 ├── blog/
+├── tools/author-geo-audit/
+├── diagnostic/start/
 ├── scripts/
 └── dist/
 ```
