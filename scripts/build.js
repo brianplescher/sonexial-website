@@ -6,7 +6,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist');
-const assetDirs = ['Images', 'assets', 'Audio', 'Intake', 'blog', 'tools'];
+const assetDirs = ['Images', 'assets', 'Audio', 'Intake', 'blog', 'tools', 'diagnostic'];
 const rootFiles = fs.readdirSync(root).filter(file => {
     const ext = path.extname(file);
     return file === '_redirects' || ['.html', '.txt', '.xml'].includes(ext);
