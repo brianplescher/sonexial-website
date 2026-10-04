@@ -40,6 +40,25 @@ db.serialize(() => {
     `);
 
     db.run('CREATE INDEX IF NOT EXISTS idx_leads_email ON leads (email)');
+
+    // stripe_session_id is UNIQUE so a retried Stripe webhook cannot start a second fulfillment.
+    db.run(`
+        CREATE TABLE IF NOT EXISTS diagnostics (
+            id TEXT PRIMARY KEY,
+            token TEXT NOT NULL UNIQUE,
+            stripe_session_id TEXT UNIQUE,
+            email TEXT,
+            name TEXT,
+            site_url TEXT,
+            status TEXT NOT NULL,
+            source TEXT,
+            result JSON,
+            html TEXT,
+            error TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
 });
 
 const getJob = (id) => {
@@ -109,8 +128,98 @@ const getRecentLeads = (limit = 200) => {
     });
 };
 
+const getLead = (id) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT id, email, name, scanned_url FROM leads WHERE id = ?', [id], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
+
+/**
+ * Inserts a diagnostic order. Resolves false when the Stripe session was already recorded.
+ */
+const createDiagnostic = ({ id, token, stripeSessionId, email, name, siteUrl, status, source }) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            'INSERT OR IGNORE INTO diagnostics (id, token, stripe_session_id, email, name, site_url, status, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [id, token, stripeSessionId || null, email || null, name || null, siteUrl || null, status, source || null],
+            function (err) {
+                if (err) reject(err);
+                else resolve(this.changes > 0);
+            }
+        );
+    });
+};
+
+const updateDiagnostic = (id, { status, result, html, error, siteUrl }) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE diagnostics SET status = ?, result = COALESCE(?, result), html = COALESCE(?, html),
+             site_url = COALESCE(?, site_url), error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+            [status, result ? JSON.stringify(result) : null, html || null, siteUrl || null, error || null, id],
+            function (err) {
+                if (err) reject(err);
+                else resolve();
+            }
+        );
+    });
+};
+
+const getDiagnostic = (id) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT id, token, stripe_session_id, email, name, site_url, status, source, error, created_at, updated_at FROM diagnostics WHERE id = ?', [id], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
+
+const getDiagnosticBySession = (stripeSessionId) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT id, token, email, name, site_url, status FROM diagnostics WHERE stripe_session_id = ?', [stripeSessionId], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
+
+/**
+ * Sets the site URL on an order still waiting for one. Resolves false when another request already claimed it.
+ */
+const claimDiagnosticUrl = (id, siteUrl) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE diagnostics SET site_url = ?, status = 'queued', updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND status = 'needs_url'`,
+            [siteUrl, id],
+            function (err) {
+                if (err) reject(err);
+                else resolve(this.changes > 0);
+            }
+        );
+    });
+};
+
+const getDiagnosticByToken = (token) => {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT id, status, site_url, html FROM diagnostics WHERE token = ?', [token], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+        });
+    });
+};
+
 module.exports = {
     db,
+    getLead,
+    createDiagnostic,
+    updateDiagnostic,
+    getDiagnostic,
+    getDiagnosticBySession,
+    claimDiagnosticUrl,
+    getDiagnosticByToken,
     getJob,
     createJob,
     updateJobStatus,

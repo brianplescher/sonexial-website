@@ -208,7 +208,13 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
                 ok: res.ok,
                 status: res.status,
                 text: text || '',
-                error: null
+                error: null,
+                url: currentUrl,
+                headers: {
+                    contentType: res.headers.get('content-type') || '',
+                    lastModified: res.headers.get('last-modified') || '',
+                    xRobotsTag: res.headers.get('x-robots-tag') || ''
+                }
             };
         }
 
@@ -587,6 +593,7 @@ async function runScan(inputUrl) {
 
 module.exports = {
     runScan,
+    safeFetch,
     validateSSRF,
     isPrivateOrReservedIP,
     parseRobots,
