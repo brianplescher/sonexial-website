@@ -40,3 +40,5 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /Intake/website-seo.html /kits 301!
 /tools/author-geo-audit /tools/author-geo-audit/ 301
 /tools/author-geo-audit/ /tools/author-geo-audit/index.html 200
+/diagnostic/start /diagnostic/start/ 301
+/diagnostic/start/ /diagnostic/start/index.html 200
