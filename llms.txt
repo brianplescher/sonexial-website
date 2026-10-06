@@ -2,7 +2,7 @@
 
 > Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
 
-Sonexial provides a free author website GEO audit, Amazon listing optimization, author website development, Generative Engine Optimization, author platform strategy, and ongoing AI visibility monitoring.
+Sonexial provides a Free AI Visibility Scan for author websites, Amazon listing optimization, author website development, Generative Engine Optimization, author platform strategy, and ongoing AI visibility monitoring.
 
 ## Core Pages
 
@@ -10,7 +10,7 @@ Sonexial provides a free author website GEO audit, Amazon listing optimization, 
 - [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
 - [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
 - [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description in one deliverable.
-- [Author Website GEO & AI Visibility Audit](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
+- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
 - [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
 - [About](https://sonexial.com/about) - Background on Sonexial and founder information.
 - [Privacy](https://sonexial.com/privacy) - Privacy Policy.
@@ -19,7 +19,7 @@ Sonexial provides a free author website GEO audit, Amazon listing optimization, 
 
 ## Services
 
-- A free Author GEO Audit scanning any author website for AI discoverability failures.
+- A Free AI Visibility Scan that checks any author website for AI discoverability failures.
 - The Amazon Visibility Kit, a one-time kit covering BISAC categories, Amazon keywords, and book description.
 - Author website builds: Author Starter and Author Platform.
 - A monthly GEO Retainer tracking how AI answer engines cite an author and their books.

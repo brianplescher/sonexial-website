@@ -206,7 +206,6 @@ Here's what makes our kit different:
 • Human-verified (not just AI-generated)
 • Tested keywords (not guesses)
 • 48-hour turnaround
-• 100% money-back guarantee
 
 REAL RESULTS:
 "I saw a 30% increase in Also-Boughts after implementing the metadata changes. It's the best money I've spent on my author career." - Sarah J.
