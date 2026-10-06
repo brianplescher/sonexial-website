@@ -273,10 +273,9 @@ HEADER
 }
 
 .header-inner {
-  max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 2rem;
-  height: 100px;
+  padding: 0 clamp(1rem, 2.5vw, 2rem);
+  height: 108px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -322,6 +321,7 @@ span.logo-mark {
   letter-spacing: 0.1em;
   color: var(--text-2);
   text-transform: uppercase;
+  white-space: nowrap;
   transition: color var(--transition);
 }
 
@@ -409,8 +409,8 @@ HERO
 .hero .cafe-content {
   position: relative;
   z-index: 2;
-  max-width: 820px;
-  padding: 2rem 2rem 6rem;
+  max-width: 1000px;
+  padding: 2rem 2rem 4rem;
   text-align: center;
   flex: 1;
   display: flex;
@@ -421,10 +421,10 @@ HERO
 
 .cafe-question {
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-size: clamp(2.4rem, 4.5vw, 3.75rem);
   font-weight: 800;
   color: var(--text-0);
-  line-height: 1.15;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   margin-bottom: 1.5rem;
 }
@@ -433,7 +433,7 @@ HERO
   font-size: 1.25rem;
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.7;
-  max-width: 600px;
+  max-width: 720px;
   margin: 0 auto 2.5rem auto;
 }
 
@@ -1976,61 +1976,6 @@ SCROLL TOP
 }
 
 /* ============================================
-AVAILABILITY BAR
-============================================ */
-.availability-bar {
-  background: var(--bg-1);
-  border-bottom: 1px solid var(--border);
-  padding: 0.6rem 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.availability-inner {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  color: var(--text-2);
-  text-transform: uppercase;
-}
-
-.avail-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
-  animation: avail-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes avail-pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4);
-  }
-
-  50% {
-    opacity: 0.6;
-    box-shadow: 0 0 0 5px rgba(0, 240, 255, 0);
-  }
-}
-
-.avail-text {
-  color: var(--text-2);
-}
-
-.avail-open {
-  color: var(--accent);
-  font-weight: 500;
-}
-
-/* ============================================
 LOGO IMAGES
 ============================================ */
 img.logo-mark {
@@ -2041,7 +1986,7 @@ img.logo-mark {
 
 .home-logo {
   display: block;
-  height: 68px;
+  height: 84px;
   width: auto;
 }
 
@@ -2117,14 +2062,13 @@ RESPONSIVE
   }
 }
 
-@media (max-width: 768px) {
-
+@media (max-width: 1100px) {
   .header-inner {
-    height: 76px;
+    height: 84px;
   }
 
   .home-logo {
-    height: 52px;
+    height: 62px;
   }
 
   .main-nav,
@@ -2140,7 +2084,7 @@ RESPONSIVE
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 76px;
+    top: 84px;
     left: 0;
     right: 0;
     background: rgba(8, 10, 12, 0.98);
@@ -2156,6 +2100,9 @@ RESPONSIVE
     color: var(--text-0);
     padding: 0.75rem 0;
   }
+}
+
+@media (max-width: 768px) {
 
   .hero-stats-bar .hero-stats {
     flex-direction: column;
@@ -2170,15 +2117,6 @@ RESPONSIVE
   .footer-inner {
     flex-direction: column;
     gap: 1.5rem;
-  }
-
-  .availability-bar {
-    padding: 0.6rem 1rem;
-  }
-
-  .availability-inner {
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
   }
 
   .testimonials {
@@ -2205,7 +2143,7 @@ RESPONSIVE
   }
 
   .hero {
-    min-height: calc(100vh - 76px);
+    min-height: calc(100vh - 84px);
     padding: 3rem 0 2rem;
   }
 
@@ -2231,10 +2169,6 @@ RESPONSIVE
   .hero-actions .btn-ghost {
     width: 100%;
     justify-content: center;
-  }
-
-  .avail-text {
-    font-size: 0.6rem;
   }
 
   .testimonial-card {
