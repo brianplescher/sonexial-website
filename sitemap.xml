@@ -48,6 +48,21 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://sonexial.com/blog/reader-concentration-2026/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/blog/author-website-invisible-to-ai/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://sonexial.com/blog/genre-clarity-trope-signals/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://sonexial.com/tools/author-geo-audit/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

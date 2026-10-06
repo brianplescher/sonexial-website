@@ -17,6 +17,13 @@ Sonexial provides a Free AI Visibility Scan for author websites, Amazon listing 
 - [Terms](https://sonexial.com/terms) - Terms of Service.
 - [Refund Policy](https://sonexial.com/refund-policy) - Refund and cancellation terms.
 
+## Content Vault
+
+- [Content Vault](https://sonexial.com/blog/) - Essays on AI search, GEO, and author platform strategy.
+- [The Brutal Math of 2026: 19% of Readers Read 82% of Books](https://sonexial.com/blog/reader-concentration-2026/) - 19% of American adults read 82% of all books. What reader concentration means for indie author discovery, formats, and platform strategy in 2026.
+- [Why Your Beautiful Author Website Is Invisible to AI (And What to Do About It)](https://sonexial.com/blog/author-website-invisible-to-ai/) - How GEO differs from SEO, why most author websites are unreadable to ChatGPT, Perplexity, and Claude, and a checklist for a machine-readable author platform.
+- [Genre Clarity Is Not Artistic Surrender: Why Trope Signals Matter More Than Ever](https://sonexial.com/blog/genre-clarity-trope-signals/) - Why clear genre and trope signals help readers and AI recommendation systems match your books with the readers who want them.
+
 ## Services
 
 - A Free AI Visibility Scan that checks any author website for AI discoverability failures.
