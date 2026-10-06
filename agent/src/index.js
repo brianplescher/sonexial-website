@@ -8,6 +8,7 @@ const pitch = require('./pitch');
 const llm = require('./llm');
 const mailer = require('./email');
 const stripe = require('./stripe');
+const { verifyNetlifySignature } = require('./netlify-signature');
 const diagnostics = require('./diagnostic/fulfill');
 
 const app = express();
@@ -46,35 +47,49 @@ const corsMiddleware = (req, res, next) => {
 
 app.use('/api', corsMiddleware);
 
-// In-memory rate limiting by IP (token bucket / fixed window).
+// In-memory fixed-window rate limiting by IP, one window map per limiter.
 // Note: In a multi-instance or high-traffic production deployment, this should move to a persistent store (e.g. Redis).
-const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
-const RATE_LIMIT_MAX = 20; // max 20 requests per minute per IP
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
-function rateLimiter(req, res, next) {
-    const forwarded = req.headers['x-forwarded-for'];
-    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null) ||
-               req.ip ||
-               req.socket.remoteAddress ||
-               'unknown';
-    const now = Date.now();
-    const clientData = rateLimitMap.get(ip) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
+function createRateLimiter(maxPerWindow) {
+    const windows = new Map();
 
-    if (now > clientData.resetTime) {
-        clientData.count = 1;
-        clientData.resetTime = now + RATE_LIMIT_WINDOW_MS;
-    } else {
-        clientData.count++;
-    }
+    setInterval(() => {
+        const now = Date.now();
+        for (const [ip, data] of windows) {
+            if (now > data.resetTime) windows.delete(ip);
+        }
+    }, RATE_LIMIT_WINDOW_MS).unref();
 
-    rateLimitMap.set(ip, clientData);
+    return function rateLimiter(req, res, next) {
+        const forwarded = req.headers['x-forwarded-for'];
+        const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null) ||
+                   req.ip ||
+                   req.socket.remoteAddress ||
+                   'unknown';
+        const now = Date.now();
+        const clientData = windows.get(ip) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
 
-    if (clientData.count > RATE_LIMIT_MAX) {
-        return res.status(429).json({ error: 'Too many requests. Please wait a moment before scanning again.' });
-    }
-    next();
+        if (now > clientData.resetTime) {
+            clientData.count = 1;
+            clientData.resetTime = now + RATE_LIMIT_WINDOW_MS;
+        } else {
+            clientData.count++;
+        }
+
+        windows.set(ip, clientData);
+
+        if (clientData.count > maxPerWindow) {
+            return res.status(429).json({ error: 'Too many requests. Please wait a moment before scanning again.' });
+        }
+        next();
+    };
 }
+
+// Each scan triggers outbound fetches; the report unlock also re-scans, writes a lead, and calls the LLM.
+const scanRateLimiter = createRateLimiter(10);
+const reportRateLimiter = createRateLimiter(5);
+const diagnosticRateLimiter = createRateLimiter(20);
 
 // Parsed rather than pattern-matched: an email regex with adjacent unbounded character
 // classes backtracks quadratically on crafted input.
@@ -129,7 +144,7 @@ app.get('/health', (req, res) => {
 
 // Public GEO Scanner endpoint (synchronous, stateless, no DB or email coupling).
 // Returns the free tier only; the full breakdown is unlocked by POST /api/scan/report.
-app.post('/api/scan', rateLimiter, async (req, res) => {
+app.post('/api/scan', scanRateLimiter, async (req, res) => {
     try {
         const { url } = req.body || {};
         if (!url || typeof url !== 'string') {
@@ -152,7 +167,7 @@ app.post('/api/scan', rateLimiter, async (req, res) => {
 // Email gate: exchanges an email address for the full report.
 // The scan itself is free; /api/scan returns the score and critical failures, and this route is
 // what unlocks the detailed breakdown, mails a copy, and records the lead.
-app.post('/api/scan/report', rateLimiter, async (req, res) => {
+app.post('/api/scan/report', reportRateLimiter, async (req, res) => {
     try {
         const { email, name, honeypot, scanReport } = req.body || {};
 
@@ -213,19 +228,14 @@ app.post('/api/scan/report', rateLimiter, async (req, res) => {
 
 // Netlify Webhook receiver (asynchronous, DB job queue + email fulfillment)
 app.post('/webhooks/netlify', async (req, res) => {
-    try {
-        // Verify signature if secret is set
-        if (NETLIFY_WEBHOOK_SECRET) {
-            const signature = req.headers['x-webhook-signature'];
-            if (!signature) return res.status(400).json({ error: 'Missing signature' });
+    if (!NETLIFY_WEBHOOK_SECRET) {
+        return res.status(503).json({ error: 'Netlify webhook not configured' });
+    }
+    if (!verifyNetlifySignature(req.rawBody, req.headers['x-webhook-signature'], NETLIFY_WEBHOOK_SECRET)) {
+        return res.status(401).json({ error: 'Invalid signature' });
+    }
 
-            const hmac = crypto.createHmac('sha256', NETLIFY_WEBHOOK_SECRET);
-            hmac.update(req.rawBody);
-            const expected = hmac.digest('hex');
-            if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
-                return res.status(401).json({ error: 'Invalid signature' });
-            }
-        }
+    try {
         
         const payload = req.body;
         const kitType = payload.form_name || 'amazon-visibility-kit';
@@ -325,7 +335,7 @@ async function remindMissingUrl(record) {
 
 // Post-payment step: the buyer names the site for an order whose checkout did not collect one.
 // The Checkout Session ID arrives via the Payment Link redirect and is only known to the buyer.
-app.post('/api/diagnostic/start', rateLimiter, async (req, res) => {
+app.post('/api/diagnostic/start', diagnosticRateLimiter, async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     const { sessionId, url } = req.body || {};
     if (!stripe.isCheckoutSessionId(sessionId)) {
