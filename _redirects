@@ -43,6 +43,14 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /Intake/ad-copy.html /kits 301!
 /Intake/cover-audit.html /tools/author-geo-audit/ 301!
 /Intake/website-seo.html /tools/author-geo-audit/ 301!
+
+# Retired legacy blog posts
+/blog/amazon-algorithm-changes-2025.html /blog/ 301!
+/blog/bisac-categories-explained.html /blog/ 301!
+/blog/book-keywords-that-work.html /blog/ 301!
+/blog/end-of-traditional-seo.html /blog/ 301!
+/blog/indie-author-marketing-budget.html /blog/ 301!
+/blog/optimize-amazon-book-metadata.html /blog/ 301!
 /tools/author-geo-audit /tools/author-geo-audit/ 301
 /tools/author-geo-audit/ /tools/author-geo-audit/index.html 200
 /diagnostic/start /diagnostic/start/ 301
