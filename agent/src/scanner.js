@@ -1,5 +1,7 @@
-const dns = require('dns').promises;
+const dnsCallback = require('dns');
+const dns = dnsCallback.promises;
 const cheerio = require('cheerio');
+const { Agent, fetch } = require('undici');
 
 // Pages below this word count are flagged as thin: too little text for an AI engine to quote.
 const THIN_CONTENT_WORDS = 300;
@@ -172,6 +174,24 @@ async function validateSSRF(urlString) {
 }
 
 /**
+ * Socket-level DNS lookup that rejects private/reserved addresses, so the IP actually connected to
+ * is the one validated (closes the DNS-rebinding gap between validateSSRF and the fetch).
+ */
+function guardedLookup(hostname, options, callback) {
+    dnsCallback.lookup(hostname, { ...options, all: true }, (err, addresses) => {
+        if (err) return callback(err);
+        const blocked = addresses.find(record => isPrivateOrReservedIP(record.address));
+        if (blocked) {
+            return callback(new Error(`SSRF validation failed: Hostname ${hostname} resolved to restricted IP ${blocked.address}.`));
+        }
+        if (options.all) return callback(null, addresses);
+        callback(null, addresses[0].address, addresses[0].family);
+    });
+}
+
+const ssrfSafeAgent = new Agent({ connect: { lookup: guardedLookup } });
+
+/**
  * Safe fetch wrapper with SSRF validation, 5s timeout, and secure redirect following.
  */
 async function safeFetch(targetUrl, maxRedirects = 3) {
@@ -186,6 +206,7 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
             const res = await fetch(parsed.href, {
                 method: 'GET',
                 redirect: 'manual',
+                dispatcher: ssrfSafeAgent,
                 signal: AbortSignal.timeout(5000),
                 headers: {
                     'User-Agent': 'Mozilla/5.0 (Sonexial GEO Scanner 1.0; +https://sonexial.com)'
@@ -224,7 +245,7 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
             ok: false,
             status: 0,
             text: '',
-            error: err.message
+            error: err.cause?.message || err.message
         };
     }
 }
@@ -595,6 +616,7 @@ module.exports = {
     runScan,
     safeFetch,
     validateSSRF,
+    guardedLookup,
     isPrivateOrReservedIP,
     parseRobots,
     evaluateRootAccess,
