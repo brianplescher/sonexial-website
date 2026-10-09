@@ -43,6 +43,10 @@ LLM (template fallback without a key). The result is one self-contained HTML doc
 2. Run `npm install`.
 3. Run `npm start`.
 
+Set `NETLIFY_API_PROXY_SECRET` to the same value in Railway and Netlify. In Netlify, give
+the variable Runtime scope; `netlify.toml` uses it to sign the `/api/*` proxy requests.
+The agent rejects unsigned requests to `/api/*`.
+
 ## Testing
 
 Run `npm run test:pipeline` to test the AI pipeline locally with mock data.

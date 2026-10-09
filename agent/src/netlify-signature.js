@@ -29,4 +29,33 @@ function verifyNetlifySignature(rawBody, signature, secret) {
     }
 }
 
-module.exports = { verifyNetlifySignature };
+function verifyNetlifyProxySignature(signature, secret, now = Date.now()) {
+    if (typeof signature !== 'string' || !secret) return false;
+
+    const parts = signature.split('.');
+    if (parts.length !== 3) return false;
+    const [encodedHeader, encodedPayload, encodedSig] = parts;
+
+    try {
+        const header = JSON.parse(Buffer.from(encodedHeader, 'base64url').toString('utf8'));
+        if (header.alg !== 'HS256') return false;
+
+        const expected = crypto.createHmac('sha256', secret)
+            .update(`${encodedHeader}.${encodedPayload}`)
+            .digest();
+        const received = Buffer.from(encodedSig, 'base64url');
+        if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+            return false;
+        }
+
+        const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8'));
+        return payload.iss === 'netlify' &&
+            typeof payload.exp === 'number' &&
+            Number.isFinite(payload.exp) &&
+            payload.exp > now / 1000;
+    } catch {
+        return false;
+    }
+}
+
+module.exports = { verifyNetlifySignature, verifyNetlifyProxySignature };

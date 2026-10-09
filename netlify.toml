@@ -7,6 +7,15 @@
 
 # Redirect rules
 [[redirects]]
+  from = "/api/*"
+  to = "https://sonexial-agent-production.up.railway.app/api/:splat"
+  status = 200
+  force = true
+  # Set this secret in Netlify and as NETLIFY_API_PROXY_SECRET in Railway.
+  # The variable must have Runtime scope so Netlify can sign proxy requests.
+  signed = "NETLIFY_API_PROXY_SECRET"
+
+[[redirects]]
   from = "/checklist-download"
   to = "/assets/The_Author_Signal_Checklist.pdf"
   status = 200

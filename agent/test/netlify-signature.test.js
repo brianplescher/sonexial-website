@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-const { verifyNetlifySignature } = require('../src/netlify-signature');
+const { verifyNetlifySignature, verifyNetlifyProxySignature } = require('../src/netlify-signature');
 const { guardedLookup } = require('../src/scanner');
 
 const SECRET = 'test-secret';
@@ -32,6 +32,31 @@ test('verifyNetlifySignature returns false instead of throwing on malformed or s
     for (const sig of [undefined, '', 'abc', 'a.b.c', 'x.y', bodyHash]) {
         assert.equal(verifyNetlifySignature(body, sig, SECRET), false);
     }
+});
+
+test('verifyNetlifyProxySignature accepts a signed, unexpired Netlify proxy token', () => {
+    const now = 1_800_000_000_000;
+    const signature = sign({
+        deploy_context: 'production',
+        exp: now / 1000 + 60,
+        iss: 'netlify',
+        netlify_id: 'site-id',
+        site_url: 'https://sonexial.com'
+    });
+
+    assert.equal(verifyNetlifyProxySignature(signature, SECRET, now), true);
+});
+
+test('verifyNetlifyProxySignature rejects invalid, expired, and wrong-issuer tokens', () => {
+    const now = 1_800_000_000_000;
+    const expired = sign({ iss: 'netlify', exp: now / 1000 - 1 });
+    const wrongIssuer = sign({ iss: 'attacker', exp: now / 1000 + 60 });
+    const valid = sign({ iss: 'netlify', exp: now / 1000 + 60 });
+
+    assert.equal(verifyNetlifyProxySignature(valid, 'wrong-secret', now), false);
+    assert.equal(verifyNetlifyProxySignature(expired, SECRET, now), false);
+    assert.equal(verifyNetlifyProxySignature(wrongIssuer, SECRET, now), false);
+    assert.equal(verifyNetlifyProxySignature('bad-token', SECRET, now), false);
 });
 
 test('guardedLookup refuses to connect to a hostname that resolves to loopback', (t, done) => {

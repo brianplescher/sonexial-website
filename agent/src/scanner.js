@@ -5,6 +5,7 @@ const { Agent, fetch } = require('undici');
 
 // Pages below this word count are flagged as thin: too little text for an AI engine to quote.
 const THIN_CONTENT_WORDS = 300;
+const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 
 // AI crawlers whose robots.txt access is reported by the scanner.
 const AI_BOTS = ['gptbot', 'claudebot', 'perplexitybot', 'anthropic-ai', 'google-extended'];
@@ -191,6 +192,37 @@ function guardedLookup(hostname, options, callback) {
 
 const ssrfSafeAgent = new Agent({ connect: { lookup: guardedLookup } });
 
+async function readLimitedResponseText(response, maxBytes = MAX_RESPONSE_BYTES) {
+    const contentLength = Number(response.headers.get('content-length'));
+    if (contentLength > maxBytes) {
+        await response.body?.cancel();
+        throw new Error(`Upstream response exceeds the ${maxBytes}-byte limit.`);
+    }
+
+    if (!response.body) return '';
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let totalBytes = 0;
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            totalBytes += value.byteLength;
+            if (totalBytes > maxBytes) {
+                await reader.cancel().catch(() => {});
+                throw new Error(`Upstream response exceeds the ${maxBytes}-byte limit.`);
+            }
+            chunks.push(Buffer.from(value));
+        }
+    } finally {
+        reader.releaseLock();
+    }
+
+    return Buffer.concat(chunks, totalBytes).toString('utf8');
+}
+
 /**
  * Safe fetch wrapper with SSRF validation, 5s timeout, and secure redirect following.
  */
@@ -224,7 +256,7 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
                 continue;
             }
 
-            const text = await res.text();
+            const text = await readLimitedResponseText(res);
             return {
                 ok: res.ok,
                 status: res.status,
@@ -617,6 +649,8 @@ module.exports = {
     safeFetch,
     validateSSRF,
     guardedLookup,
+    readLimitedResponseText,
+    MAX_RESPONSE_BYTES,
     isPrivateOrReservedIP,
     parseRobots,
     evaluateRootAccess,

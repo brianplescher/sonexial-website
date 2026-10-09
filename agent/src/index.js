@@ -8,13 +8,15 @@ const pitch = require('./pitch');
 const llm = require('./llm');
 const mailer = require('./email');
 const stripe = require('./stripe');
-const { verifyNetlifySignature } = require('./netlify-signature');
+const { verifyNetlifySignature, verifyNetlifyProxySignature } = require('./netlify-signature');
 const diagnostics = require('./diagnostic/fulfill');
+const { createRateLimiter } = require('./rate-limit');
 
 const app = express();
 app.disable('x-powered-by'); // Prevent Express version disclosure in response headers
 const PORT = process.env.PORT || 3000;
 const NETLIFY_WEBHOOK_SECRET = process.env.NETLIFY_WEBHOOK_SECRET;
+const NETLIFY_API_PROXY_SECRET = process.env.NETLIFY_API_PROXY_SECRET;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 // Buyers normally enter their URL on the post-payment page within seconds; only chase the ones who don't.
@@ -47,44 +49,15 @@ const corsMiddleware = (req, res, next) => {
 
 app.use('/api', corsMiddleware);
 
-// In-memory fixed-window rate limiting by IP, one window map per limiter.
-// Note: In a multi-instance or high-traffic production deployment, this should move to a persistent store (e.g. Redis).
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-
-function createRateLimiter(maxPerWindow) {
-    const windows = new Map();
-
-    setInterval(() => {
-        const now = Date.now();
-        for (const [ip, data] of windows) {
-            if (now > data.resetTime) windows.delete(ip);
-        }
-    }, RATE_LIMIT_WINDOW_MS).unref();
-
-    return function rateLimiter(req, res, next) {
-        const forwarded = req.headers['x-forwarded-for'];
-        const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null) ||
-                   req.ip ||
-                   req.socket.remoteAddress ||
-                   'unknown';
-        const now = Date.now();
-        const clientData = windows.get(ip) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
-
-        if (now > clientData.resetTime) {
-            clientData.count = 1;
-            clientData.resetTime = now + RATE_LIMIT_WINDOW_MS;
-        } else {
-            clientData.count++;
-        }
-
-        windows.set(ip, clientData);
-
-        if (clientData.count > maxPerWindow) {
-            return res.status(429).json({ error: 'Too many requests. Please wait a moment before scanning again.' });
-        }
-        next();
-    };
-}
+app.use('/api', (req, res, next) => {
+    if (!NETLIFY_API_PROXY_SECRET) {
+        return res.status(503).json({ error: 'Netlify API proxy not configured' });
+    }
+    if (!verifyNetlifyProxySignature(req.headers['x-nf-sign'], NETLIFY_API_PROXY_SECRET)) {
+        return res.status(401).json({ error: 'Invalid proxy signature' });
+    }
+    next();
+});
 
 // Each scan triggers outbound fetches; the report unlock also re-scans, writes a lead, and calls the LLM.
 const scanRateLimiter = createRateLimiter(10);

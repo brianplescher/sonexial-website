@@ -7,7 +7,8 @@ const {
     analyzeHtml,
     analyzeFiles,
     isCanonicalCorrect,
-    isPrivateOrReservedIP
+    isPrivateOrReservedIP,
+    readLimitedResponseText
 } = require('../src/scanner');
 
 const okRes = text => ({ ok: true, status: 200, text, error: null });
@@ -167,4 +168,14 @@ test('isPrivateOrReservedIP rejects loopback, private, and metadata addresses', 
     for (const ip of ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946']) {
         assert.equal(isPrivateOrReservedIP(ip), false, `${ip} should be allowed`);
     }
+});
+
+test('readLimitedResponseText accepts bodies within the byte limit', async () => {
+    const response = new Response('small response');
+    assert.equal(await readLimitedResponseText(response, 32), 'small response');
+});
+
+test('readLimitedResponseText rejects bodies that exceed the byte limit', async () => {
+    const response = new Response('response is too large');
+    await assert.rejects(readLimitedResponseText(response, 8), /exceeds the 8-byte limit/);
 });

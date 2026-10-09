@@ -32,25 +32,21 @@ async function sendDraftEmail(jobId, kitType, draft) {
         ? `<p><strong>Intake form:</strong> <a href="${intakeUrl}">${intakeUrl}</a></p>`
         : '';
 
-    try {
-        await resend.emails.send({
-            from: 'agent@sonexial.com',
-            to: OWNER_EMAIL,
-            subject: `[Agent] New Draft Ready: ${kitType} (${jobId})`,
-            html: `
-                <h2>Draft Ready for Review</h2>
-                <p>Job ID: ${jobId}</p>
-                <p>Kit Type: ${kitType}</p>
-                ${intakeSection}
-                <hr />
-                <h3>Draft Content:</h3>
-                <pre style="white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px;">${JSON.stringify(draft, null, 2)}</pre>
-            `
-        });
-        console.log(`Draft email sent for job ${jobId}`);
-    } catch (error) {
-        console.error('Failed to send draft email:', error);
-    }
+    await send({
+        from: 'agent@sonexial.com',
+        to: OWNER_EMAIL,
+        subject: `[Agent] New Draft Ready: ${kitType} (${jobId})`,
+        html: `
+            <h2>Draft Ready for Review</h2>
+            <p>Job ID: ${escapeHtml(jobId)}</p>
+            <p>Kit Type: ${escapeHtml(kitType)}</p>
+            ${intakeSection}
+            <hr />
+            <h3>Draft Content:</h3>
+            <pre style="white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px;">${escapeHtml(JSON.stringify(draft, null, 2))}</pre>
+        `
+    });
+    console.log(`Draft email sent for job ${jobId}`);
 }
 
 async function sendErrorEmail(jobId, kitType, errorMsg) {
@@ -60,17 +56,17 @@ async function sendErrorEmail(jobId, kitType, errorMsg) {
     }
     
     try {
-        await resend.emails.send({
+        await send({
             from: 'agent@sonexial.com',
             to: OWNER_EMAIL,
             subject: `[Agent] ERROR: ${kitType} Failed (${jobId})`,
             html: `
                 <h2>Agent Pipeline Failed</h2>
-                <p>Job ID: ${jobId}</p>
-                <p>Kit Type: ${kitType}</p>
+                <p>Job ID: ${escapeHtml(jobId)}</p>
+                <p>Kit Type: ${escapeHtml(kitType)}</p>
                 <hr />
                 <h3>Error Details:</h3>
-                <pre style="white-space: pre-wrap; background: #ffeeee; padding: 10px; border-radius: 5px;">${errorMsg}</pre>
+                <pre style="white-space: pre-wrap; background: #ffeeee; padding: 10px; border-radius: 5px;">${escapeHtml(errorMsg)}</pre>
             `
         });
         console.log(`Error email sent for job ${jobId}`);
