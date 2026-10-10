@@ -116,8 +116,17 @@ jobs:
         with:
           urls: |
             https://sonexial.com
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
 
   notify:
     name: Send Notifications
