@@ -567,7 +567,7 @@
         "@id": "https://sonexial.com#organization",
         "name": "Sonexial",
         "url": "https://sonexial.com",
-        "logo": "https://sonexial.com/Images/sonexial_logo.png",
+        "logo": {"@type": "ImageObject", "url": "https://sonexial.com/Images/sonexial_logo.png"},
         "description": "AI-ready author websites with Generative Engine Optimization (GEO).",
         "email": "brian@sonexial.com",
         "contactPoint": {
@@ -588,14 +588,14 @@
         "@type": "Person",
         "@id": "https://sonexial.com#person",
         "name": "Brian Plescher",
-        "jobTitle": "Founder",
+        "jobTitle": "Founder & Author Strategist",
         "url": "https://brianplescher.com",
         "worksFor": {"@id": "https://sonexial.com#organization"},
         "alumniOf": [
           {"@type": "EducationalOrganization", "name": "Michigan State University", "description": "MS in Management, Strategy, and Leadership"},
           {"@type": "EducationalOrganization", "name": "Yale School of Management", "description": "Executive Education in Accelerated Management"}
         ],
-        "description": "Author and strategist building AI-optimized author platforms",
+        "description": "Brian Plescher is the founder of Sonexial, an author and strategist based in Grand Haven, Michigan, specializing in AI-ready author platforms and GEO.",
         "sameAs": ["https://brianplescher.com", "https://www.linkedin.com/in/brianplescher"]
       },
       {
@@ -603,6 +603,7 @@
         "@id": "https://sonexial.com#website",
         "url": "https://sonexial.com",
         "name": "Sonexial",
+        "description": "AI-ready author websites with Generative Engine Optimization (GEO).",
         "publisher": {"@id": "https://sonexial.com#organization"},
         "inLanguage": "en-US"
       },
@@ -613,7 +614,7 @@
         "name": "Sonexial | AI-Ready Author Websites with GEO Optimization",
         "isPartOf": {"@id": "https://sonexial.com#website"},
         "about": {"@id": "https://sonexial.com#organization"},
-        "primaryImageOfPage": "https://sonexial.com/Images/sonexial_logo.png",
+        "primaryImageOfPage": {"@type": "ImageObject", "url": "https://sonexial.com/Images/og-image.jpg"},
         "inLanguage": "en-US"
       },
       {
@@ -623,10 +624,18 @@
         "mainEntity": [
           {
             "@type": "Question",
+            "name": "What exactly is GEO and why does my author website need it?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "GEO stands for Generative Engine Optimization. While traditional SEO helped Google rank webpages, GEO ensures AI answer tools (like ChatGPT, Perplexity, Claude, and Gemini) understand who you are, what books you write, and why they should recommend your work to readers. Without structured author and book schema, verified entity data, and an llms.txt roadmap, AI tools often mix up titles, miss backlists, or recommend competitors instead."
+            }
+          },
+          {
+            "@type": "Question",
             "name": "Do I need this if I already have an author website?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Probably. Most author websites built before 2025 have no GEO optimization at all. I can show you exactly what's missing."
+              "text": "Most likely. Traditional author sites look great to humans, but their data is invisible or confusing to AI crawlers. If your site lacks machine-readable schema, entity connections to Amazon/Goodreads, and an llms.txt file, AI search engines struggle to cite or recommend your books. The Free AI Visibility Scan at sonexial.com/tools/author-geo-audit shows you exactly what AI models currently see."
             }
           },
           {
