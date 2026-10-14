@@ -6,6 +6,7 @@ const pipeline = require('./pipeline');
 const scanner = require('./scanner');
 const pitch = require('./pitch');
 const llm = require('./llm');
+const semanticExtractor = require('./semantic-extractor');
 const mailer = require('./email');
 const stripe = require('./stripe');
 const { verifyNetlifySignature, verifyNetlifyProxySignature } = require('./netlify-signature');
@@ -158,7 +159,7 @@ app.post('/api/scan/report', reportRateLimiter, async (req, res) => {
         }
 
         // Re-run the scan server-side: the client-supplied report is untrusted and may be stale.
-        const report = await scanner.runScan(scanReport.url);
+        const { report, html } = await scanner.scanWithContent(scanReport.url);
         const lead = {
             email: email.trim().toLowerCase(),
             name: typeof name === 'string' ? name.trim().slice(0, 120) : null,
@@ -168,7 +169,9 @@ app.post('/api/scan/report', reportRateLimiter, async (req, res) => {
             report
         };
 
-        await db.createLead(crypto.randomUUID(), lead);
+        // The lead is saved before any LLM call so a slow or failed model never loses it.
+        const leadId = crypto.randomUUID();
+        await db.createLead(leadId, lead);
 
         // Delivery must not block the unlock; a Resend outage should still reveal the report.
         void Promise.allSettled([
@@ -179,13 +182,23 @@ app.post('/api/scan/report', reportRateLimiter, async (req, res) => {
                 .forEach(r => console.error('Lead email failed:', sanitizeLog(r.reason?.message || r.reason)));
         });
 
-        let pitchDraft = null;
-        if (llm.isConfigured()) {
-            try {
-                pitchDraft = await pitch.generatePitch(report, lead.name || 'Author');
-            } catch (err) {
-                console.error('Pitch generation error:', sanitizeLog(err.message));
-            }
+        // Both are fail-soft: extractSemantic never throws and returns null without an LLM key.
+        const [pitchResult, semantic] = await Promise.all([
+            llm.isConfigured()
+                ? pitch.generatePitch(report, lead.name || 'Author').catch(err => {
+                    console.error('Pitch generation error:', sanitizeLog(err.message));
+                    return null;
+                })
+                : null,
+            semanticExtractor.extractSemantic(html)
+        ]);
+        const pitchDraft = pitchResult;
+
+        if (semantic) {
+            report.semantic = semantic;
+            await db.updateLeadReport(leadId, report).catch(err => {
+                console.error('Lead semantic update failed:', sanitizeLog(err.message));
+            });
         }
 
         res.status(200).json({

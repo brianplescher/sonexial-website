@@ -582,6 +582,15 @@ function analyzeFiles(llmsRes, robotsRes, sitemapRes) {
  * @returns {Promise<object>} GEOReport
  */
 async function runScan(inputUrl) {
+    return (await scanWithContent(inputUrl)).report;
+}
+
+/**
+ * Same as runScan, but also returns the fetched page HTML for follow-up analysis
+ * (semantic extraction). The HTML is kept out of the report so it is never stored or sent.
+ * @returns {Promise<{report: object, html: string}>}
+ */
+async function scanWithContent(inputUrl) {
     const startTime = Date.now();
 
     if (!inputUrl || typeof inputUrl !== 'string') {
@@ -629,7 +638,7 @@ async function runScan(inputUrl) {
 
     const executionTime = `${((Date.now() - startTime) / 1000).toFixed(2)}s`;
 
-    return {
+    const report = {
         url: urlToScan,
         status: 'success',
         score: totalScore,
@@ -642,10 +651,12 @@ async function runScan(inputUrl) {
         critical_failures: [...htmlAnalysis.critical_failures, ...fileAnalysis.critical_failures],
         recommendations: [...htmlAnalysis.recommendations, ...fileAnalysis.recommendations]
     };
+    return { report, html: htmlRes.text || '' };
 }
 
 module.exports = {
     runScan,
+    scanWithContent,
     safeFetch,
     validateSSRF,
     guardedLookup,
