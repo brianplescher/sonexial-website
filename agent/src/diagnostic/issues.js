@@ -130,6 +130,14 @@ function buildIssues(crawl, facts, now = new Date()) {
             fix: 'Publish the drafted llms.txt below at /llms.txt and keep it updated when you release a book.'
         });
     } else {
+        if (!/\(https?:\/\/[^)]*(about|bio|author|meet)[^)]*\)/i.test(crawl.llmsRes.text)) {
+            add({
+                id: 'llms_txt_no_about_link', category: 'AI access', severity: 'notice', impact: 2, effort: 1,
+                title: 'llms.txt does not point AI systems to an About / bio page',
+                why: 'When an engine is asked "who is this author?", llms.txt is the first place it looks for the authoritative answer. Without a link to your bio, it falls back to third-party summaries.',
+                fix: 'Add an "Entity Resolution" or "About" section to llms.txt linking to your About page and noting that the Person/Organization schema on the homepage is the verified identity.'
+            });
+        }
         const problems = llmsTxtProblems(crawl.llmsRes.text);
         if (problems.length) {
             add({
@@ -139,6 +147,17 @@ function buildIssues(crawl, facts, now = new Date()) {
                 fix: 'Restructure it to match the drafted llms.txt below.'
             });
         }
+    }
+
+    const bingFile = crawl.bingAuthRes && crawl.bingAuthRes.ok && /<user>/i.test(crawl.bingAuthRes.text || '');
+    const bingMeta = ok.some(f => f.bingVerification);
+    if (!bingFile && !bingMeta) {
+        add({
+            id: 'bing_not_verified', category: 'AI access', severity: 'warning', impact: 3, effort: 1,
+            title: 'Site is not verified with Bing Webmaster Tools',
+            why: 'Bing\'s index is what ChatGPT search and Microsoft Copilot read, and Bing is far slower than Google to discover unverified sites. Verification lets you submit your sitemap and see which pages Bing has actually indexed.',
+            fix: 'Add the site at bing.com/webmasters, then either upload BingSiteAuth.xml to your site root or add the <meta name="msvalidate.01"> tag to your homepage <head>, and submit sitemap.xml.'
+        });
     }
 
     // --- Entity & schema ---
@@ -161,6 +180,32 @@ function buildIssues(crawl, facts, now = new Date()) {
             why: 'sameAs links are what let an engine merge your site, Amazon author page, Goodreads, and socials into one entity. Fewer than three makes it easy to confuse you with someone of the same name.',
             fix: 'Extend sameAs with every official profile (the drafted Person JSON-LD lists the ones found on your site).'
         });
+    }
+    if (allPersons.length && allPersons.every(p => !p.url || !p.hasJobTitle || !p.hasDescription)) {
+        add({
+            id: 'person_schema_thin', category: 'Entity & schema', severity: 'notice', impact: 2, effort: 1,
+            title: 'Person schema has no url, jobTitle, or description',
+            why: 'A Person block with just a name is easy to confuse with anyone of the same name. url, jobTitle, and a one-sentence description give engines the disambiguating facts they repeat in answers.',
+            fix: 'Add "url" (your official site), "jobTitle" (e.g. "Author"), and a 1-2 sentence third-person "description" naming your genres and where you are based.'
+        }, ok.filter(f => f.persons.length).map(f => f.url));
+    }
+    const brokenImages = Object.entries(crawl.imageProbes || {}).filter(([, status]) => !(status >= 200 && status < 300));
+    if (brokenImages.length) {
+        add({
+            id: 'schema_image_broken', category: 'Entity & schema', severity: 'warning', impact: 3, effort: 1,
+            title: 'Logo / og:image URLs in your schema or meta tags do not load',
+            why: 'An image URL that 404s is usually a renamed or misspelled file. Engines drop the whole logo or image claim, and link previews fall back to a blank card.',
+            fix: 'Point each URL at the file that actually exists (check hyphens vs underscores and .png vs .jpg).'
+        }, brokenImages.map(([url, status]) => `${url} (HTTP ${status})`));
+    }
+    const faqMismatch = ok.filter(f => f.faqMismatches.length);
+    if (faqMismatch.length) {
+        add({
+            id: 'faq_schema_mismatch', category: 'Entity & schema', severity: 'warning', impact: 3, effort: 1,
+            title: 'FAQ schema questions or answers that are not in the visible page text',
+            why: 'Google and AI engines check structured data against what the page actually shows. FAQ markup that does not match the visible FAQ is treated as spam and can get all of the page\'s rich results suppressed.',
+            fix: 'Make every FAQPage question and answer identical to the text visible on the page, and add any visible FAQ that is missing from the schema.'
+        }, faqMismatch.map(f => `${f.url} (${f.faqMismatches.slice(0, 3).join(' | ')})`));
     }
     if (!allBooks.length) {
         add({

@@ -4,9 +4,9 @@ const crypto = require('crypto');
 
 const { verifyStripeSignature, isDiagnosticSession, extractOrder, normalizeSiteUrl, isCheckoutSessionId } = require('../src/stripe');
 const { publicStartUrl } = require('../src/diagnostic/fulfill');
-const { analyzePage, detectProfiles } = require('../src/diagnostic/page-facts');
+const { analyzePage, detectProfiles, faqMismatches } = require('../src/diagnostic/page-facts');
 const { buildIssues, computeScores, evaluateBots, quadrant, llmsTxtProblems } = require('../src/diagnostic/issues');
-const { normalizeLink, parseSitemapUrls } = require('../src/diagnostic/crawler');
+const { normalizeLink, parseSitemapUrls, referencedImages } = require('../src/diagnostic/crawler');
 const { buildArtifacts } = require('../src/diagnostic/artifacts');
 const { fallbackWriteup, guardWriteup, claimsCrawlerBlocking } = require('../src/diagnostic/writeup');
 const { renderDiagnosticHtml } = require('../src/diagnostic/render');
@@ -152,6 +152,52 @@ test('buildIssues reports blocked search bots, missing Book schema, and thin sam
     assert.ok(!ids.includes('person_schema_missing'));
     assert.equal(issues[0].id, 'ai_search_bot_blocked');
     for (let i = 1; i < issues.length; i++) assert.ok(issues[i - 1].priority >= issues[i].priority);
+});
+
+test('buildIssues flags a site that is not verified with Bing, and not one that is', () => {
+    assert.ok(buildIssues(fakeCrawl(), [homeFacts()]).issues.some(i => i.id === 'bing_not_verified'));
+    const viaFile = fakeCrawl({ bingAuthRes: { ok: true, text: '<?xml version="1.0"?><users><user>ABC</user></users>' } });
+    assert.ok(!buildIssues(viaFile, [homeFacts()]).issues.some(i => i.id === 'bing_not_verified'));
+    const viaMeta = { ...homeFacts(), bingVerification: 'ABC' };
+    assert.ok(!buildIssues(fakeCrawl(), [viaMeta]).issues.some(i => i.id === 'bing_not_verified'));
+});
+
+test('buildIssues reports broken schema images, thin Person schema, and FAQ schema that does not match the page', () => {
+    const crawl = fakeCrawl({ imageProbes: { 'https://jane.com/Images/logo-typo.png': 404, 'https://jane.com/og.jpg': 200 } });
+    const { issues } = buildIssues(crawl, [homeFacts()]);
+    const broken = issues.find(i => i.id === 'schema_image_broken');
+    assert.deepEqual(broken.pages, ['https://jane.com/Images/logo-typo.png (HTTP 404)']);
+    assert.ok(issues.some(i => i.id === 'person_schema_thin'));
+    assert.ok(!issues.some(i => i.id === 'faq_schema_mismatch'));
+
+    const faqHtml = `<html><head><script type="application/ld+json">{"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"What is GEO?","acceptedAnswer":{"@type":"Answer","text":"GEO stands for Generative Engine Optimization."}},
+      {"@type":"Question","name":"Hidden question?","acceptedAnswer":{"@type":"Answer","text":"Never shown on the page."}}]}</script></head>
+      <body><h2>What is GEO?</h2><p>GEO stands for Generative Engine Optimization.</p></body></html>`;
+    const f = { ...analyzePage({ url: 'https://jane.com/faq', finalUrl: 'https://jane.com/faq', status: 200, html: faqHtml, headers: {} }), depth: 1, inlinks: [] };
+    assert.equal(f.faqCount, 2);
+    assert.deepEqual(f.faqMismatches, ['Hidden question?']);
+    assert.ok(buildIssues(fakeCrawl(), [homeFacts(), f]).issues.some(i => i.id === 'faq_schema_mismatch'));
+});
+
+test('faqMismatches ignores whitespace and smart quotes', () => {
+    const faqs = [{ name: 'Can\u2019t I use Wix?', answer: 'You  can.' }];
+    assert.deepEqual(faqMismatches(faqs, "Can't I use Wix? You can."), []);
+});
+
+test('referencedImages collects same-site og:image and JSON-LD image URLs only', () => {
+    const html = `<html><head><meta property="og:image" content="/Images/og.jpg">
+      <script type="application/ld+json">{"@graph":[{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://jane.com/Images/logo.png"}},
+      {"@type":"WebPage","primaryImageOfPage":"https://cdn.other.com/x.png"}]}</script></head><body></body></html>`;
+    const urls = referencedImages([{ url: 'https://jane.com/', finalUrl: 'https://jane.com/', ok: true, isHtml: true, html }], 'jane.com');
+    assert.deepEqual(urls.sort(), ['https://jane.com/Images/logo.png', 'https://jane.com/Images/og.jpg']);
+});
+
+test('llms.txt without an About link gets a notice', () => {
+    const withAbout = fakeCrawl({ llmsRes: { ok: true, text: '# Jane\n\n> Author\n\n- [About](https://jane.com/about)' } });
+    const without = fakeCrawl({ llmsRes: { ok: true, text: '# Jane\n\n> Author\n\n- [Books](https://jane.com/books)' } });
+    assert.ok(!buildIssues(withAbout, [homeFacts()]).issues.some(i => i.id === 'llms_txt_no_about_link'));
+    assert.ok(buildIssues(without, [homeFacts()]).issues.some(i => i.id === 'llms_txt_no_about_link'));
 });
 
 test('buildIssues skips orphan detection when the crawl was truncated', () => {
