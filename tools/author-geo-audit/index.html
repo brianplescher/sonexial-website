@@ -242,7 +242,7 @@
                                 </button>
                             </div>
                             <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.85rem; margin-bottom: 0;">
-                                One email with your report. Unsubscribe any time.
+                                One email with your report. Unsubscribe any time. The public text of the page you scanned is analyzed by an AI model to build your profile (<a href="/privacy" style="color: #94a3b8;">privacy</a>).
                             </p>
                         </form>
 
@@ -259,6 +259,17 @@
                             </h3>
                             <ol id="full-recommendations-list" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; padding-left: 1.25rem; margin: 0; display: flex; flex-direction: column; gap: 0.6rem;">
                             </ol>
+                        </div>
+
+                        <!-- AI-extracted profile, revealed after unlock when the model returned one -->
+                        <div id="semantic-box" style="display: none; margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 1.5rem;">
+                            <h3 style="font-family: 'DM Mono', monospace; font-size: 0.85rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 0.5rem;">
+                                What AI Currently Infers About You
+                            </h3>
+                            <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0; margin-bottom: 1rem;">
+                                An AI model read the page you scanned and built this profile. If it is thin or wrong, that is what AI search engines are working with too.
+                            </p>
+                            <dl id="semantic-fields" style="display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1.25rem; margin: 0; font-size: 0.95rem; color: #e2e8f0;"></dl>
                         </div>
 
                         <!-- Pitch Result Box -->
@@ -438,6 +449,9 @@
             document.getElementById('full-recommendations-box').style.display = 'none';
             document.getElementById('full-recommendations-list').innerHTML = '';
 
+            document.getElementById('semantic-box').style.display = 'none';
+            document.getElementById('semantic-fields').textContent = '';
+
             document.getElementById('pitch-result-box').style.display = 'none';
             document.getElementById('pitch-email-text').textContent = '';
             document.getElementById('pitch-pkg-badge').textContent = '';
@@ -601,6 +615,38 @@
             recBox.style.display = recList.childElementCount > 0 ? 'block' : 'none';
         }
 
+        const AUDIENCE_LABELS = { 'all-ages': 'All ages', 'young-adult': 'Young adult', 'new-adult': 'New adult', 'adult': 'Adult' };
+        const SPICE_LABELS = ['None / fade-to-black', 'Romance, no on-page sex', 'Brief, non-explicit', 'On-page, moderate', 'Frequent, explicit', 'Very explicit'];
+
+        // Built with textContent only: every value here came from a model reading untrusted page text.
+        function renderSemantic(semantic) {
+            const box = document.getElementById('semantic-box');
+            const fields = document.getElementById('semantic-fields');
+            fields.textContent = '';
+            if (!semantic) {
+                box.style.display = 'none';
+                return;
+            }
+            const rows = [
+                ['Genres', (semantic.primary_genres || []).join(', ')],
+                ['Tropes', (semantic.top_tropes || []).join(', ')],
+                ['Themes', (semantic.themes || []).join(', ')],
+                ['Audience', (semantic.target_audience || []).map(a => AUDIENCE_LABELS[a] || a).join(', ')],
+                ['Spice', Number.isInteger(semantic.spice_level) ? `${semantic.spice_level}/5 · ${SPICE_LABELS[semantic.spice_level]}` : ''],
+                ['Bio', semantic.short_bio || '']
+            ];
+            rows.forEach(([label, value]) => {
+                const dt = document.createElement('dt');
+                dt.textContent = label;
+                dt.style.cssText = "font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; padding-top: 0.15rem;";
+                const dd = document.createElement('dd');
+                dd.textContent = value || 'Not detected';
+                dd.style.cssText = value ? 'margin: 0;' : 'margin: 0; color: #64748b; font-style: italic;';
+                fields.append(dt, dd);
+            });
+            box.style.display = 'block';
+        }
+
         async function handleUnlockSubmit(e) {
             e.preventDefault();
 
@@ -641,6 +687,7 @@
                 if (data.report) {
                     currentScanReport = data.report;
                     renderFullReport(data.report);
+                    renderSemantic(data.report.semantic);
                     document.getElementById('locked-summary').style.display = 'none';
                 }
 

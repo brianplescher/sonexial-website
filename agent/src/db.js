@@ -115,6 +115,19 @@ const createLead = (id, { email, name, scannedUrl, score, geoGrade, report, sour
     });
 };
 
+const updateLeadReport = (id, report) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            'UPDATE leads SET report = ? WHERE id = ?',
+            [JSON.stringify(report), id],
+            function (err) {
+                if (err) reject(err);
+                else resolve();
+            }
+        );
+    });
+};
+
 const getRecentLeads = (limit = 200) => {
     return new Promise((resolve, reject) => {
         db.all(
@@ -225,5 +238,6 @@ module.exports = {
     updateJobStatus,
     getRecentJobs,
     createLead,
+    updateLeadReport,
     getRecentLeads
 };

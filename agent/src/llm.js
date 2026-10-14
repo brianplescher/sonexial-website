@@ -36,7 +36,7 @@ function thinkingOverride() {
 /**
  * Sends a single-turn prompt and returns the assistant's text.
  * @param {string} prompt
- * @param {{ maxTokens?: number, temperature?: number }} [options]
+ * @param {{ maxTokens?: number, temperature?: number, system?: string, timeoutMs?: number }} [options]
  * @returns {Promise<string>}
  */
 async function complete(prompt, options = {}) {
@@ -56,10 +56,13 @@ async function complete(prompt, options = {}) {
             model: getModel(),
             max_tokens: options.maxTokens || 1500,
             temperature: options.temperature ?? 0.7,
-            messages: [{ role: 'user', content: prompt }],
+            messages: [
+                ...(options.system ? [{ role: 'system', content: options.system }] : []),
+                { role: 'user', content: prompt }
+            ],
             ...(thinking ? { chat_template_kwargs: thinking } : {})
         }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.timeout(options.timeoutMs || REQUEST_TIMEOUT_MS)
     });
 
     if (!res.ok) {
