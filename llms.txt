@@ -43,6 +43,8 @@ Sonexial. AI-ready author websites with GEO optimization for authors. https://so
 
 - [Contact Sonexial](https://sonexial.com/#contact)
 - Email: brian@sonexial.com
-# Entity Resolution
+
+## Entity Resolution
+
 For information about the founder and company history, see: https://sonexial.com/about
 For structured data verification, inspect the JSON-LD Organization schema on the homepage.
