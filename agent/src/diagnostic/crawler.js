@@ -3,6 +3,7 @@ const { safeFetch } = require('../scanner');
 
 const DEFAULT_MAX_PAGES = 30;
 const DEFAULT_CONCURRENCY = 4;
+const MAX_IMAGE_PROBES = 15;
 const NON_HTML_EXT = /\.(pdf|jpe?g|png|gif|webp|avif|svg|ico|css|js|mjs|json|xml|txt|zip|gz|mp3|mp4|m4a|wav|mov|webm|epub|mobi|docx?|xlsx?|pptx?|woff2?|ttf|eot)$/i;
 
 function stripWww(host) {
@@ -49,6 +50,44 @@ function parseSitemapUrls(xml) {
 }
 
 /**
+ * Collects same-site image URLs referenced from JSON-LD and og:image on crawled pages.
+ */
+function referencedImages(pages, siteHost) {
+    const urls = new Set();
+    for (const page of pages) {
+        if (!page.ok || !page.isHtml) continue;
+        const $ = cheerio.load(page.html || '');
+        const candidates = [$('meta[property="og:image"]').attr('content') || ''];
+        $('script[type="application/ld+json"]').each((_, el) => {
+            const re = /"(?:logo|image|primaryImageOfPage|thumbnailUrl|url)"\s*:\s*"(https?:\/\/[^"]+\.(?:png|jpe?g|gif|webp|avif|svg))"/gi;
+            let m;
+            while ((m = re.exec($(el).text())) !== null) candidates.push(m[1]);
+        });
+        for (const c of candidates) {
+            let parsed;
+            try {
+                parsed = new URL(c, page.finalUrl || page.url);
+            } catch {
+                continue;
+            }
+            if (['http:', 'https:'].includes(parsed.protocol) && stripWww(parsed.hostname) === siteHost) urls.add(parsed.href);
+        }
+    }
+    return [...urls];
+}
+
+/**
+ * Fetches referenced images so broken logo / og:image URLs can be reported. Returns url -> HTTP status.
+ */
+async function probeImages(pages, siteHost) {
+    const urls = referencedImages(pages, siteHost).slice(0, MAX_IMAGE_PROBES);
+    const probes = {};
+    const results = await Promise.all(urls.map(u => safeFetch(u)));
+    urls.forEach((u, i) => { probes[u] = results[i].status; });
+    return probes;
+}
+
+/**
  * Breadth-first crawl of one site, seeded from the start URL and its sitemap.
  * Records click depth and internal inlinks per page so orphaned and deep pages can be reported.
  */
@@ -60,10 +99,11 @@ async function crawlSite(startUrl, options = {}) {
     const origin = `${start.protocol}//${start.host}`;
     const siteHost = stripWww(start.hostname);
 
-    const [robotsRes, llmsRes, sitemapRes, httpProbe] = await Promise.all([
+    const [robotsRes, llmsRes, sitemapRes, bingAuthRes, httpProbe] = await Promise.all([
         safeFetch(`${origin}/robots.txt`),
         safeFetch(`${origin}/llms.txt`),
         safeFetch(`${origin}/sitemap.xml`),
+        safeFetch(`${origin}/BingSiteAuth.xml`),
         safeFetch(`http://${start.host}/`)
     ]);
 
@@ -142,6 +182,8 @@ async function crawlSite(startUrl, options = {}) {
         inlinks: [...(inlinks.get(p.url) || [])].filter(u => u !== p.url)
     }));
 
+    const imageProbes = await probeImages(results, siteHost);
+
     return {
         origin,
         siteHost,
@@ -151,10 +193,12 @@ async function crawlSite(startUrl, options = {}) {
         robotsRes,
         llmsRes,
         sitemapRes,
+        bingAuthRes,
+        imageProbes,
         sitemapPages,
         httpRedirectsToHttps: Boolean(httpProbe.url && httpProbe.url.startsWith('https://')),
         httpProbeOk: httpProbe.ok
     };
 }
 
-module.exports = { crawlSite, normalizeLink, extractLinks, parseSitemapUrls, stripWww };
+module.exports = { crawlSite, normalizeLink, extractLinks, parseSitemapUrls, referencedImages, stripWww };

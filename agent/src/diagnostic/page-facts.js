@@ -41,6 +41,47 @@ function collectJsonLd($) {
     return { items, invalid };
 }
 
+const IMAGE_FIELDS = ['logo', 'image', 'primaryImageOfPage', 'thumbnailUrl'];
+
+function imageUrls(items) {
+    const urls = new Set();
+    for (const item of items) {
+        for (const field of IMAGE_FIELDS) {
+            for (const v of asArray(item[field])) {
+                if (typeof v === 'string') urls.add(v);
+                else if (v && typeof v === 'object' && typeof v.url === 'string') urls.add(v.url);
+            }
+        }
+    }
+    return [...urls].filter(u => /^https?:\/\//i.test(u));
+}
+
+function faqEntries(items) {
+    return items
+        .filter(i => typesOf(i).includes('Question'))
+        .map(q => ({
+            name: typeof q.name === 'string' ? q.name.trim() : '',
+            answer: typeof q.acceptedAnswer?.text === 'string' ? q.acceptedAnswer.text.trim() : ''
+        }))
+        .filter(q => q.name);
+}
+
+function normalizeText(str) {
+    return str.replace(/\s+/g, ' ').replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').trim().toLowerCase();
+}
+
+/**
+ * FAQ schema entries whose question or the start of its answer does not appear in the visible page text.
+ */
+function faqMismatches(faqs, visibleText) {
+    const text = normalizeText(visibleText);
+    return faqs.filter(q => {
+        const name = normalizeText(q.name);
+        const answerStart = normalizeText(q.answer).slice(0, 60);
+        return !text.includes(name) || (answerStart && !text.includes(answerStart));
+    }).map(q => q.name);
+}
+
 function typesOf(item) {
     return Array.isArray(item['@type']) ? item['@type'] : [item['@type']];
 }
@@ -72,12 +113,15 @@ function analyzePage(page) {
         og[$(el).attr('property').toLowerCase()] = $(el).attr('content') || '';
     });
 
+    const bingVerification = $('meta[name="msvalidate.01"]').attr('content') || '';
+
     const metaRobots = ($('meta[name="robots"]').attr('content') || '').toLowerCase();
     const xRobots = (page.headers?.xRobotsTag || '').toLowerCase();
 
     const body = $('body').clone();
     body.find('script, style, noscript, template, svg').remove();
     const text = body.text().replace(/\s+/g, ' ').trim();
+    const faqs = faqEntries(items);
     const wordCount = text ? text.split(' ').length : 0;
 
     const images = $('img');
@@ -122,7 +166,17 @@ function analyzePage(page) {
         appShell,
         jsonLdTypes: [...types],
         invalidJsonLd: invalid,
-        persons: persons.map(p => ({ name: p.name || '', sameAs: asArray(p.sameAs), url: p.url || '' })),
+        bingVerification,
+        schemaImages: imageUrls(items),
+        faqCount: faqs.length,
+        faqMismatches: faqMismatches(faqs, text),
+        persons: persons.map(p => ({
+            name: p.name || '',
+            sameAs: asArray(p.sameAs),
+            url: p.url || '',
+            hasJobTitle: Boolean(p.jobTitle),
+            hasDescription: Boolean(p.description)
+        })),
         books: books.map(b => ({
             name: b.name || '',
             hasAuthor: Boolean(b.author),
@@ -150,4 +204,4 @@ function detectProfiles(urls) {
     return found;
 }
 
-module.exports = { analyzePage, detectProfiles, PROFILE_PATTERNS };
+module.exports = { analyzePage, detectProfiles, faqMismatches, PROFILE_PATTERNS };
