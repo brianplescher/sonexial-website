@@ -490,7 +490,7 @@ function parseRobots(content) {
         } else if (key === 'disallow' || key === 'allow') {
             for (const agent of currentAgents) {
                 if (!groups[agent]) groups[agent] = [];
-                groups[agent].push({ action: key, path: val.toLowerCase() });
+                groups[agent].push({ action: key, path: val });
             }
         }
     }
@@ -502,94 +502,108 @@ function parseRobots(content) {
  * Resolves whether a directive group grants a crawler access to the site root.
  * @returns {'blocked'|'allowed'|'partial'}
  */
-function evaluateRootAccess(rules) {
-    const disallowsRoot = rules.some(r => r.action === 'disallow' && (r.path === '/' || r.path === '/*'));
-    const allowsRoot = rules.some(r => r.action === 'allow' && (r.path === '/' || r.path === '/*'));
-    // "Disallow:" with an empty value is the canonical way to grant full access.
-    const emptyDisallow = rules.some(r => r.action === 'disallow' && r.path === '');
-
-    if (disallowsRoot && !allowsRoot) return 'blocked';
-    if (allowsRoot || emptyDisallow) return 'allowed';
-    return 'partial';
+/**
+ * Resolve the specific scanned path using longest-matching robots rules.
+ * Ties go to Allow. Missing rules allow crawling by default.
+ * This tests published rules, not real crawler success or indexing.
+ */
+function evaluateRootAccess(rules, pathname = '/') {
+    let winner = null;
+    for (const rule of rules) {
+        if (!rule.path) continue;
+        const anchored = rule.path.endsWith('$');
+        const pattern = anchored ? rule.path.slice(0, -1) : rule.path;
+        const escaped = pattern.replace(/[|\\{}()[\]^$+?.]/g, '\\$&').replace(/\*/g, '.*');
+        const regex = new RegExp('^' + escaped + (anchored ? '$' : ''));
+        if (!regex.test(pathname)) continue;
+        const specificity = pattern.replace(/\*/g, '').length;
+        if (!winner || specificity > winner.specificity ||
+            (specificity === winner.specificity && rule.action === 'allow')) {
+            winner = { specificity, action: rule.action };
+        }
+    }
+    return winner && winner.action === 'disallow' ? 'blocked' : 'allowed';
 }
 
 /**
- * Analyzes llms.txt, robots.txt (AI bot rules), and sitemap availability.
+ * Analyze published access rules and discovery metadata for the scanned page.
+ * llms.txt is optional and never earns points or counts as a critical failure.
  */
-function analyzeFiles(llmsRes, robotsRes, sitemapRes) {
-    let score = 0;
+function analyzeFiles(llmsRes, robotsRes, sitemapRes, pageUrl = 'https://example.invalid/') {
     const checks = {};
+    const points = {};
     const critical_failures = [];
     const recommendations = [];
 
-    // llms.txt Check
-    if (llmsRes && llmsRes.ok && llmsRes.text && llmsRes.text.length > 50) {
-        checks.llms_txt = true;
-        score += 20;
-    } else {
-        checks.llms_txt = false;
-        critical_failures.push("Missing llms.txt AI roadmap file.");
-        recommendations.push("Create an llms.txt file to guide AI crawlers (ChatGPT, Claude, Perplexity) directly to your key author data.");
-    }
+    checks.llms_txt = Boolean(llmsRes?.ok && llmsRes.text?.trim());
+    // This emerging format may help some tools but is not a search requirement.
+    // Do not prescribe it as necessary for appearing in AI-generated answers.
 
-    // robots.txt AI Bot Check
     const blockedBots = [];
     const allowedBots = [];
     let hasExplicitAiRules = false;
     let robotsSitemaps = [];
+    let status = 'unrestricted';
+    let pagePath = '/';
+    try {
+        const page = new URL(pageUrl);
+        pagePath = page.pathname + page.search;
+    } catch {
+        // Invalid/absent URL: assess the root.
+    }
 
-    if (robotsRes && robotsRes.ok && robotsRes.text) {
-        const { groups, sitemaps } = parseRobots(robotsRes.text);
+    // A missing robots.txt (404/410) does not block crawling.
+    const robotsUnavailable = !robotsRes?.ok && ![404, 410].includes(robotsRes?.status);
+    if (robotsUnavailable) {
+        status = 'unknown';
+        recommendations.push('Verify robots.txt availability; crawler access could not be assessed.');
+    } else {
+        const { groups, sitemaps } = parseRobots(robotsRes?.ok ? robotsRes.text : '');
         robotsSitemaps = sitemaps;
-
         for (const bot of AI_BOTS) {
             const specificRules = groups[bot] || [];
-            const globalRules = groups['*'] || [];
-
-            if (specificRules.length > 0) {
-                hasExplicitAiRules = true;
-                const access = evaluateRootAccess(specificRules);
-                if (access === 'blocked') blockedBots.push(bot);
-                else if (access === 'allowed') allowedBots.push(bot);
-            } else if (globalRules.length > 0) {
-                // No bot-specific group: the wildcard group governs, but only blocking is reported
-                // since a permissive wildcard is not evidence of deliberate AI optimization.
-                if (evaluateRootAccess(globalRules) === 'blocked') blockedBots.push(bot);
-            }
+            const rules = specificRules.length ? specificRules : (groups['*'] || []);
+            if (specificRules.length) hasExplicitAiRules = true;
+            if (evaluateRootAccess(rules, pagePath) === 'blocked') blockedBots.push(bot);
+            else allowedBots.push(bot);
+        }
+        if (blockedBots.length === AI_BOTS.length) {
+            status = 'blocked';
+            critical_failures.push('The scanned page is disallowed for all checked AI search crawlers in robots.txt.');
+        } else if (blockedBots.length) {
+            status = 'partially_blocked';
         }
 
-        checks.ai_bot_access = {
-            blocked: blockedBots,
-            allowed: allowedBots,
-            has_explicit_ai_rules: hasExplicitAiRules
-        };
-
-        if (blockedBots.length > 0) {
-            score -= 20; // Heavy penalty for blocking AI crawlers
-            critical_failures.push(`CRITICAL: Blocking AI crawlers (${blockedBots.join(', ')}).`);
-            recommendations.push(`Update robots.txt to permit AI discovery bots (${blockedBots.join(', ')}).`);
-        } else if (hasExplicitAiRules && allowedBots.length > 0) {
-            score += 10; // Explicit bonus for AI crawler optimization
+        if (blockedBots.length) {
+            recommendations.push('Review the robots.txt restrictions for ' + blockedBots.join(', ') +
+                '. Different crawler policies may be intentional; allow search crawlers only if you want their access.');
         }
-    } else {
-        checks.ai_bot_access = {
-            blocked: [],
-            allowed: [],
-            has_explicit_ai_rules: false
-        };
-        recommendations.push("Add a robots.txt file with explicit allow rules for AI bots (GPTBot, ClaudeBot, PerplexityBot).");
     }
 
-    // Sitemap (diagnostic only, not scored)
-    const sitemapBody = sitemapRes && sitemapRes.ok ? sitemapRes.text || '' : '';
-    const servesSitemap = sitemapBody.includes('<urlset') || sitemapBody.includes('<sitemapindex');
+    checks.ai_bot_access = {
+        blocked: blockedBots,
+        allowed: allowedBots,
+        has_explicit_ai_rules: hasExplicitAiRules,
+        checked: AI_BOTS,
+        status
+    };
+    // Explicit Allow has no ranking bonus: the wildcard/default permission is
+    // sufficient. Give partial credit when only some search bots are restricted.
+    points.bot_access = status === 'unknown' ? 0 :
+        Math.round(SCORE_WEIGHTS.bot_access * allowedBots.length / AI_BOTS.length);
+
+    const sitemapBody = sitemapRes?.ok ? sitemapRes.text || '' : '';
+    const servesSitemap = /<urlset\b|<sitemapindex\b/i.test(sitemapBody);
     checks.has_sitemap = servesSitemap || robotsSitemaps.length > 0;
-
+    points.sitemap = checks.has_sitemap ? SCORE_WEIGHTS.sitemap : 0;
     if (!checks.has_sitemap) {
-        recommendations.push("Publish a sitemap.xml and reference it from robots.txt so crawlers can enumerate every book and series page.");
+        recommendations.push('Publish a sitemap.xml and reference it from robots.txt to improve page discovery.');
     }
 
-    return { score, checks, critical_failures, recommendations };
+    return {
+        score: Object.values(points).reduce((a, b) => a + b, 0),
+        score_breakdown: points, checks, critical_failures, recommendations
+    };
 }
 
 /**
@@ -638,19 +652,21 @@ async function scanWithContent(inputUrl) {
     }
 
     // Analyze HTML
-    const htmlAnalysis = analyzeHtml(htmlRes.text, urlToScan);
+    const analyzedPageUrl = htmlRes.url || urlToScan;
+    const htmlAnalysis = analyzeHtml(htmlRes.text, analyzedPageUrl);
 
     // Analyze llms.txt, robots.txt & sitemap.xml
-    const fileAnalysis = analyzeFiles(llmsRes, robotsRes, sitemapRes);
+    const fileAnalysis = analyzeFiles(llmsRes, robotsRes, sitemapRes, analyzedPageUrl);
 
     // Aggregate Score & Grade
     const rawScore = htmlAnalysis.score + fileAnalysis.score;
     const totalScore = Math.max(0, Math.min(100, rawScore));
 
-    let grade = 'F (Ghost in the Machine)';
-    if (totalScore >= 80) grade = 'A (AI-Ready)';
-    else if (totalScore >= 60) grade = 'B (Needs Tuning)';
-    else if (totalScore >= 40) grade = 'C (Invisible to AI)';
+    // Grades describe on-page technical signals, not measured AI visibility.
+    let grade = 'D (Limited Signals)';
+    if (totalScore >= 85) grade = 'A (Strong Foundations)';
+    else if (totalScore >= 70) grade = 'B (Good, Some Gaps)';
+    else if (totalScore >= 50) grade = 'C (Major Gaps)';
 
     const executionTime = `${((Date.now() - startTime) / 1000).toFixed(2)}s`;
 
@@ -659,6 +675,9 @@ async function scanWithContent(inputUrl) {
         status: 'success',
         score: totalScore,
         geo_grade: grade,
+        scoring_model: 'technical-readiness-v2',
+        scoring_basis: 'Heuristic check of publicly observable technical signals; not a measure of actual AI search rankings, citations or recommendations.',
+        score_breakdown: { ...htmlAnalysis.score_breakdown, ...fileAnalysis.score_breakdown },
         execution_time: executionTime,
         checks: {
             ...htmlAnalysis.checks,
@@ -685,5 +704,6 @@ module.exports = {
     analyzeFiles,
     isCanonicalCorrect,
     AI_BOTS,
+    SCORE_WEIGHTS,
     THIN_CONTENT_WORDS
 };
