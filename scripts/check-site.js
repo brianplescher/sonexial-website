@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
+const { URL } = require('node:url');
 
 const root = path.resolve(__dirname, '..');
 const dist = path.join(root, 'dist');
