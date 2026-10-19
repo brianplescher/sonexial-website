@@ -6,6 +6,9 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write  # Release assets and old-backup cleanup
+
 jobs:
   backup:
     name: Backup Website Files
@@ -13,19 +16,25 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0  # Full history
 
       - name: Create backup archive
         run: |
-          DATE=$(date +%Y-%m-%d)
-          tar -czf "sonexial-backup-$DATE.tar.gz" \
+          set -euo pipefail
+          DATE=$(date -u +%Y-%m-%d)
+          ARCHIVE="sonexial-backup-$DATE.tar.gz"
+          # Write outside the source tree while tar reads it. Writing in-place
+          # caused "tar: .: file changed as we read it" on every scheduled run.
+          tar -czf "$RUNNER_TEMP/$ARCHIVE" \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.github' \
-            .
-          echo "✓ Backup created: sonexial-backup-$DATE.tar.gz"
+            -C "$GITHUB_WORKSPACE" .
+          mv "$RUNNER_TEMP/$ARCHIVE" "$GITHUB_WORKSPACE/$ARCHIVE"
+          tar -tzf "$GITHUB_WORKSPACE/$ARCHIVE" > /dev/null
+          echo "Backup created and verified: $ARCHIVE"
 
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1

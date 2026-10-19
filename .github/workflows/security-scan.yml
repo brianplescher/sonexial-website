@@ -6,6 +6,8 @@ on:
     - cron: '0 9 * * 1'
   push:
     branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -26,20 +28,37 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - name: npm audit
-        run: |
-          npm audit --audit-level=high || echo "::warning::npm audit found vulnerabilities"
-        continue-on-error: true
+      # Block on vulnerabilities in packages used by the running application.
+      - name: Audit production dependencies (site)
+        run: npm audit --omit=dev --audit-level=high
 
+      - name: Audit production dependencies (agent)
+        run: npm audit --prefix agent --omit=dev --audit-level=high
+
+      # The root dev-tool dependency tree has pre-existing advisories. Publish
+      # those findings transparently without confusing them with runtime risks.
+      - name: Report all dependency advisories
+        if: always()
+        run: |
+          npm audit --json > frontend-audit.json || true
+          node -e 'const fs=require("node:fs"); const a=JSON.parse(fs.readFileSync("frontend-audit.json", "utf8")); const v=a.metadata?.vulnerabilities||{}; console.log(`::warning::Site tooling audit: ${v.high||0} high and ${v.critical||0} critical advisories; see dependency-audit artifact.`);'
+
+      - name: Upload dependency audit
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: site-dependency-audit
+          path: frontend-audit.json
+          if-no-files-found: warn
       - name: Scan for hardcoded credentials
         run: |
           echo "Scanning for potential security issues..."
-          grep -r "password\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded passwords found"
-          grep -r "api_key\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded API keys found"
-          grep -r "secret\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded secrets found"
+          grep -r -l "password\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded passwords found"
+          grep -r -l "api_key\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded API keys found"
+          grep -r -l "secret\s*=" . --include="*.js" --include="*.html" --exclude-dir=node_modules || echo "No hardcoded secrets found"
 
       - name: Check for common secret patterns
         run: |
