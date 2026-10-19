@@ -164,7 +164,7 @@ function renderDiagnosticHtml(diag, { name } = {}) {
   <section>
     <h2>Executive summary</h2>
     <p>${esc(writeup.executive_summary)}</p>
-    <p class="muted">Free scan score for the homepage: ${esc(diag.freeScan.score)}/100 (${esc(diag.freeScan.grade)}). This diagnostic crawled ${diag.pagesCrawled} page(s)${diag.sitemapPageCount ? ` (sitemap lists ${diag.sitemapPageCount})` : ''} and assessed page and site-wide signals.</p>
+    <p class="muted">The scores are technical heuristics, not measurements of actual search indexing or AI citations. Free scan score for the homepage: ${esc(diag.freeScan.score)}/100 (${esc(diag.freeScan.grade)}). This diagnostic crawled ${diag.pagesCrawled} page(s)${diag.sitemapPageCount ? ` (sitemap lists ${diag.sitemapPageCount})` : ''} and assessed page and site-wide signals.</p>
   </section>
 
   <section>
@@ -174,13 +174,13 @@ function renderDiagnosticHtml(diag, { name } = {}) {
 
   <section>
     <h2>Priority matrix</h2>
-    <p class="muted">Every issue is scored for impact on AI visibility (1-5) and effort to fix (1-5), then placed in one of four groups.</p>
+    <p class="muted">Issues are prioritized heuristically by likely practical impact (1-5) and effort (1-5). These scores are not measured changes in AI visibility.</p>
     <div class="matrix">${renderMatrix(diag.issues)}</div>
   </section>
 
   <section>
     <h2>AI crawler access</h2>
-    <p class="muted">Search crawlers fetch your pages when someone asks a question; training crawlers collect data for future models. Blocking search crawlers removes you from answers. Blocking training crawlers is your call.</p>
+    <p class="muted">Automated search, user-initiated retrieval, and model-training crawlers serve different purposes. Published robots.txt rules can limit access, but this report cannot establish whether any particular AI system has indexed or cited your site.</p>
     ${renderBots(diag.bots)}
   </section>
 
@@ -197,7 +197,7 @@ function renderDiagnosticHtml(diag, { name } = {}) {
   <section>
     <h2>Ready-to-paste fixes</h2>
     <p class="muted">Drafted from what we found on your site. Replace anything marked … before publishing, then check JSON-LD at validator.schema.org.</p>
-    ${codeBlock('Author identity (Person schema)', 'Paste inside <head> on your homepage and About page', `<script type="application/ld+json">\n${artifacts.personJsonLd}\n</script>`, 'Tells AI engines this site is the official home of this author and links your profiles into one entity.')}
+    ${codeBlock('Author identity (Person schema)', 'Paste inside <head> on your homepage and About page', `<script type="application/ld+json">\n${artifacts.personJsonLd}\n</script>`, 'Describes the author and official links as structured data. Verify every fact against the visible page content.')}
     ${codeBlock('Book schema template', 'Paste inside <head> on each book page', `<script type="application/ld+json">\n${artifacts.bookJsonLd}\n</script>`, 'One block per book. The author @id links each book back to you.')}
     ${codeBlock('llms.txt', `${new URL(diag.url).origin}/llms.txt`, artifacts.llmsTxt, 'Optional proposed text overview for tools that choose to use it; not required for AI search.')}
     ${codeBlock('robots.txt', `${new URL(diag.url).origin}/robots.txt`, artifacts.robotsTxt, 'Suggested search-crawler access and sitemap hints. Model-training policies are independent choices.')}
@@ -219,8 +219,8 @@ function renderDiagnosticHtml(diag, { name } = {}) {
 
   <section class="cta">
     <h2>Next steps</h2>
-    <p>Hand this document to whoever manages your site. Every issue includes the reason and the fix.</p>
-    <p>Want it done for you? <a href="https://sonexial.com/kits">Author Platform</a> rebuilds your site with all of this in place, and the <a href="https://sonexial.com/kits">GEO Retainer</a> ($300/month) implements these fixes and re-runs this diagnostic every month so you can see the score move.</p>
+    <p>Hand this document to whoever manages your site. Each detected finding includes context and a suggested next action.</p>
+    <p>Want it done for you? <a href="https://sonexial.com/kits">Author Platform</a> rebuilds your site with all of this in place, and the <a href="https://sonexial.com/kits">GEO Retainer</a> ($300/month) can help implement prioritized fixes and review technical readiness over time.</p>
     <p class="muted">Reply to the delivery email with any questions about this report.</p>
   </section>
 
