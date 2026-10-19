@@ -42,14 +42,16 @@ function botAccess(groups, agent) {
 }
 
 function evaluateBots(robotsRes) {
-    const groups = robotsRes && robotsRes.ok ? parseRobots(robotsRes.text).groups : {};
-    const sitemaps = robotsRes && robotsRes.ok ? parseRobots(robotsRes.text).sitemaps : [];
+    // robots.txt 404/410 defaults to allowed, but 5xx / timeouts cannot be
+    // classified as accessible from the published rules alone.
+    const accessUnknown = !robotsRes?.ok && ![404, 410].includes(robotsRes?.status);
+    const parsed = robotsRes?.ok ? parseRobots(robotsRes.text) : { groups: {}, sitemaps: [] };
     const rows = [
-        ...SEARCH_BOTS.map(b => ({ ...b, kind: 'search', access: botAccess(groups, b.agent) })),
-        ...RETRIEVAL_BOTS.map(b => ({ ...b, kind: 'retrieval', access: botAccess(groups, b.agent) })),
-        ...TRAINING_BOTS.map(b => ({ ...b, kind: 'training', access: botAccess(groups, b.agent) }))
+        ...SEARCH_BOTS.map(b => ({ ...b, kind: 'search', access: accessUnknown ? 'unknown' : botAccess(parsed.groups, b.agent) })),
+        ...RETRIEVAL_BOTS.map(b => ({ ...b, kind: 'retrieval', access: accessUnknown ? 'unknown' : botAccess(parsed.groups, b.agent) })),
+        ...TRAINING_BOTS.map(b => ({ ...b, kind: 'training', access: accessUnknown ? 'unknown' : botAccess(parsed.groups, b.agent) }))
     ];
-    return { rows, sitemaps };
+    return { rows, sitemaps: parsed.sitemaps };
 }
 
 /**
@@ -161,10 +163,10 @@ function buildIssues(crawl, facts, now = new Date()) {
     const bingMeta = ok.some(f => f.bingVerification);
     if (!bingFile && !bingMeta) {
         add({
-            id: 'bing_not_verified', category: 'AI access', severity: 'warning', impact: 3, effort: 1,
-            title: 'Site is not verified with Bing Webmaster Tools',
-            why: 'Bing\'s index is what ChatGPT search and Microsoft Copilot read, and Bing is far slower than Google to discover unverified sites. Verification lets you submit your sitemap and see which pages Bing has actually indexed.',
-            fix: 'Add the site at bing.com/webmasters, then either upload BingSiteAuth.xml to your site root or add the <meta name="msvalidate.01"> tag to your homepage <head>, and submit sitemap.xml.'
+            id: 'bing_verification_not_found', category: 'Search tooling', severity: 'notice', impact: 1, effort: 1,
+            title: 'No public Bing Webmaster verification marker was detected',
+            why: 'This scan did not find a public Bing verification marker. That does not prove the site is unverified; DNS or other verification methods may be in use.',
+            fix: 'If you use Bing Webmaster Tools, confirm ownership and sitemap submission in your dashboard. Do not add duplicate verification methods just to satisfy this check.'
         });
     }
 
