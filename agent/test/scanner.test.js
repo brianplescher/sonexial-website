@@ -6,6 +6,8 @@ const {
     evaluateRootAccess,
     analyzeHtml,
     analyzeFiles,
+    AI_BOTS,
+    SCORE_WEIGHTS,
     isCanonicalCorrect,
     isPrivateOrReservedIP,
     readLimitedResponseText
@@ -16,25 +18,25 @@ const missingRes = () => ({ ok: false, status: 404, text: '', error: null });
 
 test('parseRobots starts a new group when a User-agent line follows a directive', () => {
     const { groups } = parseRobots([
-        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
         'Disallow: /',
         'User-agent: *',
         'Allow: /'
     ].join('\n'));
 
-    assert.deepEqual(groups['gptbot'], [{ action: 'disallow', path: '/' }]);
+    assert.deepEqual(groups['oai-searchbot'], [{ action: 'disallow', path: '/' }]);
     assert.deepEqual(groups['*'], [{ action: 'allow', path: '/' }]);
 });
 
 test('parseRobots keeps consecutive User-agent lines in one group', () => {
     const { groups } = parseRobots([
         'User-agent: GPTBot',
-        'User-agent: ClaudeBot',
+        'User-agent: Claude-SearchBot',
         'Disallow: /drafts'
     ].join('\n'));
 
     assert.deepEqual(groups['gptbot'], [{ action: 'disallow', path: '/drafts' }]);
-    assert.deepEqual(groups['claudebot'], [{ action: 'disallow', path: '/drafts' }]);
+    assert.deepEqual(groups['claude-searchbot'], [{ action: 'disallow', path: '/drafts' }]);
 });
 
 test('parseRobots strips comments and collects sitemaps', () => {
@@ -79,7 +81,7 @@ test('a wildcard block marks every AI crawler as blocked', () => {
     const { checks } = analyzeFiles(missingRes(), okRes('User-agent: *\nDisallow: /'), missingRes());
 
     assert.deepEqual(checks.ai_bot_access.blocked, [
-        'gptbot', 'claudebot', 'perplexitybot', 'anthropic-ai', 'google-extended'
+        ...AI_BOTS
     ]);
     assert.equal(checks.ai_bot_access.has_explicit_ai_rules, false);
 });
@@ -178,4 +180,103 @@ test('readLimitedResponseText accepts bodies within the byte limit', async () =>
 test('readLimitedResponseText rejects bodies that exceed the byte limit', async () => {
     const response = new Response('response is too large');
     await assert.rejects(readLimitedResponseText(response, 8), /exceeds the 8-byte limit/);
+});
+
+test('scoring weights total 100 and missing optional llms.txt does not reduce score', () => {
+    assert.equal(Object.values(SCORE_WEIGHTS).reduce((a, b) => a + b, 0), 100);
+    const allowed = okRes('User-agent: *\\nAllow: /');
+    const sitemap = okRes('<urlset></urlset>');
+    const withFile = analyzeFiles(okRes('# Site overview\\n' + 'More information'.repeat(12)),
+        allowed, sitemap);
+    const withoutFile = analyzeFiles(missingRes(), allowed, sitemap);
+    assert.equal(withFile.score, withoutFile.score);
+    assert.equal(withoutFile.checks.llms_txt, false);
+    assert.deepEqual(withoutFile.critical_failures, []);
+    assert.equal(withoutFile.score, SCORE_WEIGHTS.bot_access + SCORE_WEIGHTS.sitemap);
+});
+
+test('explicit bot allow rules do not earn more points than default permission', () => {
+    const defaultAllowed = analyzeFiles(missingRes(), okRes('User-agent: *\\nAllow: /'), missingRes());
+    const explicitAllowed = analyzeFiles(missingRes(), okRes([
+        'User-agent: OAI-SearchBot', 'User-agent: Claude-SearchBot',
+        'User-agent: PerplexityBot', 'User-agent: Googlebot',
+        'Allow: /'
+    ].join('\\n')), missingRes());
+    assert.equal(defaultAllowed.score, explicitAllowed.score);
+    assert.equal(defaultAllowed.score, SCORE_WEIGHTS.bot_access);
+});
+
+test('training bot opt-outs do not count as search crawler restrictions', () => {
+    const analysis = analyzeFiles(missingRes(), okRes([
+        'User-agent: GPTBot', 'Disallow: /',
+        'User-agent: ClaudeBot', 'Disallow: /',
+        'User-agent: Google-Extended', 'Disallow: /',
+        'User-agent: *', 'Allow: /'
+    ].join('\\n')), missingRes());
+    assert.deepEqual(analysis.checks.ai_bot_access.blocked, []);
+    assert.equal(analysis.score, SCORE_WEIGHTS.bot_access);
+});
+
+test('robots matching evaluates the scanned page path and specific allow precedence', () => {
+    const rules = [
+        { action: 'disallow', path: '/books/' },
+        { action: 'allow', path: '/books/public/' }
+    ];
+    assert.equal(evaluateRootAccess(rules, '/books/private/'), 'blocked');
+    assert.equal(evaluateRootAccess(rules, '/books/public/book1'), 'allowed');
+    assert.equal(evaluateRootAccess(rules, '/'), 'allowed');
+    assert.equal(evaluateRootAccess([
+        { action: 'disallow', path: '/books/*' },
+        { action: 'allow', path: '/books/open$' }
+    ], '/books/open'), 'allowed');
+    assert.equal(evaluateRootAccess([
+        { action: 'disallow', path: '/' },
+        { action: 'allow', path: '/public/' }
+    ], '/public/author'), 'allowed');
+});
+
+test('a blocked target URL is a real critical crawler issue, not a training preference', () => {
+    const rules = okRes('User-agent: *\\nDisallow: /private/');
+    const blocked = analyzeFiles(missingRes(), rules, missingRes(), 'https://author.example/private/books');
+    const allowed = analyzeFiles(missingRes(), rules, missingRes(), 'https://author.example/public');
+    assert.equal(blocked.checks.ai_bot_access.status, 'blocked');
+    assert.equal(blocked.checks.ai_bot_access.blocked.length, AI_BOTS.length);
+    assert.equal(blocked.critical_failures.length, 1);
+    assert.equal(allowed.checks.ai_bot_access.status, 'unrestricted');
+    assert.deepEqual(allowed.checks.ai_bot_access.blocked, []);
+});
+
+test('robots access unknown is not reported as allowed', () => {
+    const unknown = analyzeFiles(missingRes(), { ok: false, status: 503, text: '' }, missingRes());
+    assert.equal(unknown.checks.ai_bot_access.status, 'unknown');
+    assert.equal(unknown.score, 0);
+});
+
+test('canonical check requires same page path as well as same domain', () => {
+    assert.equal(isCanonicalCorrect('https://example.com/books/other', 'https://example.com/books/mine'), false);
+    assert.equal(isCanonicalCorrect('https://www.example.com/books/mine/', 'https://example.com/books/mine'), true);
+});
+
+test('entity link spoofing and incomplete Open Graph tags do not receive full credit', () => {
+    const html = '<html><head><meta property="og:title" content="Author">' +
+        '<meta property="og:url" content="https://example.com/"></head>' +
+        '<body><h1>Author</h1><a href="https://amazon.com.evil.example/b">Not Amazon</a></body></html>';
+    const analysis = analyzeHtml(html, 'https://example.com/');
+    assert.equal(analysis.checks.entity_links.amazon, false);
+    assert.equal(analysis.checks.open_graph, false);
+    assert.ok(analysis.score_breakdown.open_graph < SCORE_WEIGHTS.open_graph);
+});
+
+test('complete observable technical signals can attain the full heuristic score', () => {
+    const words = Array.from({ length: 310 }, () => 'useful').join(' ');
+    const html = '<!doctype html><html><head>' +
+        '<script type="application/ld+json">{"@type":"Person","name":"Author","book":{"@type":"Book","name":"Book"}}</script>' +
+        '<link rel="canonical" href="https://example.com/">' +
+        '<meta property="og:title" content="Author"><meta property="og:description" content="A description">' +
+        '<meta property="og:image" content="https://example.com/image.jpg"></head>' +
+        '<body><h1>Author</h1><h2>Books</h2><a href="https://www.goodreads.com/book">Book</a>' + words + '</body></html>';
+    const page = analyzeHtml(html, 'https://example.com/');
+    const files = analyzeFiles(missingRes(), okRes('User-agent: *\\nAllow: /'), okRes('<urlset></urlset>'));
+    assert.equal(page.score + files.score, 100);
+    assert.deepEqual([...page.critical_failures, ...files.critical_failures], []);
 });
