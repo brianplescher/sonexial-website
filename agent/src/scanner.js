@@ -8,7 +8,22 @@ const THIN_CONTENT_WORDS = 300;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 
 // AI crawlers whose robots.txt access is reported by the scanner.
-const AI_BOTS = ['gptbot', 'claudebot', 'perplexitybot', 'anthropic-ai', 'google-extended'];
+// Bots used for search discovery. Training controls (GPTBot, ClaudeBot,
+// Google-Extended) are independent from search inclusion and do not belong here.
+const AI_BOTS = ['oai-searchbot', 'claude-searchbot', 'perplexitybot'];
+
+// Versioned, heuristic weights for observable *technical* readiness, not
+// likelihood of being cited or recommended by any particular AI product.
+const SCORE_WEIGHTS = Object.freeze({
+    schema: 25,
+    headings: 15,
+    entity_links: 10,
+    open_graph: 10,
+    canonical: 15,
+    content: 10,
+    bot_access: 10,
+    sitemap: 5
+});
 
 // Sanitize a value before logging
 function sanitizeLog(val) {
@@ -22,11 +37,17 @@ function isCanonicalCorrect(canonicalHref, pageUrl) {
     if (!canonicalHref || !pageUrl) return false;
 
     const stripWww = host => host.replace(/^www\./, '');
+    const normalizedPath = pathname => {
+        const withoutIndex = pathname.replace(/\/index\.html$/i, '/');
+        return withoutIndex.replace(/\/+$/, '') || '/';
+    };
 
     try {
         const canonical = new URL(canonicalHref, pageUrl);
         const page = new URL(pageUrl);
-        return stripWww(canonical.hostname.toLowerCase()) === stripWww(page.hostname.toLowerCase());
+        return ['http:', 'https:'].includes(canonical.protocol) &&
+            stripWww(canonical.hostname.toLowerCase()) === stripWww(page.hostname.toLowerCase()) &&
+            normalizedPath(canonical.pathname) === normalizedPath(page.pathname);
     } catch {
         return false;
     }
@@ -290,11 +311,12 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
 function analyzeHtml(htmlText, pageUrl) {
     const $ = cheerio.load(htmlText || '');
     const checks = {};
-    let score = 0;
+    const points = {};
     const critical_failures = [];
     const recommendations = [];
 
-    // 1. JSON-LD Schema (Book, Person, FAQPage) and sameAs entity references
+    // 1. Author/book JSON-LD provides explicit entity facts; it is not a
+    // guarantee that AI systems will retrieve or recommend a book.
     let hasBook = false;
     let hasPerson = false;
     let hasFaq = false;
@@ -302,8 +324,7 @@ function analyzeHtml(htmlText, pageUrl) {
 
     $('script[type="application/ld+json"]').each((_, el) => {
         try {
-            const content = $(el).text();
-            const data = JSON.parse(content);
+            const data = JSON.parse($(el).text());
             const items = [];
 
             function walk(obj) {
@@ -327,108 +348,103 @@ function analyzeHtml(htmlText, pageUrl) {
             }
 
             walk(data);
-
             if (items.includes('Book')) hasBook = true;
             if (items.includes('Person')) hasPerson = true;
             if (items.includes('FAQPage')) hasFaq = true;
         } catch {
-            // Invalid JSON in schema tag
+            // Invalid JSON-LD is ignored and will not earn schema points.
         }
     });
 
     checks.schema_markup = { book: hasBook, person: hasPerson, faq: hasFaq };
     checks.sameas_count = sameAsUrls.size;
-
-    if (hasBook && hasPerson) {
-        score += 30;
-    } else if (hasBook || hasPerson) {
-        score += 15;
-        recommendations.push("Missing complete Author/Book entity mapping in JSON-LD Schema.");
-    } else {
-        critical_failures.push("Missing core JSON-LD Schema (Person/Book).");
-        recommendations.push("Add 'Person' and 'Book' JSON-LD schema to define your author entity for AI discovery.");
+    points.schema = hasBook && hasPerson ? SCORE_WEIGHTS.schema :
+        (hasBook || hasPerson ? 12 : 0);
+    if (hasBook !== hasPerson) {
+        recommendations.push('Add the missing Person or Book schema and connect the author to the books.');
+    } else if (!hasBook) {
+        recommendations.push('Add valid Person and Book JSON-LD to describe your author and titles explicitly.');
+    }
+    if (!sameAsUrls.size) {
+        recommendations.push('Add relevant sameAs URLs to verified author profiles where available.');
     }
 
-    if (sameAsUrls.size === 0) {
-        recommendations.push("Add 'sameAs' links (Amazon author page, Goodreads, Wikipedia, social profiles) to your schema so AI engines resolve your profiles to one identity.");
-    }
-
-    // 2. Semantic HTML Hierarchy
-    const h1Tags = $('h1');
-    const h2Tags = $('h2');
-    const h1Count = h1Tags.length;
-    const h2Count = h2Tags.length;
-
+    // 2. Meaningful headings help readers and parsers understand page sections.
+    const h1Count = $('h1').length;
+    const h2Count = $('h2').length;
     checks.semantic_html = { h1_count: h1Count, h2_count: h2Count };
-
-    if (h1Count === 1 && h2Count > 0) {
-        score += 15;
-    } else if (h1Count === 0) {
-        critical_failures.push("Missing H1 heading. Semantic hierarchy requires exactly one H1.");
-        recommendations.push("Add a single H1 tag defining your primary author entity or book.");
+    points.headings = h1Count === 1 ? (h2Count ? SCORE_WEIGHTS.headings : 10) :
+        (h1Count > 1 ? 5 : 0);
+    if (h1Count === 0) {
+        critical_failures.push('No H1 heading found on the scanned page.');
+        recommendations.push('Add a descriptive H1 heading for the main page topic.');
     } else if (h1Count > 1) {
-        critical_failures.push("Multiple H1 headings detected. Semantic hierarchy requires exactly one H1.");
-        recommendations.push("Consolidate multiple H1 tags into a single H1 so AI crawlers parse your core topic correctly.");
-    } else {
-        recommendations.push("Add H2 subheadings to organize your content hierarchy for AI crawler comprehension.");
+        recommendations.push('Consider one clear top-level H1 heading and logical subheadings.');
+    } else if (h2Count === 0) {
+        recommendations.push('Add meaningful H2 headings if the page has distinct sections.');
     }
 
-    // 3. Entity Connectivity (Amazon, Goodreads, BookBub)
-    const links = [];
+    // 3. Check actual URL hostnames, not substrings (which can be spoofed).
+    const links = new Set();
     $('a[href]').each((_, el) => {
-        const href = $(el).attr('href');
-        if (href) links.push(href.toLowerCase());
-    });
-
-    const hasAmazon = links.some(l => l.includes('amazon.') || l.includes('amzn.to'));
-    const hasGoodreads = links.some(l => l.includes('goodreads.com'));
-    const hasBookbub = links.some(l => l.includes('bookbub.com'));
-
-    checks.entity_links = { amazon: hasAmazon, goodreads: hasGoodreads, bookbub: hasBookbub };
-
-    if (hasAmazon || hasGoodreads || hasBookbub) {
-        score += 15;
-    } else {
-        recommendations.push("Add outbound entity links to Amazon, Goodreads, or BookBub to connect your knowledge graph.");
-    }
-
-    // 4. Open Graph / Meta Tags
-    let ogCount = 0;
-    $('meta').each((_, el) => {
-        const prop = $(el).attr('property') || $(el).attr('name') || '';
-        if (prop.toLowerCase().startsWith('og:')) {
-            ogCount++;
+        try {
+            const href = $(el).attr('href');
+            const url = new URL(href, pageUrl || 'https://example.invalid/');
+            if (['http:', 'https:'].includes(url.protocol)) links.add(url.hostname.toLowerCase());
+        } catch {
+            // Ignore malformed and non-HTTP links.
         }
     });
-
-    checks.open_graph = ogCount >= 3;
-    if (ogCount >= 3) {
-        score += 10;
-    } else {
-        recommendations.push("Add Open Graph meta tags (og:title, og:description, og:image) for rich AI and social previews.");
+    const isHost = (host, domain) => host === domain || host.endsWith('.' + domain);
+    const hasAmazon = [...links].some(h => h === 'amzn.to' || /^amazon\.[a-z.]+$/.test(h) ||
+        /^[a-z0-9-]+\.amazon\.[a-z.]+$/.test(h));
+    const hasGoodreads = [...links].some(h => isHost(h, 'goodreads.com'));
+    const hasBookbub = [...links].some(h => isHost(h, 'bookbub.com'));
+    checks.entity_links = { amazon: hasAmazon, goodreads: hasGoodreads, bookbub: hasBookbub };
+    points.entity_links = hasAmazon || hasGoodreads || hasBookbub ? SCORE_WEIGHTS.entity_links : 0;
+    if (!points.entity_links) {
+        recommendations.push('Link to an official book listing or author profile where one exists.');
     }
 
-    // 5. Canonical URL (diagnostic only, not scored)
+    // 4. Check actual social preview fields rather than counting any three OG tags.
+    const ogFields = new Set();
+    $('meta[property]').each((_, el) => {
+        const prop = ($(el).attr('property') || '').trim().toLowerCase();
+        const content = ($(el).attr('content') || '').trim();
+        if (content) ogFields.add(prop);
+    });
+    const essentialOg = ['og:title', 'og:description', 'og:image'];
+    const presentOg = essentialOg.filter(field => ogFields.has(field)).length;
+    checks.open_graph = presentOg === essentialOg.length;
+    points.open_graph = checks.open_graph ? SCORE_WEIGHTS.open_graph : (presentOg ? 5 : 0);
+    if (!checks.open_graph) {
+        recommendations.push('Add complete og:title, og:description and og:image tags for reliable social previews.');
+    }
+
+    // 5. A canonical is useful only when it resolves to this page, not merely this domain.
     const canonicalHref = $('link[rel="canonical"]').first().attr('href');
     checks.canonical_correct = isCanonicalCorrect(canonicalHref, pageUrl);
-
+    points.canonical = checks.canonical_correct ? SCORE_WEIGHTS.canonical : 0;
     if (!canonicalHref) {
-        recommendations.push("Add a <link rel=\"canonical\"> tag so AI crawlers consolidate duplicate URLs into one authoritative page.");
+        recommendations.push('Add a self-referencing canonical URL for the scanned page.');
     } else if (!checks.canonical_correct) {
-        recommendations.push("Your canonical tag points to a different site or an unresolvable URL, which tells AI crawlers to credit another page.");
+        recommendations.push('Review the canonical URL: it should identify this page, not a different path or domain.');
     }
 
-    // 6. Content depth (diagnostic only, not scored)
+    // 6. Word count is a rough completeness signal, not a search-engine rule.
     const bodyText = $('body').clone().find('script, style, noscript, template').remove().end().text();
     const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
     checks.word_count = wordCount;
     checks.thin_content_flag = wordCount < THIN_CONTENT_WORDS;
-
+    points.content = wordCount >= THIN_CONTENT_WORDS ? SCORE_WEIGHTS.content : (wordCount >= 150 ? 5 : 0);
     if (checks.thin_content_flag) {
-        recommendations.push(`This page has roughly ${wordCount} words. AI engines need substantive text to quote you; aim for at least ${THIN_CONTENT_WORDS}.`);
+        recommendations.push('Review whether the page gives readers enough useful, original information about the author and books; word count alone is not a ranking rule.');
     }
 
-    return { score, checks, critical_failures, recommendations };
+    return {
+        score: Object.values(points).reduce((a, b) => a + b, 0),
+        score_breakdown: points, checks, critical_failures, recommendations
+    };
 }
 
 /**
