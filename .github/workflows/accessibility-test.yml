@@ -41,7 +41,7 @@ jobs:
           echo 'Sonexial WCAG 2 AA checks' > a11y-report.txt
           for page in / /kits.html /tools/author-geo-audit/; do
             echo "--- $page ---" | tee -a a11y-report.txt
-            npx pa11y --standard WCAG2AA --chrome-launch-config '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' "http://127.0.0.1:8080$page" >> a11y-report.txt 2>&1
+            npx pa11y --config pa11y.json --standard WCAG2AA "http://127.0.0.1:8080$page" >> a11y-report.txt 2>&1
             code=$?
             tail -n 35 a11y-report.txt
             if [ "$code" -ne 0 ]; then failed=1; fi
