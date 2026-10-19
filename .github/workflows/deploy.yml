@@ -18,34 +18,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '18'
+          node-version-file: '.nvmrc'
           cache: ''
 
       - name: Install dependencies
-        run: |
-          npm install -g --ignore-scripts html-validate@8.24.1
-          npm install -g --ignore-scripts stylelint@16.10.0 stylelint-config-standard@36.0.1
-          npm install -g --ignore-scripts eslint@9.15.0
+        run: npm ci
+
+      - name: Validate production build and site integrity
+        run: npm run build && npm run test:site
 
       - name: Validate HTML
-        run: |
-          html-validate "*.html" || echo "HTML validation warnings found"
+        run: npx html-validate "*.html"
 
       - name: Lint CSS
         run: |
           echo "Linting CSS files..."
-          # stylelint "*.css" || echo "CSS linting warnings found"
+          npx stylelint '*.css'
 
       - name: Lint JavaScript
         run: |
           echo "Linting JavaScript files..."
-          # eslint "*.js" || echo "JS linting warnings found"
+          npx eslint '*.js' 'scripts/*.js'
 
       - name: Check for broken links
         uses: lycheeverse/lychee-action@2b973e86fc7b1f6b36a93795fe2c9c6ae1118621 # v1
         with:
           args: --verbose --no-progress '*.html' '*.md'
-          fail: false
+          fail: true
 
   build:
     name: Build Production Assets
@@ -59,11 +58,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '18'
+          node-version-file: '.nvmrc'
           cache: ''
 
       - name: Build production site
-        run: npm run build
+        run: npm ci && npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
