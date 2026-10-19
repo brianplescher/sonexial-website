@@ -62,7 +62,7 @@ function renderBots(bots) {
         <td><code>${esc(b.label)}</code></td>
         <td>${esc(b.engine)}</td>
         <td>${b.kind === 'search' ? 'Automated search' : (b.kind === 'retrieval' ? 'User-initiated retrieval' : 'Model training')}</td>
-        <td class="${b.access === 'blocked' ? (b.kind === 'search' ? 'bad' : 'mid') : 'good'}">${b.access === 'blocked' ? 'Blocked' : 'Allowed'}</td>
+        <td class="${b.access === 'unknown' ? 'mid' : (b.access === 'blocked' ? (b.kind === 'search' ? 'bad' : 'mid') : 'good')}">${b.access === 'unknown' ? 'Unknown' : (b.access === 'blocked' ? 'Blocked' : 'Allowed')}</td>
       </tr>`).join('');
     return `<div class="table-wrap"><table><thead><tr><th>Crawler</th><th>Feeds</th><th>Purpose</th><th>Access</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
