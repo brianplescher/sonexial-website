@@ -2048,8 +2048,6 @@ RESPONSIVE
 }
 
 @media (max-width: 768px) {
-
-
   .footer-inner {
     flex-direction: column;
     gap: 1.5rem;
