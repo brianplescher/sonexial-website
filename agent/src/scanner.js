@@ -10,7 +10,9 @@ const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 // AI crawlers whose robots.txt access is reported by the scanner.
 // Bots used for search discovery. Training controls (GPTBot, ClaudeBot,
 // Google-Extended) are independent from search inclusion and do not belong here.
-const AI_BOTS = ['oai-searchbot', 'claude-searchbot', 'perplexitybot'];
+// Googlebot governs eligibility for Google Search's AI features. Search and
+// training crawlers are separate policy choices.
+const AI_BOTS = ['oai-searchbot', 'claude-searchbot', 'perplexitybot', 'googlebot'];
 
 // Versioned, heuristic weights for observable *technical* readiness, not
 // likelihood of being cited or recommended by any particular AI product.
