@@ -73,7 +73,7 @@ test('robots.txt group order does not change the reported result', () => {
 
     assert.deepEqual(first.checks.ai_bot_access.blocked, ['oai-searchbot']);
     assert.deepEqual(last.checks.ai_bot_access.blocked, ['oai-searchbot']);
-    assert.deepEqual(first.checks.ai_bot_access.allowed, []);
+    assert.deepEqual(first.checks.ai_bot_access.allowed, AI_BOTS.filter(bot => bot !== 'oai-searchbot'));
     assert.equal(first.score, last.score);
 });
 
