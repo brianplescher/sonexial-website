@@ -94,12 +94,13 @@ function buildReportHtml(name, report) {
     return `
         <div style="font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; color:#111; max-width:640px;">
             <p>${name ? `${escapeHtml(name)},` : 'Hi,'}</p>
-            <p>Here is the full AI visibility report for <strong>${escapeHtml(report.url)}</strong>.</p>
+            <p>Here are the technical-readiness findings for <strong>${escapeHtml(report.url)}</strong>.</p>
             <p style="font-size:20px; margin:24px 0;">
-                <strong>Score: ${escapeHtml(report.score)}/100</strong> &nbsp;&mdash;&nbsp; ${escapeHtml(report.geo_grade)}
+                <strong>Technical readiness: ${escapeHtml(report.score)}/100</strong> &nbsp;&mdash;&nbsp; ${escapeHtml(report.geo_grade)}
             </p>
-            ${failures ? `<h3>Critical failures</h3><ul>${failures}</ul>` : '<p>No critical failures detected.</p>'}
-            ${recommendations ? `<h3>Every fix, in priority order</h3><ol>${recommendations}</ol>` : ''}
+            <p style="font-size:13px; color:#555;">This heuristic score assesses public page and crawler signals. It does not measure AI search rankings, citations or recommendation likelihood.</p>
+            ${failures ? `<h3>Important technical issues</h3><ul>${failures}</ul>` : '<p>No critical technical issues detected.</p>'}
+            ${recommendations ? `<h3>Recommendations</h3><ol>${recommendations}</ol>` : ''}
             <p style="margin-top:32px;">
                 Want these fixed for you? The
                 <a href="https://sonexial.com/kits">Sonexial kits</a> cover metadata, schema, and full author platforms.
@@ -123,7 +124,7 @@ async function sendScanReportEmail(toEmail, name, report) {
     await send({
         from: SCANNER_FROM,
         to: toEmail,
-        subject: `Your AI visibility report: ${report.score}/100 for ${report.url}`,
+        subject: `Your author-site readiness report: ${report.score}/100 for ${report.url}`,
         html: buildReportHtml(name, report)
     });
 }
