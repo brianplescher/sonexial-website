@@ -2,7 +2,9 @@
 
 > Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
 
-Sonexial provides a Free AI Visibility Scan for author websites, Amazon listing optimization, author website development, Generative Engine Optimization, author platform strategy, and ongoing AI visibility monitoring.
+Sonexial provides a free technical-readiness scan for author websites, Amazon listing optimization, author website development, Generative Engine Optimization (GEO) services, author platform strategy, and ongoing discovery checks.
+
+This llms.txt overview is optional and designed for humans and tools that choose to read it. It is not required for inclusion in Google AI features or ChatGPT search and does not guarantee AI citations.
 
 ## Core Pages
 
@@ -10,7 +12,7 @@ Sonexial provides a Free AI Visibility Scan for author websites, Amazon listing 
 - [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
 - [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
 - [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description in one deliverable.
-- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free live GEO scanner auditing schema markup, llms.txt, robots.txt crawler rules, and AI discovery readiness.
+- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free heuristic scan of observable page signals: author/book markup, headings, canonicals, content and published crawler rules. Presence of llms.txt is informational.
 - [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
 - [About](https://sonexial.com/about) - Background on Sonexial and founder information.
 - [Privacy](https://sonexial.com/privacy) - Privacy Policy.
@@ -21,15 +23,15 @@ Sonexial provides a Free AI Visibility Scan for author websites, Amazon listing 
 
 - [Content Vault](https://sonexial.com/blog/) - Essays on AI search, GEO, and author platform strategy.
 - [The Brutal Math of 2026: 19% of Readers Read 82% of Books](https://sonexial.com/blog/reader-concentration-2026/) - 19% of American adults read 82% of all books. What reader concentration means for indie author discovery, formats, and platform strategy in 2026.
-- [Why Your Beautiful Author Website Is Invisible to AI (And What to Do About It)](https://sonexial.com/blog/author-website-invisible-to-ai/) - How GEO differs from SEO, why most author websites are unreadable to ChatGPT, Perplexity, and Claude, and a checklist for a machine-readable author platform.
+- [Why Your Beautiful Author Website Is Invisible to AI (And What to Do About It)](https://sonexial.com/blog/author-website-invisible-to-ai/) - How GEO differs from SEO, common author-site clarity and crawlability gaps, and a checklist for a machine-readable author platform.
 - [Genre Clarity Is Not Artistic Surrender: Why Trope Signals Matter More Than Ever](https://sonexial.com/blog/genre-clarity-trope-signals/) - Why clear genre and trope signals help readers and AI recommendation systems match your books with the readers who want them.
 
 ## Services
 
-- A Free AI Visibility Scan that checks any author website for AI discoverability failures.
+- A Free AI Visibility Scan that assesses observable technical-readiness signals on publicly accessible author websites; it does not test search engines' internal indexes.
 - The Amazon Visibility Kit, a one-time kit covering BISAC categories, Amazon keywords, and book description.
 - Author website builds: Author Starter and Author Platform.
-- A monthly GEO Retainer tracking how AI answer engines cite an author and their books.
+- A monthly GEO Retainer offering technical checks and sampled observations of selected publicly accessible AI search interfaces.
 
 ## Founder
 
