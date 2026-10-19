@@ -398,8 +398,17 @@ function analyzeHtml(htmlText, pageUrl) {
         }
     });
     const isHost = (host, domain) => host === domain || host.endsWith('.' + domain);
-    const hasAmazon = [...links].some(h => h === 'amzn.to' || /^amazon\.[a-z.]+$/.test(h) ||
-        /^[a-z0-9-]+\.amazon\.[a-z.]+$/.test(h));
+    // Compare against known retail registrable domains. A loose regex would
+    // mistake amazon.com.attacker.example for a real Amazon link.
+    const amazonDomains = [
+        'amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr',
+        'amazon.it', 'amazon.es', 'amazon.nl', 'amazon.pl', 'amazon.se',
+        'amazon.in', 'amazon.co.jp', 'amazon.com.au', 'amazon.com.br',
+        'amazon.com.mx', 'amazon.sg', 'amazon.ae', 'amazon.sa', 'amazon.eg',
+        'amazon.com.tr', 'amazon.com.be'
+    ];
+    const hasAmazon = [...links].some(host =>
+        host === 'amzn.to' || amazonDomains.some(domain => isHost(host, domain)));
     const hasGoodreads = [...links].some(h => isHost(h, 'goodreads.com'));
     const hasBookbub = [...links].some(h => isHost(h, 'bookbub.com'));
     checks.entity_links = { amazon: hasAmazon, goodreads: hasGoodreads, bookbub: hasBookbub };
