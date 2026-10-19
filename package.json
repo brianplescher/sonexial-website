@@ -18,6 +18,7 @@
     "test:js": "eslint '*.js'",
     "test:a11y": "pa11y --standard WCAG2AA index.html",
     "test:links": "linkinator *.html --recurse",
+    "test:site": "node scripts/check-site.js",
     "optimize:images": "node scripts/optimize-images.js",
     "lighthouse": "lighthouse https://sonexial.com --view",
     "deploy": "npm run build && npx netlify-cli deploy --prod",
