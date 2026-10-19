@@ -102,8 +102,8 @@
                 <div class="section-label">FREE DIAGNOSTIC SCANNER</div>
                 <h1>Free AI Visibility Scan for Author Websites</h1>
                 <p class="section-sub" style="font-size: 1.2rem; margin-top: 1rem;">
-                    Generative Engine Optimization (GEO) scanner. Test your author website against AI crawlers
-                    (ChatGPT, Perplexity, Claude, Google AI Overviews) in real time.
+                    Generative Engine Optimization (GEO) readiness scanner. Check publicly observable signals relevant to AI crawlers
+                    and search tools (including ChatGPT and Perplexity). This is not a live test of those systems' internal indexes or recommendations.
                 </p>
 
                 <!-- Scanner Form Card -->
@@ -228,7 +228,7 @@
                             Unlock Your Full AI Visibility Report
                         </h2>
                         <p id="gate-copy" style="color: #cbd5e1; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
-                            See every check we ran, the complete prioritized fix list, and a tailored diagnosis of what is keeping your books out of ChatGPT and Perplexity. We will email you a copy to keep.
+                            See every check we ran, a prioritized fix list, and an explanation of the technical signals that may affect discovery. We will email you a copy to keep.
                         </p>
 
                         <form id="pitch-capture-form" onsubmit="handleUnlockSubmit(event)">
@@ -273,7 +273,7 @@
                                 What AI Currently Infers About You
                             </h3>
                             <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0; margin-bottom: 1rem;">
-                                An AI model read the page you scanned and built this profile. If it is thin or wrong, that is what AI search engines are working with too.
+                                An AI model summarized publicly available page content. Other AI search systems may retrieve, interpret, or rank your site differently.
                             </p>
                             <dl id="semantic-fields" style="display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1.25rem; margin: 0; font-size: 0.95rem; color: #e2e8f0;"></dl>
                         </div>
@@ -306,7 +306,7 @@
                     <div class="dfy-content">
                         <h3>Need Your AI Discovery Signals Built For You?</h3>
                         <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
-                            We build complete author websites and optimize existing sites with full JSON-LD entity schema, llms.txt roadmaps, and crawl hierarchies so AI engines recognize your books immediately.
+                            We build complete author websites and optimize existing sites with full JSON-LD entity schema, llms.txt roadmaps, and crawl hierarchies to make your book information easier to interpret.
                         </p>
                         <ul class="deliverables" style="margin-top: 1.5rem;" aria-label="Available services">
                             <li><span class="check" aria-hidden="true">→</span> <strong>GEO Diagnostic ($297)</strong>: Every failure this scan can find, prioritized by fix effort against visibility impact.</li>
@@ -331,7 +331,7 @@
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
                             <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What is an llms.txt file and why does an author need one?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                An <code>/llms.txt</code> file is a standardized markdown roadmap placed in the root directory of your website. It provides LLM crawlers (ChatGPT, Perplexity, Claude) with structured, clean text summarizing your books, series reading order, tropes, and buy links without clutter from scripts or navigation menus.
+                                An <code>/llms.txt</code> file is a standardized markdown roadmap placed in the root directory of your website. It can provide participating tools with structured, clean text summarizing your books, series reading order, tropes, and buy links without clutter from scripts or navigation menus.
                             </p>
                         </div>
 
@@ -529,7 +529,7 @@
                 llmsDesc.textContent = 'AI roadmap file is active and guiding LLM crawlers.';
             } else {
                 llmsEl.innerHTML = '<span style="color: #f87171;">✕ Missing llms.txt</span>';
-                llmsDesc.textContent = 'No /llms.txt file found. Crawlers must guess your site structure.';
+                llmsDesc.textContent = 'No /llms.txt file found. This optional format is not universally used by crawlers.';
             }
 
             // 3. Robots.txt AI Rules
