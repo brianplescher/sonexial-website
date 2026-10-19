@@ -1,21 +1,26 @@
 const { parseRobots, evaluateRootAccess, isCanonicalCorrect, THIN_CONTENT_WORDS } = require('../scanner');
 const { detectProfiles } = require('./page-facts');
 
-// Bots that fetch pages to answer or cite in live AI search results. Blocking these removes the site from answers.
+// Published search-crawler rules influence whether that crawler may fetch a page.
+// They are not a measurement of whether an answer engine will cite or recommend it.
 const UTILITY_PATH = /^\/(404|500|privacy|terms|cookies?|refund|legal|disclaimer)(\.html)?\/?$|-policy\/?$/i;
 
 const SEARCH_BOTS = [
     { agent: 'oai-searchbot', label: 'OAI-SearchBot', engine: 'ChatGPT search' },
-    { agent: 'chatgpt-user', label: 'ChatGPT-User', engine: 'ChatGPT browsing' },
     { agent: 'claude-searchbot', label: 'Claude-SearchBot', engine: 'Claude search' },
-    { agent: 'claude-user', label: 'Claude-User', engine: 'Claude browsing' },
     { agent: 'perplexitybot', label: 'PerplexityBot', engine: 'Perplexity' },
-    { agent: 'perplexity-user', label: 'Perplexity-User', engine: 'Perplexity browsing' },
     { agent: 'googlebot', label: 'Googlebot', engine: 'Google Search + AI Overviews' },
     { agent: 'bingbot', label: 'Bingbot', engine: 'Bing + Copilot (and ChatGPT web results)' }
 ];
 
-// Bots that collect model-training data. Blocking them is a legitimate rights choice, so it is only a notice.
+// User-initiated retrieval requests are different from automated search crawling.
+const RETRIEVAL_BOTS = [
+    { agent: 'chatgpt-user', label: 'ChatGPT-User', engine: 'ChatGPT browsing' },
+    { agent: 'claude-user', label: 'Claude-User', engine: 'Claude browsing' },
+    { agent: 'perplexity-user', label: 'Perplexity-User', engine: 'Perplexity browsing' }
+];
+
+// Training-crawler restrictions are a publisher rights choice, not an SEO failure.
 const TRAINING_BOTS = [
     { agent: 'gptbot', label: 'GPTBot', engine: 'OpenAI model training' },
     { agent: 'claudebot', label: 'ClaudeBot', engine: 'Anthropic model training' },
@@ -41,6 +46,7 @@ function evaluateBots(robotsRes) {
     const sitemaps = robotsRes && robotsRes.ok ? parseRobots(robotsRes.text).sitemaps : [];
     const rows = [
         ...SEARCH_BOTS.map(b => ({ ...b, kind: 'search', access: botAccess(groups, b.agent) })),
+        ...RETRIEVAL_BOTS.map(b => ({ ...b, kind: 'retrieval', access: botAccess(groups, b.agent) })),
         ...TRAINING_BOTS.map(b => ({ ...b, kind: 'training', access: botAccess(groups, b.agent) }))
     ];
     return { rows, sitemaps };
@@ -99,51 +105,53 @@ function buildIssues(crawl, facts, now = new Date()) {
     const blockedSearch = bots.rows.filter(b => b.kind === 'search' && b.access === 'blocked');
     if (blockedSearch.length) {
         add({
-            id: 'ai_search_bot_blocked', category: 'AI access', severity: 'error', impact: 5, effort: 1,
-            title: `robots.txt blocks ${blockedSearch.length} AI search crawler(s): ${blockedSearch.map(b => b.label).join(', ')}`,
-            why: 'These crawlers fetch pages at answer time. When they are blocked, the engine cannot read or cite your site, so it answers questions about you and your books from third-party pages instead.',
-            fix: `Remove the Disallow rules for ${blockedSearch.map(b => b.label).join(', ')} or add an explicit "Allow: /" group for each (see the ready-to-paste robots.txt block).`
+            id: 'ai_search_bot_blocked', category: 'AI access',
+            severity: blockedSearch.length === SEARCH_BOTS.length ? 'error' : 'warning',
+            impact: blockedSearch.length === SEARCH_BOTS.length ? 5 : 3, effort: 1,
+            title: `robots.txt restricts ${blockedSearch.length} search crawler(s): ${blockedSearch.map(b => b.label).join(', ')}`,
+            why: 'The published rules disallow the site root for these automated search crawlers. This can reduce their access, but does not measure whether your site appears in any AI answer.',
+            fix: `Review published rules for ${blockedSearch.map(b => b.label).join(', ')}. Allow search crawling if you want access; keep any intentional restrictions.`
         });
     }
     const blockedTraining = bots.rows.filter(b => b.kind === 'training' && b.access === 'blocked');
     if (blockedTraining.length) {
         add({
-            id: 'ai_training_bot_blocked', category: 'AI access', severity: 'notice', impact: 2, effort: 1,
+            id: 'ai_training_bot_blocked', category: 'Publisher controls', severity: 'notice', impact: 0, effort: 1,
             title: `Model-training crawlers blocked: ${blockedTraining.map(b => b.label).join(', ')}`,
-            why: 'Blocking training crawlers is a legitimate rights decision. The trade-off is that future model versions learn less about you from your own site, so their built-in knowledge leans on retailer and review pages.',
-            fix: 'Keep the block if protecting your text matters more than baseline model awareness; otherwise allow them. Either way, keep the search crawlers above allowed.'
+            why: 'Model-training restrictions are an independent rights preference. They do not by themselves determine eligibility for search results in ChatGPT or Google.',
+            fix: 'Keep or revise these rules according to your publishing rights preferences. Set automated search-crawler policies separately.'
         });
     }
-    if (!crawl.robotsRes || !crawl.robotsRes.ok) {
+    if (!crawl.robotsRes || (!crawl.robotsRes.ok && ![404, 410].includes(crawl.robotsRes.status))) {
         add({
-            id: 'robots_missing', category: 'AI access', severity: 'warning', impact: 2, effort: 1,
-            title: 'No robots.txt file',
-            why: 'Crawlers treat a missing robots.txt as "allow everything", but you lose the one place that tells every crawler where your sitemap lives and that AI search bots are welcome.',
-            fix: 'Publish the ready-to-paste robots.txt below at /robots.txt.'
+            id: 'robots_unavailable', category: 'Crawlability', severity: 'warning', impact: 3, effort: 1,
+            title: 'robots.txt could not be fetched successfully',
+            why: 'A robots.txt server error or fetch failure can disrupt crawler permissions. A missing file (404) is not in itself a crawl block.',
+            fix: 'Check the server response for /robots.txt. A missing file is optional, but server errors should be resolved.'
         });
     }
     if (!crawl.llmsRes || !crawl.llmsRes.ok || (crawl.llmsRes.text || '').length < 50) {
         add({
-            id: 'llms_txt_missing', category: 'AI access', severity: 'warning', impact: 3, effort: 1,
-            title: 'No llms.txt file',
-            why: 'llms.txt is a proposed plain-text map that tells AI systems who you are and which pages matter. It is cheap to add and removes guesswork about which page is canonical for you and each book.',
-            fix: 'Publish the drafted llms.txt below at /llms.txt and keep it updated when you release a book.'
+            id: 'llms_txt_missing', category: 'Optional metadata', severity: 'notice', impact: 0, effort: 1,
+            title: 'No optional llms.txt overview',
+            why: 'llms.txt is a proposed optional text overview. Major search products do not require it and no citation or ranking benefit is established.',
+            fix: 'Optional: publish a concise llms.txt summary for compatible tools. Prioritize accessible web pages, canonicals, and helpful content first.'
         });
     } else {
         if (!/\(https?:\/\/[^)]*(about|bio|author|meet)[^)]*\)/i.test(crawl.llmsRes.text)) {
             add({
-                id: 'llms_txt_no_about_link', category: 'AI access', severity: 'notice', impact: 2, effort: 1,
-                title: 'llms.txt does not point AI systems to an About / bio page',
-                why: 'When an engine is asked "who is this author?", llms.txt is the first place it looks for the authoritative answer. Without a link to your bio, it falls back to third-party summaries.',
+                id: 'llms_txt_no_about_link', category: 'Optional metadata', severity: 'notice', impact: 0, effort: 1,
+                title: 'Optional llms.txt omits your About / bio page',
+                why: 'If a particular tool chooses to read llms.txt, a link to your About page can make this summary more useful. There is no evidence all AI search tools read it.',
                 fix: 'Add an "Entity Resolution" or "About" section to llms.txt linking to your About page and noting that the Person/Organization schema on the homepage is the verified identity.'
             });
         }
         const problems = llmsTxtProblems(crawl.llmsRes.text);
         if (problems.length) {
             add({
-                id: 'llms_txt_malformed', category: 'AI access', severity: 'notice', impact: 2, effort: 1,
-                title: `llms.txt does not follow the spec: ${problems.join('; ')}`,
-                why: 'Tools that parse llms.txt expect a title, a one-line summary, and linked sections. A free-form file is read as unstructured text.',
+                id: 'llms_txt_malformed', category: 'Optional metadata', severity: 'notice', impact: 0, effort: 1,
+                title: `Optional llms.txt differs from the proposed format: ${problems.join('; ')}`,
+                why: 'Tools that explicitly support the proposed format may benefit from a title, summary and links. This is not a search inclusion requirement.',
                 fix: 'Restructure it to match the drafted llms.txt below.'
             });
         }
