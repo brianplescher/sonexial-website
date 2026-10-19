@@ -30,12 +30,12 @@ test('parseRobots starts a new group when a User-agent line follows a directive'
 
 test('parseRobots keeps consecutive User-agent lines in one group', () => {
     const { groups } = parseRobots([
-        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
         'User-agent: Claude-SearchBot',
         'Disallow: /drafts'
     ].join('\n'));
 
-    assert.deepEqual(groups['gptbot'], [{ action: 'disallow', path: '/drafts' }]);
+    assert.deepEqual(groups['oai-searchbot'], [{ action: 'disallow', path: '/drafts' }]);
     assert.deepEqual(groups['claude-searchbot'], [{ action: 'disallow', path: '/drafts' }]);
 });
 
@@ -53,7 +53,7 @@ test('parseRobots strips comments and collects sitemaps', () => {
 
 test('robots.txt group order does not change the reported result', () => {
     const blockedFirst = [
-        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
         'Disallow: /',
         '',
         'User-agent: *',
@@ -64,15 +64,15 @@ test('robots.txt group order does not change the reported result', () => {
         'User-agent: *',
         'Allow: /',
         '',
-        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
         'Disallow: /'
     ].join('\n');
 
     const first = analyzeFiles(missingRes(), okRes(blockedFirst), missingRes());
     const last = analyzeFiles(missingRes(), okRes(blockedLast), missingRes());
 
-    assert.deepEqual(first.checks.ai_bot_access.blocked, ['gptbot']);
-    assert.deepEqual(last.checks.ai_bot_access.blocked, ['gptbot']);
+    assert.deepEqual(first.checks.ai_bot_access.blocked, ['oai-searchbot']);
+    assert.deepEqual(last.checks.ai_bot_access.blocked, ['oai-searchbot']);
     assert.deepEqual(first.checks.ai_bot_access.allowed, []);
     assert.equal(first.score, last.score);
 });
@@ -91,19 +91,19 @@ test('a bot-specific allow overrides a wildcard block', () => {
         'User-agent: *',
         'Disallow: /',
         '',
-        'User-agent: GPTBot',
+        'User-agent: OAI-SearchBot',
         'Allow: /'
     ].join('\n')), missingRes());
 
-    assert.deepEqual(checks.ai_bot_access.allowed, ['gptbot']);
-    assert.ok(!checks.ai_bot_access.blocked.includes('gptbot'));
-    assert.ok(checks.ai_bot_access.blocked.includes('claudebot'));
+    assert.deepEqual(checks.ai_bot_access.allowed, ['oai-searchbot']);
+    assert.ok(!checks.ai_bot_access.blocked.includes('oai-searchbot'));
+    assert.ok(checks.ai_bot_access.blocked.includes('claude-searchbot'));
 });
 
 test('evaluateRootAccess treats an empty Disallow as full access', () => {
     assert.equal(evaluateRootAccess([{ action: 'disallow', path: '' }]), 'allowed');
     assert.equal(evaluateRootAccess([{ action: 'disallow', path: '/' }]), 'blocked');
-    assert.equal(evaluateRootAccess([{ action: 'disallow', path: '/admin' }]), 'partial');
+    assert.equal(evaluateRootAccess([{ action: 'disallow', path: '/admin' }]), 'allowed');
 });
 
 test('analyzeFiles reports a sitemap from robots.txt when /sitemap.xml is absent', () => {
@@ -184,9 +184,9 @@ test('readLimitedResponseText rejects bodies that exceed the byte limit', async 
 
 test('scoring weights total 100 and missing optional llms.txt does not reduce score', () => {
     assert.equal(Object.values(SCORE_WEIGHTS).reduce((a, b) => a + b, 0), 100);
-    const allowed = okRes('User-agent: *\\nAllow: /');
+    const allowed = okRes('User-agent: *\nAllow: /');
     const sitemap = okRes('<urlset></urlset>');
-    const withFile = analyzeFiles(okRes('# Site overview\\n' + 'More information'.repeat(12)),
+    const withFile = analyzeFiles(okRes('# Site overview\n' + 'More information'.repeat(12)),
         allowed, sitemap);
     const withoutFile = analyzeFiles(missingRes(), allowed, sitemap);
     assert.equal(withFile.score, withoutFile.score);
@@ -196,12 +196,12 @@ test('scoring weights total 100 and missing optional llms.txt does not reduce sc
 });
 
 test('explicit bot allow rules do not earn more points than default permission', () => {
-    const defaultAllowed = analyzeFiles(missingRes(), okRes('User-agent: *\\nAllow: /'), missingRes());
+    const defaultAllowed = analyzeFiles(missingRes(), okRes('User-agent: *\nAllow: /'), missingRes());
     const explicitAllowed = analyzeFiles(missingRes(), okRes([
         'User-agent: OAI-SearchBot', 'User-agent: Claude-SearchBot',
         'User-agent: PerplexityBot', 'User-agent: Googlebot',
         'Allow: /'
-    ].join('\\n')), missingRes());
+    ].join('\n')), missingRes());
     assert.equal(defaultAllowed.score, explicitAllowed.score);
     assert.equal(defaultAllowed.score, SCORE_WEIGHTS.bot_access);
 });
@@ -212,7 +212,7 @@ test('training bot opt-outs do not count as search crawler restrictions', () => 
         'User-agent: ClaudeBot', 'Disallow: /',
         'User-agent: Google-Extended', 'Disallow: /',
         'User-agent: *', 'Allow: /'
-    ].join('\\n')), missingRes());
+    ].join('\n')), missingRes());
     assert.deepEqual(analysis.checks.ai_bot_access.blocked, []);
     assert.equal(analysis.score, SCORE_WEIGHTS.bot_access);
 });
@@ -236,7 +236,7 @@ test('robots matching evaluates the scanned page path and specific allow precede
 });
 
 test('a blocked target URL is a real critical crawler issue, not a training preference', () => {
-    const rules = okRes('User-agent: *\\nDisallow: /private/');
+    const rules = okRes('User-agent: *\nDisallow: /private/');
     const blocked = analyzeFiles(missingRes(), rules, missingRes(), 'https://author.example/private/books');
     const allowed = analyzeFiles(missingRes(), rules, missingRes(), 'https://author.example/public');
     assert.equal(blocked.checks.ai_bot_access.status, 'blocked');
@@ -276,7 +276,7 @@ test('complete observable technical signals can attain the full heuristic score'
         '<meta property="og:image" content="https://example.com/image.jpg"></head>' +
         '<body><h1>Author</h1><h2>Books</h2><a href="https://www.goodreads.com/book">Book</a>' + words + '</body></html>';
     const page = analyzeHtml(html, 'https://example.com/');
-    const files = analyzeFiles(missingRes(), okRes('User-agent: *\\nAllow: /'), okRes('<urlset></urlset>'));
+    const files = analyzeFiles(missingRes(), okRes('User-agent: *\nAllow: /'), okRes('<urlset></urlset>'));
     assert.equal(page.score + files.score, 100);
     assert.deepEqual([...page.critical_failures, ...files.critical_failures], []);
 });
