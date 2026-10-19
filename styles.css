@@ -456,25 +456,6 @@ HERO
   font-weight: 700;
 }
 
-.hero-stats-bar {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  padding: 1.5rem 0;
-}
-
-.hero-stats-bar .hero-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
 .hero-grid-overlay {
   position: absolute;
   inset: 0;
@@ -525,42 +506,6 @@ HERO
   margin-bottom: 4rem;
   opacity: 0;
   animation: fadeUp 0.7s ease 0.45s forwards;
-}
-
-.hero-stats {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.stat-num {
-  font-family: var(--font-mono);
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.stat-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  color: var(--text-2);
-  text-transform: uppercase;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 40px;
-  background: var(--border);
-  flex-shrink: 0;
 }
 
 @keyframes fadeUp {
@@ -2103,17 +2048,6 @@ RESPONSIVE
 }
 
 @media (max-width: 768px) {
-
-  .hero-stats-bar .hero-stats {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .stat-divider {
-    width: 40px;
-    height: 1px;
-  }
-
   .footer-inner {
     flex-direction: column;
     gap: 1.5rem;
