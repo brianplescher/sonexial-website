@@ -538,8 +538,11 @@
             const robotsCheck = report.checks?.ai_bot_access || {};
             const robotsEl = document.getElementById('check-robots-status');
             const robotsDesc = document.getElementById('check-robots-desc');
-            if (robotsCheck.blocked && robotsCheck.blocked.length > 0) {
-                robotsEl.innerHTML = `<span style="color: #f87171;">✕ Blocking AI (${robotsCheck.blocked.join(', ')})</span>`;
+            if (robotsCheck.status === 'unknown') {
+                robotsEl.innerHTML = '<span style="color: #facc15;">⚠ Access Unverified</span>';
+                robotsDesc.textContent = 'robots.txt was unavailable or returned an error; access could not be established.';
+            } else if (robotsCheck.blocked && robotsCheck.blocked.length > 0) {
+                robotsEl.innerHTML = `<span style="color: #f87171;">✕ Search Crawler Restrictions (${robotsCheck.blocked.join(', ')})</span>`;
                 robotsDesc.textContent = 'Published robots.txt rules restrict access for the listed search crawlers; this does not verify real indexing.';
             } else if (robotsCheck.has_explicit_ai_rules) {
                 robotsEl.innerHTML = '<span style="color: #4ade80;">✓ AI Crawlers Explicitly Allowed</span>';
