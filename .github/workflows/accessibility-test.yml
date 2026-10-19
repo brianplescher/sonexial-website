@@ -6,14 +6,12 @@ on:
   pull_request:
     branches: [ main, master ]
   schedule:
-    # Run weekly on Sundays at 2 AM UTC
     - cron: '0 2 * * 0'
 
 jobs:
   a11y-test:
     name: Accessibility Audit
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -21,28 +19,39 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '18'
+          node-version-file: '.nvmrc'
 
-      - name: Install Pa11y
-        run: npm ci --ignore-scripts && npm install -g pa11y pa11y-ci
+      - name: Install dependencies and build site
+        run: npm ci && npm run build
 
-      - name: Run Pa11y accessibility tests
+      - name: Start local server
         run: |
-          echo "Running accessibility tests..."
-          pa11y --standard WCAG2AA index.html || echo "Accessibility issues found"
-          pa11y --standard WCAG2AA 404.html || echo "Accessibility issues found"
+          npx http-server dist -a 127.0.0.1 -p 8080 -s > "$RUNNER_TEMP/sonexial-http.log" 2>&1 &
+          for i in $(seq 1 20); do
+            if curl --silent --fail http://127.0.0.1:8080/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/sonexial-http.log"
+          exit 1
 
-      - name: Generate accessibility report
+      - name: Audit rendered pages with Pa11y
         run: |
-          echo "# Accessibility Report" > a11y-report.md
-          echo "" >> a11y-report.md
-          echo "Generated: $(date)" >> a11y-report.md
-          echo "" >> a11y-report.md
-          echo "## WCAG 2.1 AA Compliance" >> a11y-report.md
-          echo "Target: 100% compliance" >> a11y-report.md
+          set +e
+          failed=0
+          echo 'Sonexial WCAG 2 AA checks' > a11y-report.txt
+          for page in / /kits.html /tools/author-geo-audit/; do
+            echo "--- $page ---" | tee -a a11y-report.txt
+            npx pa11y --standard WCAG2AA "http://127.0.0.1:8080$page" >> a11y-report.txt 2>&1
+            code=$?
+            tail -n 35 a11y-report.txt
+            if [ "$code" -ne 0 ]; then failed=1; fi
+          done
+          exit "$failed"
 
       - name: Upload accessibility report
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: accessibility-report
-          path: a11y-report.md
+          path: a11y-report.txt
+          if-no-files-found: warn
