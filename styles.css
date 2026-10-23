@@ -1069,7 +1069,7 @@ PRODUCTS
 .constellations-hero { padding: clamp(5rem, 9vw, 9rem) 0 3.5rem; border-bottom: 1px solid var(--border); }
 .constellations-hero-inner { max-width: 900px; }
 .constellations-subtitle { font-family: var(--font-mono); color: var(--text-1); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.25rem; }
-.constellations-hero h1 { font-size: clamp(2.7rem, 6.3vw, 5.8rem); line-height: 1.11; letter-spacing: -0.045em; max-width: 960px; text-wrap: balance; }
+.constellations-hero h1 { font-size: clamp(1.9rem, 4.4vw, 4.05rem); line-height: 1.16; letter-spacing: -0.045em; max-width: 960px; text-wrap: balance; }
 .constellations-hero-note { font-size: 1.1rem; color: var(--accent); margin-top: 2rem; }
 .constellations-reading { padding: clamp(3rem, 6vw, 6rem) 0 7rem; }
 .constellations-byline { margin: 0 0 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); color: var(--text-2); font-family: var(--font-mono); font-size: 0.8rem; }

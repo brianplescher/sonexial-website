@@ -17,7 +17,10 @@ assert.ok(exists('_redirects'), 'Netlify redirects are not deployed');
 assert.ok(exists('constellations/index.html'), 'Constellations page is not in the production build');
 assert.ok(!exists('blog/index.html'), 'Retired Content Vault was copied to the production build');
 const constellations = read('constellations/index.html');
-assert.match(constellations, /When Knowledge Becomes Accessible, What Becomes Possible\?/);
+assert.match(constellations, /<h1 id="constellations-title">When Knowledge Becomes Accessible, What Becomes Possible\?<\/h1>/);
+assert.match(constellations, /<p class="constellations-subtitle">Introducing Sonexial Constellations<\/p>/);
+assert.match(constellations, /<p>This project began with a concern about books\.<\/p>/);
+assert.doesNotMatch(constellations, /###/);
 assert.match(constellations, /<link rel="canonical" href="https:\/\/sonexial\.com\/constellations\/"/);
 
 const robots = read('robots.txt');
