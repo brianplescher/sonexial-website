@@ -15,6 +15,7 @@ assert.ok(exists('robots.txt'), 'robots.txt is not deployed');
 assert.ok(exists('sitemap.xml'), 'sitemap.xml is not deployed');
 assert.ok(exists('_redirects'), 'Netlify redirects are not deployed');
 assert.ok(exists('constellations/index.html'), 'Constellations page is not in the production build');
+assert.ok(exists('Images/Sonexial_Constellations_Optimized.webp'), 'Constellations artwork was not copied into the production build');
 assert.ok(!exists('blog/index.html'), 'Retired Content Vault was copied to the production build');
 const constellations = read('constellations/index.html');
 assert.match(constellations, /<h1 id="constellations-title">When Knowledge Becomes Accessible, What Becomes Possible\?<\/h1>/);
