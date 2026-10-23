@@ -1,6 +1,6 @@
 # Sonexial Website
 
-Static marketing site for Sonexial, including the homepage, product pages, intake forms, blog pages, and the Amazon book ad profit calculator.
+Static marketing site for Sonexial, including the homepage, product pages, intake forms, the Constellations essay, and the Amazon book ad profit calculator.
 
 ## Project Structure
 
@@ -20,7 +20,7 @@ Sonexial-Website/
 ├── Intake/
 ├── Images/
 ├── assets/
-├── blog/
+├── constellations/
 ├── tools/author-geo-audit/
 ├── diagnostic/start/
 ├── scripts/
@@ -29,7 +29,7 @@ Sonexial-Website/
 
 ## Current Features
 
-- Static HTML pages for the homepage, product offers, blog, intake forms, and 404 page.
+- Static HTML pages for the homepage, product offers, Constellations essay, intake forms, and 404 page.
 - Shared global styling in `styles.css`.
 - Shared browser behavior in `script.js`.
 - Calculator-specific behavior in `scripts/calculator.js`.
@@ -125,9 +125,9 @@ npm run deploy
 
 ## SEO Files
 
-- `sitemap.xml` lists the homepage, product pages, blog hub, blog articles, and calculator page.
+- `sitemap.xml` lists the homepage, product pages, Sonexial Constellations, and calculator page.
 - `robots.txt` allows crawlers and points to the sitemap.
-- Product and blog pages use canonical URLs.
+- Product and the Constellations essay use canonical URLs.
 - The homepage includes Organization, Person, and FAQ structured data.
 
 ## Maintenance Notes
