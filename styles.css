@@ -1071,6 +1071,14 @@ PRODUCTS
 .constellations-subtitle { font-family: var(--font-mono); color: var(--text-1); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.25rem; }
 .constellations-hero h1 { font-size: clamp(1.9rem, 4.4vw, 4.05rem); line-height: 1.16; letter-spacing: -0.045em; max-width: 960px; text-wrap: balance; }
 .constellations-hero-note { font-size: 1.1rem; color: var(--accent); margin-top: 2rem; }
+/* Let the artwork act as a bridge from the headline into the essay.
+   Keep its entire composition visible instead of cropping or applying filters. */
+.constellations-artwork { padding: clamp(1.25rem, 3vw, 3rem) clamp(1rem, 3vw, 2.5rem) 0; }
+.constellations-artwork-figure { max-width: 1360px; margin: 0 auto; }
+.constellations-artwork-figure a { display: block; background: #eeeade; border: 1px solid rgba(255,255,255,0.12); overflow: hidden; }
+.constellations-artwork-figure a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.constellations-artwork-figure img { display: block; width: 100%; height: auto; aspect-ratio: 2016 / 1200; object-fit: contain; }
+.constellations-artwork-figure figcaption { padding-top: 0.9rem; font-family: var(--font-mono); color: var(--text-2); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
 .constellations-reading { padding: clamp(3rem, 6vw, 6rem) 0 7rem; }
 .constellations-byline { margin: 0 0 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); color: var(--text-2); font-family: var(--font-mono); font-size: 0.8rem; }
 .constellations-byline a { color: var(--accent); }
