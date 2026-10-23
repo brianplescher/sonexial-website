@@ -89,6 +89,36 @@ test('evaluateBots separates AI search crawlers from training crawlers', () => {
     assert.equal(by['OAI-SearchBot'].access, 'allowed');
 });
 
+test('paid diagnostic separates search, retrieval, and training bots, and treats unavailable rules as unknown', () => {
+    const robots = { ok: true, text: [
+        'User-agent: GPTBot', 'Disallow: /',
+        'User-agent: OAI-SearchBot', 'Allow: /',
+        'User-agent: *', 'Allow: /'
+    ].join('\n') };
+    const { rows } = evaluateBots(robots);
+    const by = Object.fromEntries(rows.map(r => [r.label, r]));
+    assert.equal(by.GPTBot.kind, 'training');
+    assert.equal(by.GPTBot.access, 'blocked');
+    assert.equal(by['OAI-SearchBot'].kind, 'search');
+    assert.equal(by['OAI-SearchBot'].access, 'allowed');
+    assert.equal(by['ChatGPT-User'].kind, 'retrieval');
+    assert.equal(evaluateBots({ ok: false, status: 503 }).rows[0].access, 'unknown');
+    assert.equal(evaluateBots({ ok: false, status: 404 }).rows[0].access, 'allowed');
+});
+
+test('optional llms and blocked model-training bots never reduce paid readiness grade', () => {
+    const withLlm = fakeCrawl({
+        robotsRes: { ok: true, text: 'User-agent: GPTBot\nDisallow: /\nUser-agent: *\nAllow: /' },
+        llmsRes: { ok: true, text: '# Jane\n> Author\n- [About](https://jane.com/about)' }
+    });
+    const withoutLlm = { ...withLlm, llmsRes: { ok: false, status: 404, text: '' } };
+    const a = buildIssues(withLlm, [homeFacts()]).issues;
+    const b = buildIssues(withoutLlm, [homeFacts()]).issues;
+    assert.equal(computeScores(a, [homeFacts()]).aiReadiness, computeScores(b, [homeFacts()]).aiReadiness);
+    assert.ok(b.some(i => i.id === 'llms_txt_missing' && i.impact === 0));
+    assert.ok(b.some(i => i.id === 'ai_training_bot_blocked' && i.impact === 0));
+});
+
 test('quadrant places issues by impact and effort', () => {
     assert.equal(quadrant(5, 1), 'Quick win');
     assert.equal(quadrant(4, 4), 'Major project');
@@ -150,16 +180,16 @@ test('buildIssues reports blocked search bots, missing Book schema, and thin sam
     assert.ok(ids.includes('llms_txt_missing'));
     assert.ok(ids.includes('img_alt_missing'));
     assert.ok(!ids.includes('person_schema_missing'));
-    assert.equal(issues[0].id, 'ai_search_bot_blocked');
+    assert.ok(issues.find(i => i.id === 'ai_search_bot_blocked').priority > 0);
     for (let i = 1; i < issues.length; i++) assert.ok(issues[i - 1].priority >= issues[i].priority);
 });
 
-test('buildIssues flags a site that is not verified with Bing, and not one that is', () => {
-    assert.ok(buildIssues(fakeCrawl(), [homeFacts()]).issues.some(i => i.id === 'bing_not_verified'));
+test('buildIssues reports absence of a visible Bing marker without asserting unverified ownership', () => {
+    assert.ok(buildIssues(fakeCrawl(), [homeFacts()]).issues.some(i => i.id === 'bing_verification_not_found'));
     const viaFile = fakeCrawl({ bingAuthRes: { ok: true, text: '<?xml version="1.0"?><users><user>ABC</user></users>' } });
-    assert.ok(!buildIssues(viaFile, [homeFacts()]).issues.some(i => i.id === 'bing_not_verified'));
+    assert.ok(!buildIssues(viaFile, [homeFacts()]).issues.some(i => i.id === 'bing_verification_not_found'));
     const viaMeta = { ...homeFacts(), bingVerification: 'ABC' };
-    assert.ok(!buildIssues(fakeCrawl(), [viaMeta]).issues.some(i => i.id === 'bing_not_verified'));
+    assert.ok(!buildIssues(fakeCrawl(), [viaMeta]).issues.some(i => i.id === 'bing_verification_not_found'));
 });
 
 test('buildIssues reports broken schema images, thin Person schema, and FAQ schema that does not match the page', () => {

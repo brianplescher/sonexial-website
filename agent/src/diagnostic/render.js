@@ -61,8 +61,8 @@ function renderBots(bots) {
       <tr>
         <td><code>${esc(b.label)}</code></td>
         <td>${esc(b.engine)}</td>
-        <td>${b.kind === 'search' ? 'AI search / answers' : 'Model training'}</td>
-        <td class="${b.access === 'blocked' ? (b.kind === 'search' ? 'bad' : 'mid') : 'good'}">${b.access === 'blocked' ? 'Blocked' : 'Allowed'}</td>
+        <td>${b.kind === 'search' ? 'Automated search' : (b.kind === 'retrieval' ? 'User-initiated retrieval' : 'Model training')}</td>
+        <td class="${b.access === 'unknown' ? 'mid' : (b.access === 'blocked' ? (b.kind === 'search' ? 'bad' : 'mid') : 'good')}">${b.access === 'unknown' ? 'Unknown' : (b.access === 'blocked' ? 'Blocked' : 'Allowed')}</td>
       </tr>`).join('');
     return `<div class="table-wrap"><table><thead><tr><th>Crawler</th><th>Feeds</th><th>Purpose</th><th>Access</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -154,7 +154,7 @@ function renderDiagnosticHtml(diag, { name } = {}) {
     <h1>${esc(artifacts.authorName)}</h1>
     <p><code>${esc(diag.url)}</code> · ${esc(date)}${name ? ` · Prepared for ${esc(name)}` : ''}</p>
     <div class="scores">
-      <div class="score"><div class="v ${scoreClass(scores.aiReadiness)}">${scores.aiReadiness}</div><div class="l">AI Readiness / 100</div></div>
+      <div class="score"><div class="v ${scoreClass(scores.aiReadiness)}">${scores.aiReadiness}</div><div class="l">Technical Readiness / 100</div></div>
       <div class="score"><div class="v ${scoreClass(scores.siteHealth)}">${scores.siteHealth}%</div><div class="l">Site Health</div></div>
       <div class="score"><div class="v">${scores.counts.error} / ${scores.counts.warning} / ${scores.counts.notice}</div><div class="l">Errors / Warnings / Notices</div></div>
       <div class="score"><div class="v">${quickWins}</div><div class="l">Quick wins</div></div>
@@ -164,23 +164,23 @@ function renderDiagnosticHtml(diag, { name } = {}) {
   <section>
     <h2>Executive summary</h2>
     <p>${esc(writeup.executive_summary)}</p>
-    <p class="muted">Free scan score for the homepage: ${esc(diag.freeScan.score)}/100 (${esc(diag.freeScan.grade)}). This diagnostic crawled ${diag.pagesCrawled} page(s)${diag.sitemapPageCount ? ` (sitemap lists ${diag.sitemapPageCount})` : ''} and ran every check on each one.</p>
+    <p class="muted">The scores are technical heuristics, not measurements of actual search indexing or AI citations. Free scan score for the homepage: ${esc(diag.freeScan.score)}/100 (${esc(diag.freeScan.grade)}). This diagnostic crawled ${diag.pagesCrawled} page(s)${diag.sitemapPageCount ? ` (sitemap lists ${diag.sitemapPageCount})` : ''} and assessed page and site-wide signals.</p>
   </section>
 
   <section>
-    <h2>Why AI engines may be missing you</h2>
+    <h2>What these technical findings mean</h2>
     <p>${esc(writeup.why_ai_misses_you)}</p>
   </section>
 
   <section>
     <h2>Priority matrix</h2>
-    <p class="muted">Every issue is scored for impact on AI visibility (1-5) and effort to fix (1-5), then placed in one of four groups.</p>
+    <p class="muted">Issues are prioritized heuristically by likely practical impact (1-5) and effort (1-5). These scores are not measured changes in AI visibility.</p>
     <div class="matrix">${renderMatrix(diag.issues)}</div>
   </section>
 
   <section>
     <h2>AI crawler access</h2>
-    <p class="muted">Search crawlers fetch your pages when someone asks a question; training crawlers collect data for future models. Blocking search crawlers removes you from answers. Blocking training crawlers is your call.</p>
+    <p class="muted">Automated search, user-initiated retrieval, and model-training crawlers serve different purposes. Published robots.txt rules can limit access, but this report cannot establish whether any particular AI system has indexed or cited your site.</p>
     ${renderBots(diag.bots)}
   </section>
 
@@ -197,10 +197,10 @@ function renderDiagnosticHtml(diag, { name } = {}) {
   <section>
     <h2>Ready-to-paste fixes</h2>
     <p class="muted">Drafted from what we found on your site. Replace anything marked … before publishing, then check JSON-LD at validator.schema.org.</p>
-    ${codeBlock('Author identity (Person schema)', 'Paste inside <head> on your homepage and About page', `<script type="application/ld+json">\n${artifacts.personJsonLd}\n</script>`, 'Tells AI engines this site is the official home of this author and links your profiles into one entity.')}
+    ${codeBlock('Author identity (Person schema)', 'Paste inside <head> on your homepage and About page', `<script type="application/ld+json">\n${artifacts.personJsonLd}\n</script>`, 'Describes the author and official links as structured data. Verify every fact against the visible page content.')}
     ${codeBlock('Book schema template', 'Paste inside <head> on each book page', `<script type="application/ld+json">\n${artifacts.bookJsonLd}\n</script>`, 'One block per book. The author @id links each book back to you.')}
-    ${codeBlock('llms.txt', `${new URL(diag.url).origin}/llms.txt`, artifacts.llmsTxt, 'A plain-text map of your site for AI systems.')}
-    ${codeBlock('robots.txt', `${new URL(diag.url).origin}/robots.txt`, artifacts.robotsTxt, 'Allows every AI search crawler and points to your sitemap. Add Disallow groups for training crawlers only if you want to opt out of training.')}
+    ${codeBlock('llms.txt', `${new URL(diag.url).origin}/llms.txt`, artifacts.llmsTxt, 'Optional proposed text overview for tools that choose to use it; not required for AI search.')}
+    ${codeBlock('robots.txt', `${new URL(diag.url).origin}/robots.txt`, artifacts.robotsTxt, 'Suggested search-crawler access and sitemap hints. Model-training policies are independent choices.')}
   </section>
 
   <section>
@@ -219,13 +219,13 @@ function renderDiagnosticHtml(diag, { name } = {}) {
 
   <section class="cta">
     <h2>Next steps</h2>
-    <p>Hand this document to whoever manages your site. Every issue includes the reason and the fix.</p>
-    <p>Want it done for you? <a href="https://sonexial.com/kits">Author Platform</a> rebuilds your site with all of this in place, and the <a href="https://sonexial.com/kits">GEO Retainer</a> ($300/month) implements these fixes and re-runs this diagnostic every month so you can see the score move.</p>
+    <p>Hand this document to whoever manages your site. Each detected finding includes context and a suggested next action.</p>
+    <p>Want it done for you? <a href="https://sonexial.com/kits">Author Platform</a> rebuilds your site with all of this in place, and the <a href="https://sonexial.com/kits">GEO Retainer</a> ($300/month) can help implement prioritized fixes and review technical readiness over time.</p>
     <p class="muted">Reply to the delivery email with any questions about this report.</p>
   </section>
 
   <section>
-    <p class="muted" style="font-size:13px">Method: Sonexial crawled up to ${diag.pagesCrawled} pages starting from your homepage and sitemap, reading raw HTML the way most AI crawlers do (no JavaScript execution). Checks cover AI crawler access, llms.txt, structured data, author entity signals, content depth, on-page tags, crawlability, and HTTPS. Written analysis ${writeup.generated_by === 'llm' ? 'drafted with AI from the crawl data' : 'generated from the crawl data'}.</p>
+    <p class="muted" style="font-size:13px">Method: Sonexial crawled ${diag.pagesCrawled} accessible pages, up to a configured 30-page limit, primarily using raw HTML (without JavaScript execution). This is a technical heuristic, not a direct test of search engines, index inclusion, AI citations, or recommendations. The optional llms.txt file is informational. Checks cover published crawler rules, structured data, content, on-page tags, and HTTPS. Written analysis ${writeup.generated_by === 'llm' ? 'drafted with AI from the crawl data' : 'generated from the crawl data'}.</p>
   </section>
 </main>
 </body>

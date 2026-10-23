@@ -32,18 +32,18 @@ function fallbackWriteup(diag) {
     const major = issues.filter(i => i.quadrant === 'Major project');
     const top = issues[0];
     return {
-        executive_summary: `${artifacts.authorName}'s site scored ${scores.aiReadiness}/100 for AI readiness and ${scores.siteHealth}% site health across ${diag.pagesCrawled} crawled pages. We found ${scores.counts.error} errors, ${scores.counts.warning} warnings, and ${scores.counts.notice} notices. ${quick.length} of them are quick wins that can be fixed in an afternoon${top ? `, starting with: ${top.title}` : ''}.`,
+        executive_summary: `${artifacts.authorName}'s site scored ${scores.aiReadiness}/100 for technical discovery readiness and ${scores.siteHealth}% site health across ${diag.pagesCrawled} crawled pages. We found ${scores.counts.error} errors, ${scores.counts.warning} warnings, and ${scores.counts.notice} notices. ${quick.length} of them are quick wins that can be fixed in an afternoon${top ? `, starting with: ${top.title}` : ''}.`,
         why_ai_misses_you: issues.some(i => i.category === 'Entity & schema')
-            ? 'AI engines answer questions about authors by matching a name to a known entity and then quoting the most authoritative page about it. Your site is not yet giving them the machine-readable signals (Person and Book schema, sameAs links to your book listings) that mark it as the official source, so they lean on retailer and review pages instead.'
-            : 'Your entity signals are in place. The remaining gaps are about access and content depth: making sure every AI crawler can read your pages and that each page gives them something specific to quote.',
+            ? 'The audit found missing or inconsistent entity markup on checked pages. Accurate Person and Book schema and official links may help search systems interpret the catalog, but this scan has not measured any engine\'s actual citations or recommendations.'
+            : 'The checked pages have some useful entity information. Remaining technical findings may involve crawl rules or page content; actual AI search visibility has not been measured by this diagnostic.',
         thirty_day_plan: [
             { week: 'Week 1', focus: 'Quick wins', tasks: quick.slice(0, 5).map(i => i.title) },
-            { week: 'Week 2', focus: 'Entity and schema', tasks: ['Publish the Person JSON-LD on the homepage and About page', 'Add Book JSON-LD to every book page', 'Publish llms.txt'] },
+            { week: 'Week 2', focus: 'Entity and schema', tasks: ['Verify the visible author and book facts are consistent', 'Add or correct Person and Book JSON-LD where relevant', 'Review official catalog and retailer links'] },
             { week: 'Weeks 3-4', focus: 'Major projects', tasks: major.slice(0, 4).map(i => i.title) }
         ].filter(w => w.tasks.length),
         positioning: {
             one_line_bio: `${artifacts.authorName} is the author of … (one sentence: genre, best-known book, and what readers get).`,
-            entity_statement: `Use the same name, photo, and one-line bio on your site, Amazon author page, Goodreads, and BookBub so engines treat them as one person.`
+            entity_statement: `Use the same name, photo, and one-line bio on your site, Amazon author page, Goodreads, and BookBub to reduce identity confusion across these sources.`
         },
         generated_by: 'template'
     };
@@ -70,7 +70,7 @@ function guardWriteup(writeup, fallback, blockedBots) {
 async function generateWriteup(diag) {
     const fallback = fallbackWriteup(diag);
     if (!llm.isConfigured()) return fallback;
-    const blocked = diag.bots.filter(b => b.access === 'blocked').map(b => b.label);
+    const blocked = diag.bots.filter(b => b.kind === 'search' && b.access === 'blocked').map(b => b.label);
 
     const prompt = `
 You are a Generative Engine Optimization (GEO) consultant writing a paid diagnostic for an author's website.
@@ -79,23 +79,25 @@ Write in plain, direct English for a non-technical author. No hype, no emojis.
 Site: ${diag.url}
 Author (best guess): ${diag.artifacts.authorName}
 Pages crawled: ${diag.pagesCrawled}
-AI readiness: ${diag.scores.aiReadiness}/100, Site health: ${diag.scores.siteHealth}%
+Technical discovery readiness (heuristic): ${diag.scores.aiReadiness}/100, Site health: ${diag.scores.siteHealth}%
 Issue counts: ${JSON.stringify(diag.scores.counts)}
 Top issues (highest priority first): ${JSON.stringify(topIssues(diag.issues, 12))}
-AI crawlers blocked by robots.txt: ${JSON.stringify(blocked)}${blocked.length ? '' : ` (none: all ${diag.bots.length} AI crawlers are allowed)`}
+Automated search-crawler restrictions at the root URL: ${JSON.stringify(blocked)}
 Profiles found: ${JSON.stringify(Object.keys(diag.profiles))}
 Homepage description: ${JSON.stringify(diag.homepageDescription || '')}
 
 Accuracy rules (this is a paid report; a wrong claim destroys trust):
 - Only state problems that appear in the issue list above. Do not invent issues.
 - "noindex" means a page asks search engines not to list it. It is NOT crawler blocking; never describe it as blocking AI crawlers.
-- If the "AI crawlers blocked" list is empty, say AI crawlers can currently reach the site.
+- A lack of robots.txt blocking does not prove that real crawlers can access, index or cite the site; avoid stating they definitely can.
 - When an issue affects specific pages, name them instead of implying the whole site.
+- Treat llms.txt as an optional format, never a technical prerequisite or ranking signal.
+- The diagnostic does NOT test AI assistants or their internal indexes. Do not infer that any engine has ignored, indexed, cited or recommended this author.
 
 Output valid JSON ONLY, no markdown fences:
 {
   "executive_summary": "3-4 sentences: overall state, the single biggest problem, and what fixing it unlocks.",
-  "why_ai_misses_you": "One paragraph explaining, specifically for this site, why ChatGPT, Perplexity, Claude, and Google AI Overviews may not cite or recommend this author.",
+  "why_ai_misses_you": "One paragraph describing observed page and crawler signals that could affect discoverability, clearly avoiding claims about measured ChatGPT, Claude, Perplexity or Google results.",
   "thirty_day_plan": [{"week": "Week 1", "focus": "short label", "tasks": ["task", "task"]}],
   "positioning": {
     "one_line_bio": "A one-sentence third-person bio the author could use everywhere (fill with what you can infer, use … for unknowns).",

@@ -22,13 +22,13 @@ You are Brian Plescher, founder of Sonexial. You build done-for-you author websi
 An author (${authorName}) recently ran a free GEO audit on their website: ${url}.
 
 Audit Findings:
-- GEO Score: ${score}/100 (${grade})
+- Technical readiness (heuristic): ${score}/100 (${grade})
 - Critical Failures: ${JSON.stringify(criticalFailures)}
 - Key Recommendations: ${JSON.stringify(recommendations)}
 
 Analyze these audit results and formulate an outreach strategy:
-1. What is the core reason AI engines (ChatGPT, Perplexity, Claude, Google AI Overviews) are struggling to recommend or cite this author?
-2. What are the specific high-leverage fixes needed (e.g. llms.txt roadmap, JSON-LD Schema entity mapping, semantic heading hierarchy)?
+1. Which technical issues were actually observed? Do NOT infer that an AI engine has failed to cite or recommend the author; this audit cannot measure that.
+2. What verifiable, high-impact improvements would make the site more accessible and accurate (for example, valid canonicals, crawl rules, schema consistent with the page, or meaningful content)? llms.txt is optional, not a ranking factor.
 3. Which Sonexial package is the natural solution (GEO Diagnostic for $297, Author Starter for $497, or Author Platform for $3,000)?
 4. What tone will resonate best with this author (empathetic, authoritative, peer-to-peer author-to-author, direct)?
 `;
@@ -45,15 +45,15 @@ ${positioningBrief}
 
 Audit Summary:
 - Website: ${url}
-- GEO Score: ${score}/100 (${grade})
+- Technical readiness (heuristic): ${score}/100 (${grade})
 - Critical Failures: ${JSON.stringify(criticalFailures)}
 - Recommendations: ${JSON.stringify(recommendations)}
 
 Requirements:
 - Professional, peer-to-peer (author to author), authoritative, but empathetic.
 - Under 200 words.
-- Clearly explain the specific discovery obstacles detected (mention llms.txt, Schema, or entity links where relevant).
-- Present the appropriate Sonexial package as the solution.
+- Describe only documented page or crawl issues and explain their practical consequences. Do not claim any AI assistant has indexed, ignored, or ranked the site. Do not pitch llms.txt as necessary.
+- Suggest a Sonexial package only if it reasonably addresses the observed findings; avoid guaranteed citations, rankings or sales.
 
 Output valid JSON ONLY — no markdown fences, no commentary:
 {

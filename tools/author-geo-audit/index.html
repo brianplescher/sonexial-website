@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Free AI visibility scanner for indie author websites. Test your JSON-LD schema, llms.txt, robots.txt crawler access, and entity signals for ChatGPT, Perplexity, and Claude.">
+        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://sonexial.com/tools/author-geo-audit/">
 
@@ -13,13 +13,13 @@
     <meta property="og:url" content="https://sonexial.com/tools/author-geo-audit/">
     <meta property="og:title" content="Free AI Visibility Scan for Author Websites | Sonexial">
     <meta property="og:description"
-        content="Free AI visibility scanner for indie author websites. Test your JSON-LD schema, llms.txt, robots.txt crawler access, and entity signals for ChatGPT, Perplexity, and Claude.">
+        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
     <meta property="og:image" content="https://sonexial.com/Images/og-image.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Free AI Visibility Scan for Author Websites | Sonexial">
     <meta name="twitter:description"
-        content="Free AI visibility scanner for indie author websites. Test your JSON-LD schema, llms.txt, robots.txt crawler access, and entity signals for ChatGPT, Perplexity, and Claude.">
+        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
     <meta name="twitter:image" content="https://sonexial.com/Images/og-image.jpg">
 
     <title>Free AI Visibility Scan for Author Websites | Sonexial</title>
@@ -121,7 +121,7 @@
                                 </button>
                             </div>
                             <span style="font-size: 0.8rem; color: var(--color-text-dim, #94a3b8);">
-                                Concurrently tests JSON-LD schema, semantic hierarchy, outbound entity links, llms.txt roadmap, and robots.txt bot rules.
+                                Checks schema, headings, page URLs, content, outbound links, sitemap and search-crawler permissions. Optional llms.txt status is informational.
                             </span>
                         </div>
                     </form>
@@ -133,7 +133,7 @@
                             Scanning <span id="loading-target-url"></span>...
                         </p>
                         <p style="font-size: 0.85rem; color: #94a3b8;">
-                            Auditing DOM schema, llms.txt AI roadmap, and crawler permissions...
+                            Checking page markup, canonicals, sitemap and published crawler directives...
                         </p>
                     </div>
 
@@ -148,7 +148,7 @@
                     <div style="background: rgba(18, 20, 26, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem;">
                             <div>
-                                <span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">GEO Readiness Score</span>
+                                <span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Technical Readiness Score</span>
                                 <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-top: 0.25rem;">
                                     <span id="score-value" style="font-family: 'DM Serif Display', serif; font-size: 3.5rem; line-height: 1; color: #fff;">--</span>
                                     <span style="color: #64748b; font-size: 1.2rem;">/ 100</span>
@@ -164,10 +164,12 @@
                             </div>
                         </div>
 
+                        <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin: 1.25rem 0 0;">A heuristic based on observable page and crawler signals. This does not measure actual AI search results, ranking, citations or recommendation probability.</p>
+
                         <!-- Top Critical Failures Banner -->
                         <div id="critical-failures-box" style="margin-top: 1.5rem; display: none;">
                             <h3 style="font-size: 1rem; color: #f87171; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
-                                ⚠️ Top Critical AI Obstacles Detected:
+                                ⚠️ Important technical access or structure issues:
                             </h3>
                             <ul id="critical-failures-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
                             </ul>
@@ -186,13 +188,13 @@
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">2. AI ROADMAP (llms.txt)</div>
+                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">2. OPTIONAL llms.txt OVERVIEW</div>
                             <div id="check-llms-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-llms-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">3. ROBOTS.TXT AI RULES</div>
+                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">3. SEARCH-CRAWLER ACCESS</div>
                             <div id="check-robots-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-robots-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
@@ -225,7 +227,7 @@
                     <!-- Email gate: unlocks the full breakdown and mails a copy of the report -->
                     <div id="action-plan-gate" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
                         <h2 id="gate-heading" style="font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 0.75rem; color: #fff;">
-                            Unlock Your Full AI Visibility Report
+                            Unlock Your Full Technical Scan Report
                         </h2>
                         <p id="gate-copy" style="color: #cbd5e1; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
                             See every check we ran, a prioritized fix list, and an explanation of the technical signals that may affect discovery. We will email you a copy to keep.
@@ -306,10 +308,10 @@
                     <div class="dfy-content">
                         <h3>Need Your AI Discovery Signals Built For You?</h3>
                         <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
-                            We build complete author websites and optimize existing sites with full JSON-LD entity schema, llms.txt roadmaps, and crawl hierarchies to make your book information easier to interpret.
+                            We build author sites with descriptive content, structured author and book data, consistent official links and straightforward navigation. Optional llms.txt summaries are available for tools that use them.
                         </p>
                         <ul class="deliverables" style="margin-top: 1.5rem;" aria-label="Available services">
-                            <li><span class="check" aria-hidden="true">→</span> <strong>GEO Diagnostic ($297)</strong>: Every failure this scan can find, prioritized by fix effort against visibility impact.</li>
+                            <li><span class="check" aria-hidden="true">→</span> <strong>GEO Diagnostic ($297)</strong>: More detailed technical findings, prioritized by practical impact and effort.</li>
                             <li><span class="check" aria-hidden="true">→</span> <strong>Amazon Visibility Kit</strong>: BISAC categories, Amazon keywords, and a KDP-ready description in one deliverable.</li>
                             <li><span class="check" aria-hidden="true">→</span> <strong>Author Starter ($497) and Author Platform ($3,000)</strong>: AI-ready author websites with schema, llms.txt, and reader funnels built in.</li>
                         </ul>
@@ -329,23 +331,23 @@
 
                     <div class="faq-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
-                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What is an llms.txt file and why does an author need one?</h3>
+                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What is llms.txt, and is it required?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                An <code>/llms.txt</code> file is a standardized markdown roadmap placed in the root directory of your website. It can provide participating tools with structured, clean text summarizing your books, series reading order, tropes, and buy links without clutter from scripts or navigation menus.
+                                An <code>/llms.txt</code> file is an optional proposed text overview for compatible tools. Major AI search products have not established it as a requirement for citation or discovery. Clear site pages and crawl access matter more.
                             </p>
                         </div>
 
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
-                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">Why is JSON-LD schema critical for AI search engines?</h3>
+                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">How does accurate JSON-LD schema help?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                Schema.org JSON-LD tags (specifically <code>Person</code> and <code>Book</code> schemas) declare unambiguous entities in your code. When a reader asks ChatGPT "Who wrote The Silent Orbit?", schema markup connects your author entity directly to your books and knowledge graph nodes.
+                                Accurate Schema.org <code>Person</code> and <code>Book</code> data helps search systems interpret the people and titles described on a page. It should reflect visible content; schema by itself does not guarantee an AI recommendation.
                             </p>
                         </div>
 
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
                             <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What if my site is blocking AI crawlers in robots.txt?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                Many default website builders or security plugins block <code>GPTBot</code>, <code>ClaudeBot</code>, or <code>PerplexityBot</code> by default. If blocked, these engines cannot index your website, making your books effectively invisible when readers query AI tools for recommendations.
+                                Check access for search crawlers such as <code>OAI-SearchBot</code>, <code>Claude-SearchBot</code>, <code>PerplexityBot</code>, and <code>Googlebot</code>. Training crawler policies (for example <code>GPTBot</code> or <code>ClaudeBot</code>) are separate choices and should not be scored as search visibility failures.
                             </p>
                         </div>
                     </div>
@@ -518,7 +520,7 @@
                 schemaDesc.textContent = 'Found partial entity markup. Missing complete Person + Book mapping.';
             } else {
                 schemaEl.innerHTML = '<span style="color: #f87171;">✕ Missing Schema</span>';
-                schemaDesc.textContent = 'No Person or Book JSON-LD schema found. AI engines lack entity definitions.';
+                schemaDesc.textContent = 'No Person or Book JSON-LD found; clear visible page content can still describe these entities.';
             }
 
             // 2. llms.txt
@@ -526,9 +528,9 @@
             const llmsDesc = document.getElementById('check-llms-desc');
             if (report.checks?.llms_txt) {
                 llmsEl.innerHTML = '<span style="color: #4ade80;">✓ llms.txt Present</span>';
-                llmsDesc.textContent = 'AI roadmap file is active and guiding LLM crawlers.';
+                llmsDesc.textContent = 'Optional overview file detected. Use by AI search systems is not guaranteed.';
             } else {
-                llmsEl.innerHTML = '<span style="color: #f87171;">✕ Missing llms.txt</span>';
+                llmsEl.innerHTML = '<span style="color: #94a3b8;">– No optional llms.txt</span>';
                 llmsDesc.textContent = 'No /llms.txt file found. This optional format is not universally used by crawlers.';
             }
 
@@ -536,15 +538,18 @@
             const robotsCheck = report.checks?.ai_bot_access || {};
             const robotsEl = document.getElementById('check-robots-status');
             const robotsDesc = document.getElementById('check-robots-desc');
-            if (robotsCheck.blocked && robotsCheck.blocked.length > 0) {
-                robotsEl.innerHTML = `<span style="color: #f87171;">✕ Blocking AI (${robotsCheck.blocked.join(', ')})</span>`;
-                robotsDesc.textContent = 'Robots.txt is actively blocking AI recommendation crawlers.';
+            if (robotsCheck.status === 'unknown') {
+                robotsEl.innerHTML = '<span style="color: #facc15;">⚠ Access Unverified</span>';
+                robotsDesc.textContent = 'robots.txt was unavailable or returned an error; access could not be established.';
+            } else if (robotsCheck.blocked && robotsCheck.blocked.length > 0) {
+                robotsEl.innerHTML = `<span style="color: #f87171;">✕ Search Crawler Restrictions (${robotsCheck.blocked.join(', ')})</span>`;
+                robotsDesc.textContent = 'Published robots.txt rules restrict access for the listed search crawlers; this does not verify real indexing.';
             } else if (robotsCheck.has_explicit_ai_rules) {
                 robotsEl.innerHTML = '<span style="color: #4ade80;">✓ AI Crawlers Explicitly Allowed</span>';
-                robotsDesc.textContent = 'Explicit allow directives configured for AI search bots.';
+                robotsDesc.textContent = 'Published allow rules were found. Explicit allows do not increase search ranking.';
             } else {
                 robotsEl.innerHTML = '<span style="color: #94a3b8;">– Default Access</span>';
-                robotsDesc.textContent = 'No blocking rules detected. Standard crawl permissions apply.';
+                robotsDesc.textContent = 'No published restriction found for the checked search bots; real access may still vary.';
             }
 
             // 4. Semantic Hierarchy
@@ -560,11 +565,11 @@
                 headEl.innerHTML = `<span style="color: #facc15;">⚠ Non-optimal (${h1Count} H1, ${h2Count} H2)</span>`;
 
                 if (h1Count === 0) {
-                    headDesc.textContent = 'Missing H1 heading: AI crawlers have no title for this page.';
+                    headDesc.textContent = 'No H1 heading detected; use a descriptive main page heading.';
                 } else if (h1Count > 1) {
-                    headDesc.textContent = 'Multiple H1 headings confuse AI crawlers about the page topic.';
+                    headDesc.textContent = 'Multiple H1 headings detected; consider a clear page heading hierarchy.';
                 } else {
-                    headDesc.textContent = 'No H2 subheadings, so there is no structure for AI crawlers to follow.';
+                    headDesc.textContent = 'No H2 headings detected; add useful section headings where appropriate.';
                 }
             }
 
@@ -585,7 +590,7 @@
             const ogDesc = document.getElementById('check-og-desc');
             if (report.checks?.open_graph) {
                 ogEl.innerHTML = '<span style="color: #4ade80;">✓ Open Graph Configured</span>';
-                ogDesc.textContent = 'Rich social and AI preview meta tags detected.';
+                ogDesc.textContent = 'Social preview metadata detected; this does not measure AI citations.';
             } else {
                 ogEl.innerHTML = '<span style="color: #facc15;">⚠ Missing Open Graph</span>';
                 ogDesc.textContent = 'Missing complete og:title, og:description, or og:image tags.';
