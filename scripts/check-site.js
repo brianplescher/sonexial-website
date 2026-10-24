@@ -15,7 +15,12 @@ assert.ok(exists('robots.txt'), 'robots.txt is not deployed');
 assert.ok(exists('sitemap.xml'), 'sitemap.xml is not deployed');
 assert.ok(exists('_redirects'), 'Netlify redirects are not deployed');
 assert.ok(exists('constellations/index.html'), 'Constellations page is not in the production build');
-assert.ok(exists('Images/Sonexial_Constellations_Optimized.webp'), 'Constellations artwork was not copied into the production build');
+const artworkPath = 'Images/examples/Sonexial_Constellations_Optimized.webp';
+assert.ok(exists(artworkPath), 'Constellations artwork was not copied into the production build');
+const artwork = fs.readFileSync(path.join(dist, artworkPath));
+assert.ok(artwork.byteLength > 5000, 'Constellations artwork is empty or incomplete');
+assert.equal(artwork.subarray(0, 4).toString('ascii'), 'RIFF', 'Constellations artwork has an invalid WebP header');
+assert.equal(artwork.subarray(8, 12).toString('ascii'), 'WEBP', 'Constellations artwork must be a valid WebP file');
 assert.ok(!exists('blog/index.html'), 'Retired Content Vault was copied to the production build');
 const constellations = read('constellations/index.html');
 assert.match(constellations, /<h1 id="constellations-title">When Knowledge Becomes Accessible, What Becomes Possible\?<\/h1>/);
@@ -54,3 +59,6 @@ for (const oldRoute of ['/metadata-kit', '/bisac-kit', '/ad-copy-suite']) {
   assert.ok(redirects.split(/\r?\n/).some(line => line.startsWith(oldRoute + ' ') && / 301!?\s*$/.test(line)), `Retired route missing redirect: ${oldRoute}`);
 }
 console.log(`Site integrity passed: ${locs.length} sitemap URLs and production assets verified.`);
+
+assert.match(constellations, /src="\/Images\/examples\/Sonexial_Constellations_Optimized\.webp"/);
+assert.doesNotMatch(constellations, /src="\/Images\/Sonexial_Constellations_Optimized\.webp"/);
