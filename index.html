@@ -57,19 +57,16 @@
   <header id="site-header">
     <div class="header-inner">
       <a href="/" class="home-logo-link" aria-label="Sonexial Home">
-        <img src="/Images/sonexial_logo.png" alt="Sonexial Logo" class="home-logo" width="309" height="84">
+        <img src="/Images/sonexial_logo.png" alt="Sonexial Logo" class="home-logo" width="206" height="56">
       </a>
       <nav class="main-nav" aria-label="Main navigation">
-        <a href="/scan/">Free AI Scan</a>
-        <a href="/about">About</a>
-        <a href="#process">Process</a>
-        <a href="#products">Products</a>
+        <a href="/scan/">Free Scan</a>
         <a href="/kits">Pricing</a>
-        <a href="/constellations/">Sonexial Constellations</a>
-        <a href="#contact">Contact</a>
-        <a href="#faq">FAQ</a>
+        <a href="#process">How It Works</a>
+        <a href="/constellations/">Constellations</a>
+        <a href="/about">About</a>
       </nav>
-      <a href="#products" class="nav-cta">Get Started</a>
+      <a href="#products" class="nav-cta">See Packages</a>
       <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
         <span></span>
         <span></span>
@@ -81,87 +78,32 @@
   <!-- Main Content -->
   <main id="main-content">
 
-    <!-- Hero Section (Option 1: Dead Signal / Live Wire + Interactive Scan & Terminal Comparison) -->
+    <!-- Hero Section -->
     <section class="hero" id="home">
       <div class="hero-grid-overlay"></div>
       <div class="hero-inner">
-        <div class="hero-split">
-          <div>
-            <span class="hero-eyebrow">GENERATIVE ENGINE OPTIMIZATION (GEO) · GRAND HAVEN, MI</span>
-            <h1 class="cafe-question">When buyers ask AI who to trust, does your website answer—or disappear?</h1>
-            <p class="cafe-sub">
-              Sonexial engineers AI-ready websites, JSON-LD entity graphs, and technical GEO fixes for professional practices, growing businesses, and authors. DIY builders give you visual templates. Legacy SEO chases yesterday’s keywords. We make your site machine-readable, verifiable, and quotable from day one.
-            </p>
+        <div class="cafe-content hero-centered">
+          <span class="hero-eyebrow">GENERATIVE ENGINE OPTIMIZATION (GEO) · GRAND HAVEN, MI</span>
+          <h1 class="cafe-question">When buyers ask AI who to trust, does your website answer—or disappear?</h1>
+          <p class="cafe-sub">
+            Sonexial engineers AI-ready websites, JSON-LD entity graphs, and 72-hour technical GEO fixes for businesses, professional practices, and authors.
+          </p>
 
+          <div class="hero-scan-box">
             <div class="mode-toggle" role="group" aria-label="Select website type to scan">
-              <button type="button" class="mode-btn active" id="hero-mode-smb" onclick="document.getElementById('hero-mode-input').value='smb';this.classList.add('active');document.getElementById('hero-mode-author').classList.remove('active');document.getElementById('hero-scan-url').placeholder='https://yourbusiness.com';">Business / SMB</button>
-              <button type="button" class="mode-btn" id="hero-mode-author" onclick="document.getElementById('hero-mode-input').value='author';this.classList.add('active');document.getElementById('hero-mode-smb').classList.remove('active');document.getElementById('hero-scan-url').placeholder='https://yourauthorname.com';">Author / Book</button>
+              <button type="button" class="mode-btn active" id="hero-mode-smb" onclick="document.getElementById('hero-mode-input').value='smb';this.classList.add('active');document.getElementById('hero-mode-author').classList.remove('active');document.getElementById('hero-scan-url').placeholder='Enter your business website (e.g. https://yourfirm.com)';">Business / SMB</button>
+              <button type="button" class="mode-btn" id="hero-mode-author" onclick="document.getElementById('hero-mode-input').value='author';this.classList.add('active');document.getElementById('hero-mode-smb').classList.remove('active');document.getElementById('hero-scan-url').placeholder='Enter your author website (e.g. https://yourname.com)';">Author / Book</button>
             </div>
 
             <form class="hero-scan-form" action="/scan/" method="GET">
               <input type="hidden" name="mode" id="hero-mode-input" value="smb">
-              <input type="url" name="url" id="hero-scan-url" class="hero-scan-input" placeholder="https://yourbusiness.com" aria-label="Website URL to scan" required>
-              <button type="submit" class="btn-primary">Run Free GEO Scan</button>
+              <input type="url" name="url" id="hero-scan-url" class="hero-scan-input" placeholder="Enter your business website (e.g. https://yourfirm.com)" aria-label="Website URL to scan" required>
+              <button type="submit" class="btn-primary">Run Free Scan →</button>
             </form>
-            <p style="font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.5rem;">
-              Free · No card · No call · Checks public schema, headings, canonicals &amp; AI crawler rules in seconds.
+
+            <p class="hero-fine-print">
+              Free · No card · No call · Checks public JSON-LD schema, headings &amp; AI crawler rules in seconds.
             </p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-              <a href="#products" class="btn-secondary">Compare Diagnostics &amp; Done-For-You Sprints</a>
-            </div>
-          </div>
-
-          <div class="signal-terminal" aria-label="Comparison of unoptimized brochure website versus Sonexial GEO stack">
-            <div class="signal-terminal-header">
-              <span>SONEXIAL SIGNAL TELEMETRY</span>
-              <span style="color: var(--accent);">LIVE PARSER CHECK</span>
-            </div>
-
-            <div class="signal-card-Compare">
-              <div class="signal-row">
-                <strong>TYPICAL BROCHURE SITE</strong>
-                <span class="signal-bad">42 / 100 (GRADE D)</span>
-              </div>
-              <div class="signal-row">
-                <span>Organization / Service JSON-LD</span>
-                <span class="signal-bad">✕ Missing</span>
-              </div>
-              <div class="signal-row">
-                <span>FAQPage Direct-Answer Schema</span>
-                <span class="signal-bad">✕ None</span>
-              </div>
-              <div class="signal-row">
-                <span>Semantic H1 / H2 Hierarchy</span>
-                <span class="signal-bad">⚠ 0 H1s or 10+ H1s</span>
-              </div>
-              <div class="signal-row">
-                <span>AI Search Bots (OAI / Perplexity)</span>
-                <span class="signal-bad">⚠ Ambiguous</span>
-              </div>
-            </div>
-
-            <div class="signal-card-Compare live-wire">
-              <div class="signal-row">
-                <strong style="color: #fff;">SONEXIAL GEO STACK</strong>
-                <span class="signal-good">96 / 100 (GRADE A)</span>
-              </div>
-              <div class="signal-row">
-                <span>Entity &amp; Offer Graph (JSON-LD)</span>
-                <span class="signal-good">✓ Verified</span>
-              </div>
-              <div class="signal-row">
-                <span>FAQPage &amp; Service Quotability</span>
-                <span class="signal-good">✓ Structured</span>
-              </div>
-              <div class="signal-row">
-                <span>sameAs Authority Resolution</span>
-                <span class="signal-good">✓ Connected</span>
-              </div>
-              <div class="signal-row">
-                <span>Search Crawler Directives + llms.txt</span>
-                <span class="signal-good">✓ Configured</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -422,7 +364,7 @@
               Before founding Sonexial, Brian led multi-shift operations and HR strategy inside a 1,200-person Amazon fulfillment center, managed large-scale retail operations, and worked as an AI evaluation and data analysis consultant training frontier language models.
             </p>
             <p class="methodology-copy">
-              <a href="/about" style="color:var(--accent);">Read more about Brian and the engineering behind Sonexial</a>
+              <a href="/about" style="color:var(--accent);">Read more about Brian and the engineering behind Sonexial →</a>
             </p>
             <div class="methodology-credit">
               <p>→ MS in Management, Strategy, and Leadership — Michigan State University</p>
