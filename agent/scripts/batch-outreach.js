@@ -7,12 +7,13 @@ const { generatePitch } = require('../src/pitch');
 
 function parseArgs(argv) {
     const positional = [];
-    const opts = { mode: 'smb', maxScore: 70, useLlm: false, concurrency: 4 };
+    const opts = { mode: 'smb', maxScore: 70, useLlm: false, concurrency: 4, delay: 800 };
     for (let i = 0; i < argv.length; i++) {
         const a = argv[i];
         if (a === '--mode') opts.mode = argv[++i] || 'smb';
         else if (a === '--max-score') opts.maxScore = Number(argv[++i] ?? 70);
         else if (a === '--concurrency') opts.concurrency = Number(argv[++i] ?? 4);
+        else if (a === '--delay') opts.delay = Number(argv[++i] ?? 800);
         else if (a === '--llm') opts.useLlm = true;
         else positional.push(a);
     }
@@ -75,6 +76,8 @@ async function main() {
     const stream = fs.createWriteStream(outPath);
     stream.write(OUT_COLUMNS.join(',') + '\n');
 
+    console.log(`Scanning ${prospects.length} prospects (mode=${mode}, qualifying score < ${maxScore}, llm=${useLlm})...`);
+
     const queue = [...prospects];
     let qualifiedCount = 0;
 
@@ -104,6 +107,7 @@ async function main() {
                     error: ''
                 };
                 stream.write(OUT_COLUMNS.map(c => csvCell(row[c])).join(',') + '\n');
+                console.log(`[${qualified ? 'QUALIFIED' : 'SKIP'}] ${p.url} -> ${report.score}/100 (${report.geo_grade})`);
             } catch (err) {
                 const row = {
                     url: p.url,
@@ -114,13 +118,14 @@ async function main() {
                     error: err.message
                 };
                 stream.write(OUT_COLUMNS.map(c => csvCell(row[c])).join(',') + '\n');
+                console.log(`[ERROR] ${p.url} -> ${err.message}`);
             }
         }
     }
 
     await Promise.all(Array.from({ length: Math.min(concurrency, prospects.length || 1) }, worker));
     await new Promise(r => stream.end(r));
-    console.log(`Complete! ${qualifiedCount} qualified outreach drafts written to ${outPath}`);
+    console.log(`\nComplete! ${qualifiedCount} qualified outreach drafts written to ${outPath}`);
 }
 
 if (require.main === module) {
