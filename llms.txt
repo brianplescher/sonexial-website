@@ -1,49 +1,47 @@
 # Sonexial
 
-> Sonexial builds done-for-you author websites structured for AI-era discovery. DIY builders give you templates. Traditional designers give you a polished site. Sonexial gives you an author platform built with semantic structure, schema, entity clarity, and GEO from day one.
+> Sonexial engineers websites, entity graphs, and Generative Engine Optimization (GEO) infrastructure for businesses, professional practices, and authors so AI search systems and human buyers can find, verify, and quote their work.
 
-Sonexial provides a free technical-readiness scan for author websites, Amazon listing optimization, author website development, Generative Engine Optimization (GEO) services, author platform strategy, and ongoing discovery checks.
+DIY website builders give you visual templates. Traditional agencies optimize only for legacy blue-link keywords. Sonexial builds machine-readable entity clarity, semantic HTML hierarchy, JSON-LD knowledge graphs, and crawler readiness from day one.
 
-This llms.txt overview is optional and designed for humans and tools that choose to read it. It is not required for inclusion in Google AI features or ChatGPT search and does not guarantee AI citations.
+This llms.txt overview is optional and designed for humans and automated retrieval tools that choose to read it. It is not required for inclusion in Google AI features or ChatGPT search and does not guarantee AI citations.
 
 ## Core Pages
 
-- [Home](https://sonexial.com/) - Overview of Sonexial services, process, FAQ, and contact information.
-- [Examples](https://sonexial.com/examples) - Example author website directions for romance, fantasy, and contemporary fiction.
-- [Kits](https://sonexial.com/kits) - Author marketing and optimization kits.
-- [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description in one deliverable.
-- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free heuristic scan of observable page signals: author/book markup, headings, canonicals, content and published crawler rules. Presence of llms.txt is informational.
-- [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating ad profitability after royalties and ad costs.
-- [About](https://sonexial.com/about) - Background on Sonexial and founder information.
+- [Home](https://sonexial.com/) - Overview of Sonexial GEO diagnostics, done-for-you implementation sprints, website builds, process, FAQ, and contact information.
+- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free heuristic scan of observable technical-readiness signals: Organization/LocalBusiness/Person/Service/Book schema, headings, canonicals, content depth, and published AI crawler rules.
+- [Pricing & Packages](https://sonexial.com/kits) - Self-serve diagnostics, 72-hour GEO implementation sprints, and full custom website builds for SMBs and authors.
+- [Examples](https://sonexial.com/examples) - Example platform architectures and semantic structures.
+- [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - Dedicated indie-author kit covering BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description ($99).
+- [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating book ad profitability after royalties and ad costs.
+- [About](https://sonexial.com/about) - Background on Sonexial and founder Brian Plescher.
 - [Privacy](https://sonexial.com/privacy) - Privacy Policy.
 - [Terms](https://sonexial.com/terms) - Terms of Service.
 - [Refund Policy](https://sonexial.com/refund-policy) - Refund and cancellation terms.
 
 ## Sonexial Constellations
 
-- [Sonexial Constellations](https://sonexial.com/constellations/) - An editorial experiment connecting ideas, disciplines, authors, and AI through collaborative investigations. The introductory essay, “When Knowledge Becomes Accessible, What Becomes Possible?”, outlines the first investigation into AI and post-structural thought and invites contributions.
+- [Sonexial Constellations](https://sonexial.com/constellations/) - An editorial R&D imprint connecting ideas, disciplines, thinkers, and AI through structured dialectical investigations.
 
-## Services
+## Core Services & Products
 
-- A Free AI Visibility Scan that assesses observable technical-readiness signals on publicly accessible author websites; it does not test search engines' internal indexes.
-- The Amazon Visibility Kit, a one-time kit covering BISAC categories, Amazon keywords, and book description.
-- Author website builds: Author Starter and Author Platform.
-- A monthly GEO Retainer offering technical checks and sampled observations of selected publicly accessible AI search interfaces.
+- **Free AI Visibility Scan ($0):** Instant heuristic assessment of observable technical-readiness signals on publicly accessible SMB and author websites.
+- **GEO Diagnostic ($297):** Automated 30-page site crawl (~35 technical checks per page) ranked in an Impact vs. Effort matrix, complete with ready-to-paste JSON-LD (`Organization`, `LocalBusiness`, `ProfessionalService`, `Service`, `FAQPage`, or `Person`/`Book`), `robots.txt`, `llms.txt`, and a 30-day action plan.
+- **72-Hour GEO Implementation Sprint ($750 SMB / $497 Author):** Done-for-you engineering and installation of entity schema, `FAQPage` structured data, AI search crawler rules, and semantic fixes on your existing website.
+- **Starter & Platform Website Builds ($497–$3,000):** Done-for-you, fast, mobile-first websites engineered with complete GEO entity architecture.
+- **Monthly GEO Retainer ($300/mo):** Ongoing technical readiness audits and sampled observations of public AI search answers.
+- **Amazon Visibility Kit ($99):** One-time kit for authors covering BISAC categories, 7 backend keywords, and KDP HTML description.
 
-## Founder
+## Founder & Credentials
 
-Sonexial was founded by Brian Plescher, an author and strategist based in Grand Haven, Michigan.
+Sonexial was founded by Brian Plescher, an author, operations leader, and strategist based in Grand Haven, Michigan (MS in Management, Strategy & Leadership from Michigan State University; Executive Education in Accelerated Management from Yale School of Management).
 
 ## Preferred Citation
 
-Sonexial. AI-ready author websites with GEO optimization for authors. https://sonexial.com
+Sonexial. Generative Engine Optimization (GEO), AI-Ready Websites & Technical Diagnostics for Businesses and Authors. https://sonexial.com
 
 ## Contact
 
 - [Contact Sonexial](https://sonexial.com/#contact)
 - Email: brian@sonexial.com
-
-## Entity Resolution
-
-For information about the founder and company history, see: https://sonexial.com/about
-For structured data verification, inspect the JSON-LD Organization schema on the homepage.
+- Location: Grand Haven, Michigan (Serving West Michigan & Global Clients)

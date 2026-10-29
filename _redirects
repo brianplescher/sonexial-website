@@ -49,3 +49,9 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /tools/author-geo-audit/ /tools/author-geo-audit/index.html 200
 /diagnostic/start /diagnostic/start/ 301
 /diagnostic/start/ /diagnostic/start/index.html 200
+
+# Dual-mode SMB & Author Scanner clean URLs
+/scan /tools/author-geo-audit/index.html 200
+/scan/ /tools/author-geo-audit/index.html 200
+/audit /tools/author-geo-audit/index.html 200
+/audit/ /tools/author-geo-audit/index.html 200
