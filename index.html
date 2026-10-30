@@ -90,14 +90,8 @@
           </p>
 
           <div class="hero-scan-box">
-            <div class="mode-toggle" role="group" aria-label="Select website type to scan">
-              <button type="button" class="mode-btn active" id="hero-mode-smb" onclick="document.getElementById('hero-mode-input').value='smb';this.classList.add('active');document.getElementById('hero-mode-author').classList.remove('active');document.getElementById('hero-scan-url').placeholder='Enter your business website (e.g. https://yourfirm.com)';">Business / SMB</button>
-              <button type="button" class="mode-btn" id="hero-mode-author" onclick="document.getElementById('hero-mode-input').value='author';this.classList.add('active');document.getElementById('hero-mode-smb').classList.remove('active');document.getElementById('hero-scan-url').placeholder='Enter your author website (e.g. https://yourname.com)';">Author / Book</button>
-            </div>
-
             <form class="hero-scan-form" action="/scan/" method="GET">
-              <input type="hidden" name="mode" id="hero-mode-input" value="smb">
-              <input type="url" name="url" id="hero-scan-url" class="hero-scan-input" placeholder="Enter your business website (e.g. https://yourfirm.com)" aria-label="Website URL to scan" required>
+              <input type="url" name="url" id="hero-scan-url" class="hero-scan-input" placeholder="Enter your website (e.g. https://yoursite.com)" aria-label="Enter your website" required>
               <button type="submit" class="btn-primary">Run Free Scan →</button>
             </form>
 
@@ -172,8 +166,8 @@
             </div>
             <div class="lead-magnet-cta-block">
               <div class="lead-magnet-badge-stack">
-                <span class="lm-badge">SMBS &amp; PRACTICES</span>
-                <span class="lm-badge">AUTHORS</span>
+                <span class="lm-badge">EXISTING SITES</span>
+                <span class="lm-badge">GEO GAP ANALYSIS</span>
                 <span class="lm-badge">FREE SCAN</span>
               </div>
               <p class="lead-magnet-cta-copy">
@@ -267,8 +261,8 @@
             <p class="card-best-for"><strong>Best for:</strong> business owners, partners, and authors who want to see their exact technical gaps before spending a dollar.</p>
             <ul class="deliverables">
               <li><span class="check">→</span> Heuristic technical-readiness score and grade</li>
-              <li><span class="check">→</span> Business/SMB mode and Author/Book mode</li>
               <li><span class="check">→</span> Top critical failures named immediately</li>
+              <li><span class="check">→</span> Full report emailed to you</li>
               <li><span class="check">→</span> No call, no card</li>
             </ul>
             <div class="card-footer">
