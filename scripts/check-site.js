@@ -14,6 +14,46 @@ assert.ok(exists('index.html'), 'Built homepage is missing');
 assert.ok(exists('robots.txt'), 'robots.txt is not deployed');
 assert.ok(exists('sitemap.xml'), 'sitemap.xml is not deployed');
 assert.ok(exists('_redirects'), 'Netlify redirects are not deployed');
+// Validate PNG chunk checksums as well as its signature. A valid header alone
+// did not catch the broken logo files previously committed to the repository.
+function assertValidPng(relative) {
+  assert.ok(exists(relative), `Missing PNG: ${relative}`);
+  const png = fs.readFileSync(path.join(dist, relative));
+  assert.ok(png.length > 1000, `PNG file is unexpectedly short: ${relative}`);
+  assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `Invalid PNG signature: ${relative}`);
+
+  let offset = 8;
+  let seenData = false;
+  let seenEnd = false;
+  while (offset < png.length) {
+    assert.ok(offset + 12 <= png.length, `Truncated PNG chunk header: ${relative}`);
+    const length = png.readUInt32BE(offset);
+    const type = png.toString('ascii', offset + 4, offset + 8);
+    const end = offset + length + 12;
+    assert.ok(end <= png.length, `Truncated PNG ${type} chunk: ${relative}`);
+
+    let crc = 0xffffffff;
+    for (let i = offset + 4; i < offset + length + 8; i++) {
+      crc ^= png[i];
+      for (let bit = 0; bit < 8; bit++) {
+        crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+      }
+    }
+    assert.equal((crc ^ 0xffffffff) >>> 0, png.readUInt32BE(offset + length + 8),
+      `Corrupt PNG ${type} chunk checksum: ${relative}`);
+    if (type === 'IDAT') seenData = true;
+    if (type === 'IEND') {
+      assert.equal(length, 0, `Invalid PNG ending: ${relative}`);
+      seenEnd = true;
+    }
+    offset = end;
+    if (seenEnd) break;
+  }
+  assert.ok(seenData && seenEnd && offset === png.length,
+    `PNG missing image data, complete ending, or containing trailing data: ${relative}`);
+}
+assertValidPng('Images/sonexial_logo.png');
+
 assert.ok(exists('constellations/index.html'), 'Constellations page is not in the production build');
 const artworkPath = 'Images/examples/Sonexial_Constellations_Optimized.webp';
 assert.ok(exists(artworkPath), 'Constellations artwork was not copied into the production build');
