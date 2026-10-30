@@ -1,6 +1,13 @@
 const llm = require('./llm');
 const { sanitizeLog, parseJson } = require('./ai-utils');
 
+const SIGNATURE = `Best,
+
+Brian L. Plescher
+Founder & Principal Consultant
+616.502.5320
+www.sonexial.com`;
+
 function generateTemplatePitch(scanReport, recipientName = 'there', options = {}) {
     const mode = options.mode || scanReport?.mode || 'author';
     const previewUrl = options.previewUrl || 'https://sonexial.com/scan/';
@@ -34,14 +41,11 @@ ${host} currently scores ${score}/100 (${grade}). Three specific technical gaps 
 
 You can view the technical snapshot here: ${previewUrl}
 
-If you have an in-house web person, you can order the full 30-page GEO Diagnostic ($297)—which includes ready-to-paste Organization/Service JSON-LD schema, robots.txt crawler rules, and a prioritized 30-day fix plan.
+If you have an in-house web person, you can order the full 30-page GEO Diagnostic ($297)—which includes ready-to-paste Organization/Service JSON-LD schema, robots.txt crawler rules, and a prioritized 30-day fix plan: https://sonexial.com/kits
 
 Or, if you want my studio to simply build and install the complete AI-readiness fix pack for ${host} in 72 hours ($750 flat, 100% credited if you ever rebuild), just reply "FIX" and I will send the 1-page scope.
 
-Best,
-Brian Plescher
-Founder, Sonexial (Grand Haven, MI)
-https://sonexial.com`;
+${SIGNATURE}`;
 
         return {
             subject,
@@ -70,10 +74,7 @@ You can review the scan details here: ${previewUrl}
 
 If you manage your own site, our 30-page GEO Diagnostic ($297) generates the exact ready-to-paste Person & Book JSON-LD schema, robots.txt rules, and llms.txt file for your catalog. Or if you'd rather have us handle the implementation or build a clean AI-ready author site ($497 Author Starter), just reply to this email and I'll point you in the right direction.
 
-Warmly,
-Brian Plescher
-Founder, Sonexial
-https://sonexial.com`;
+${SIGNATURE}`;
 
     return {
         subject,
@@ -102,11 +103,11 @@ async function generatePitch(scanReport, recipientName = 'Author', options = {})
     const recommendations = scanReport?.recommendations || [];
 
     const roleContext = mode === 'smb'
-        ? `You are Brian Plescher, founder of Sonexial (MS Management/Strategy, former Amazon Operations & HRBP leader). You help SMBs, consultancies, and professional practices structure their websites for AI-era discovery (Generative Engine Optimization / GEO).`
-        : `You are Brian Plescher, founder of Sonexial and fellow author. You build done-for-you author websites and GEO diagnostics structured for AI-era discovery.`;
+        ? `You are Brian L. Plescher, Founder & Principal Consultant of Sonexial (MS Management/Strategy, former Amazon Operations & HRBP leader). You help SMBs, consultancies, and professional practices structure their websites for AI-era discovery (Generative Engine Optimization / GEO).`
+        : `You are Brian L. Plescher, Founder & Principal Consultant of Sonexial and fellow author. You build done-for-you author websites and GEO diagnostics structured for AI-era discovery.`;
 
     const packageOptions = mode === 'smb'
-        ? `GEO Diagnostic with ready-to-paste schema/crawler code ($297), 72-Hour Done-For-You GEO Implementation Sprint ($750), or Full AI-Ready Website Build ($1,500-$3,000)`
+        ? `GEO Diagnostic with ready-to-paste schema/crawler code ($297), 72-Hour Done-For-You GEO Implementation Sprint ($750), or Full AI-Ready Website Build ($997-$3,000)`
         : `GEO Diagnostic ($297), Author Starter ($497), or Author Platform ($3,000)`;
 
     const prompt = `
@@ -123,6 +124,8 @@ Write a short, punchy, peer-to-peer outreach note to ${recipientName} (<180 word
 - Do NOT claim any AI assistant has indexed, ignored, or ranked the site. Do NOT pitch llms.txt as mandatory.
 - Recommend the most natural package from: ${packageOptions}.
 - Give a frictionless reply CTA (e.g., reply "FIX" or check the self-serve diagnostic).
+- End with this exact signature:
+${SIGNATURE}
 
 Output valid JSON ONLY — no markdown fences:
 {
@@ -149,4 +152,4 @@ Output valid JSON ONLY — no markdown fences:
     }
 }
 
-module.exports = { generatePitch, generateTemplatePitch };
+module.exports = { generatePitch, generateTemplatePitch, SIGNATURE };
