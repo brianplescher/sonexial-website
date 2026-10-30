@@ -1091,6 +1091,7 @@ PRODUCTS
 .constellations-prose li { padding-left: 0.25rem; }
 .constellations-invite { margin-top: 4.5rem; padding: 2rem; border: 1px solid var(--accent-border); background: var(--accent-dim); }
 .constellations-invite p { font-size: 1.2rem; color: var(--text-0); margin-bottom: 1.5rem; }
+
 @media (max-width: 640px) { .constellations-hero { padding-top: 4rem; } .constellations-invite { padding: 1.5rem; } }
 
 .package-guide {
