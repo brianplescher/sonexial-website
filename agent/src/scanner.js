@@ -310,6 +310,20 @@ async function safeFetch(targetUrl, maxRedirects = 3) {
  * @param {string} htmlText - Raw HTML of the scanned page.
  * @param {string} [pageUrl] - URL the HTML was fetched from, used to validate the canonical tag.
  */
+const BUSINESS_SCHEMA_TYPES = new Set([
+    'Organization', 'Corporation', 'LocalBusiness', 'ProfessionalService',
+    'LegalService', 'Attorney', 'AccountingService', 'FinancialService',
+    'MedicalBusiness', 'MedicalClinic', 'Dentist', 'Physician',
+    'Restaurant', 'FoodEstablishment', 'Bakery', 'CafeOrCoffeeShop',
+    'HealthAndBeautyBusiness', 'DaySpa', 'HomeAndConstructionBusiness',
+    'HVACBusiness', 'Plumber', 'Electrician', 'GeneralContractor',
+    'RealEstateAgent', 'Store', 'SoftwareApplication'
+]);
+
+const OFFER_SCHEMA_TYPES = new Set([
+    'Service', 'Product', 'Offer', 'AggregateOffer', 'OfferCatalog', 'Course', 'Menu'
+]);
+
 function analyzeHtml(htmlText, pageUrl) {
     const $ = cheerio.load(htmlText || '');
     const checks = {};
@@ -317,11 +331,12 @@ function analyzeHtml(htmlText, pageUrl) {
     const critical_failures = [];
     const recommendations = [];
 
-    // 1. Author/book JSON-LD provides explicit entity facts; it is not a
-    // guarantee that AI systems will retrieve or recommend a book.
+    // 1. Entity JSON-LD (supports both Business/Practice Organization+Service and Author Person+Book)
     let hasBook = false;
     let hasPerson = false;
     let hasFaq = false;
+    let hasOrgOrLocal = false;
+    let hasServiceOrOffer = false;
     const sameAsUrls = new Set();
 
     $('script[type="application/ld+json"]').each((_, el) => {
@@ -336,7 +351,13 @@ function analyzeHtml(htmlText, pageUrl) {
                 } else if (typeof obj === 'object') {
                     if (obj['@type']) {
                         const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
-                        items.push(...types);
+                        for (const t of types) {
+                            const clean = String(t).replace(/^https?:\/\/schema\.org\//i, '');
+                            items.push(clean);
+                        }
+                    }
+                    if (obj.hasOfferCatalog || obj.makesOffer || obj.hasMenu) {
+                        hasServiceOrOffer = true;
                     }
                     if (obj.sameAs) {
                         const refs = Array.isArray(obj.sameAs) ? obj.sameAs : [obj.sameAs];
@@ -353,22 +374,38 @@ function analyzeHtml(htmlText, pageUrl) {
             if (items.includes('Book')) hasBook = true;
             if (items.includes('Person')) hasPerson = true;
             if (items.includes('FAQPage')) hasFaq = true;
+            if (items.some(t => BUSINESS_SCHEMA_TYPES.has(t))) hasOrgOrLocal = true;
+            if (items.some(t => OFFER_SCHEMA_TYPES.has(t))) hasServiceOrOffer = true;
         } catch {
             // Invalid JSON-LD is ignored and will not earn schema points.
         }
     });
 
-    checks.schema_markup = { book: hasBook, person: hasPerson, faq: hasFaq };
+    const hasFullEntitySchema = (hasBook && hasPerson) || (hasOrgOrLocal && (hasServiceOrOffer || hasFaq));
+    const hasPartialEntitySchema = hasBook || hasPerson || hasOrgOrLocal || hasServiceOrOffer || hasFaq;
+
+    checks.schema_markup = {
+        book: hasBook,
+        person: hasPerson,
+        faq: hasFaq,
+        organization_or_local: hasOrgOrLocal,
+        service_or_product: hasServiceOrOffer
+    };
     checks.sameas_count = sameAsUrls.size;
-    points.schema = hasBook && hasPerson ? SCORE_WEIGHTS.schema :
-        (hasBook || hasPerson ? 12 : 0);
-    if (hasBook !== hasPerson) {
-        recommendations.push('Add the missing Person or Book schema and connect the author to the books.');
-    } else if (!hasBook) {
-        recommendations.push('Add valid Person and Book JSON-LD to describe your author and titles explicitly.');
+    points.schema = hasFullEntitySchema ? SCORE_WEIGHTS.schema :
+        (hasPartialEntitySchema ? 12 : 0);
+
+    if (!hasFullEntitySchema) {
+        if (hasBook || hasPerson) {
+            recommendations.push('Complete your Person and Book JSON-LD schema so search systems can connect your identity and catalog.');
+        } else if (hasOrgOrLocal) {
+            recommendations.push('Add Service, OfferCatalog, or FAQPage JSON-LD schema alongside your Organization/LocalBusiness markup.');
+        } else {
+            recommendations.push('Add structured JSON-LD entity schema (Organization, LocalBusiness, & Service/FAQPage — or Person & Book) to describe your site explicitly.');
+        }
     }
     if (!sameAsUrls.size) {
-        recommendations.push('Add relevant sameAs URLs to verified author profiles where available.');
+        recommendations.push('Add relevant sameAs URLs in your JSON-LD linking to verified official profiles and directories.');
     }
 
     // 2. Meaningful headings help readers and parsers understand page sections.
@@ -386,7 +423,7 @@ function analyzeHtml(htmlText, pageUrl) {
         recommendations.push('Add meaningful H2 headings if the page has distinct sections.');
     }
 
-    // 3. Check actual URL hostnames, not substrings (which can be spoofed).
+    // 3. Check actual URL hostnames for external entity profiles & listings.
     const links = new Set();
     $('a[href]').each((_, el) => {
         try {
@@ -398,8 +435,6 @@ function analyzeHtml(htmlText, pageUrl) {
         }
     });
     const isHost = (host, domain) => host === domain || host.endsWith('.' + domain);
-    // Compare against known retail registrable domains. A loose regex would
-    // mistake amazon.com.attacker.example for a real Amazon link.
     const amazonDomains = [
         'amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr',
         'amazon.it', 'amazon.es', 'amazon.nl', 'amazon.pl', 'amazon.se',
@@ -407,14 +442,26 @@ function analyzeHtml(htmlText, pageUrl) {
         'amazon.com.mx', 'amazon.sg', 'amazon.ae', 'amazon.sa', 'amazon.eg',
         'amazon.com.tr', 'amazon.com.be'
     ];
+    const businessProfileDomains = [
+        'linkedin.com', 'yelp.com', 'bbb.org', 'trustpilot.com',
+        'clutch.co', 'g.page', 'facebook.com', 'instagram.com', 'youtube.com'
+    ];
     const hasAmazon = [...links].some(host =>
         host === 'amzn.to' || amazonDomains.some(domain => isHost(host, domain)));
     const hasGoodreads = [...links].some(h => isHost(h, 'goodreads.com'));
     const hasBookbub = [...links].some(h => isHost(h, 'bookbub.com'));
-    checks.entity_links = { amazon: hasAmazon, goodreads: hasGoodreads, bookbub: hasBookbub };
-    points.entity_links = hasAmazon || hasGoodreads || hasBookbub ? SCORE_WEIGHTS.entity_links : 0;
+    const hasBusinessProfiles = [...links].some(host =>
+        businessProfileDomains.some(domain => isHost(host, domain)));
+
+    checks.entity_links = {
+        amazon: hasAmazon,
+        goodreads: hasGoodreads,
+        bookbub: hasBookbub,
+        verified_profile_count: hasBusinessProfiles ? 1 : 0
+    };
+    points.entity_links = (hasAmazon || hasGoodreads || hasBookbub || hasBusinessProfiles) ? SCORE_WEIGHTS.entity_links : 0;
     if (!points.entity_links) {
-        recommendations.push('Link to an official book listing or author profile where one exists.');
+        recommendations.push('Link to your official external profiles, directories, or listings (e.g. LinkedIn, Google Business, BBB, or retail listings).');
     }
 
     // 4. Check actual social preview fields rather than counting any three OG tags.
@@ -449,7 +496,7 @@ function analyzeHtml(htmlText, pageUrl) {
     checks.thin_content_flag = wordCount < THIN_CONTENT_WORDS;
     points.content = wordCount >= THIN_CONTENT_WORDS ? SCORE_WEIGHTS.content : (wordCount >= 150 ? 5 : 0);
     if (checks.thin_content_flag) {
-        recommendations.push('Review whether the page gives readers enough useful, original information about the author and books; word count alone is not a ranking rule.');
+        recommendations.push('Expand on-page copy with clear, factual descriptions of your services, credentials, or offerings so search parsers have sufficient context.');
     }
 
     return {
