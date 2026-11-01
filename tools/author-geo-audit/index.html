@@ -5,29 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
+        content="Free technical GEO readiness scan for business, professional practice, and author websites. Check Organization, Service, FAQ, and Book JSON-LD schema, headings, canonicals, sitemap, and published AI crawler rules.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://sonexial.com/tools/author-geo-audit/">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://sonexial.com/tools/author-geo-audit/">
-    <meta property="og:title" content="Free AI Visibility Scan for Author Websites | Sonexial">
+    <meta property="og:title" content="Free AI Visibility &amp; GEO Readiness Scan | Sonexial">
     <meta property="og:description"
-        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
+        content="Free technical GEO readiness scan for business, professional practice, and author websites. Check JSON-LD entity schema, headings, canonicals, sitemap, and published AI crawler rules.">
     <meta property="og:image" content="https://sonexial.com/Images/og-image.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Free AI Visibility Scan for Author Websites | Sonexial">
+    <meta name="twitter:title" content="Free AI Visibility &amp; GEO Readiness Scan | Sonexial">
     <meta name="twitter:description"
-        content="Free technical-readiness scan of author websites. Check author and book schema, page content, canonicals, sitemap and published search-crawler rules. Results are estimates, not AI citation measurements.">
+        content="Free technical GEO readiness scan for business, professional practice, and author websites. Check JSON-LD entity schema, headings, canonicals, sitemap, and published AI crawler rules.">
     <meta name="twitter:image" content="https://sonexial.com/Images/og-image.jpg">
 
-    <title>Free AI Visibility Scan for Author Websites | Sonexial</title>
+    <title>Free AI Visibility &amp; GEO Readiness Scan | Sonexial</title>
     <link rel="icon" href="/Images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <style>
@@ -50,9 +50,9 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Free AI Visibility Scan",
+      "name": "Free AI Visibility & GEO Readiness Scan",
       "applicationCategory": "BusinessApplication",
-      "description": "Free AI visibility scanner for indie author websites.",
+      "description": "Free technical GEO readiness scanner for business, professional practice, and author websites.",
       "url": "https://sonexial.com/tools/author-geo-audit/",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
@@ -80,15 +80,16 @@
     <header id="site-header">
         <div class="header-inner">
             <a href="/" class="logo-link home-logo-link">
-                <img src="/Images/sonexial_logo.png" alt="Sonexial" class="home-logo">
+                <img src="/Images/sonexial_logo.png" alt="Sonexial" class="home-logo" width="206" height="56">
             </a>
             <nav class="main-nav" aria-label="Main navigation">
-                <a href="/#products">Products</a>
-                <a href="/#process">Process</a>
-                <a href="/#faq">FAQ</a>
-                <a href="/#contact">Contact</a>
+                <a href="/scan/">Free Scan</a>
+                <a href="/kits">Pricing</a>
+                <a href="/#process">How It Works</a>
+                <a href="/constellations/">Constellations</a>
+                <a href="/about">About</a>
             </nav>
-            <a href="/#products" class="nav-cta">Get Started</a>
+            <a href="/kits" class="nav-cta">See Packages</a>
             <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
@@ -100,40 +101,39 @@
         <section class="problem" style="padding-top: 8rem; padding-bottom: 3rem;">
             <div class="container">
                 <div class="section-label">FREE DIAGNOSTIC SCANNER</div>
-                <h1>Free AI Visibility Scan for Author Websites</h1>
+                <h1>Free AI Visibility &amp; GEO Readiness Scan</h1>
                 <p class="section-sub" style="font-size: 1.2rem; margin-top: 1rem;">
-                    Generative Engine Optimization (GEO) readiness scanner. Check publicly observable signals relevant to AI crawlers
-                    and search tools (including ChatGPT and Perplexity). This is not a live test of those systems' internal indexes or recommendations.
+                    Generative Engine Optimization (GEO) readiness scanner for businesses, professional practices, and authors. Check the publicly observable technical signals that AI search crawlers (ChatGPT Search, Perplexity, Claude, and Google AI Overviews) use to parse and verify your website.
                 </p>
 
                 <!-- Scanner Form Card -->
                 <div class="calculator-card" style="margin-top: 2.5rem; background: var(--color-surface, #12141a); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 2rem;">
                     <form id="geo-scanner-form" onsubmit="handleScanSubmit(event)">
                         <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            <label for="scan-url" style="font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--color-text-dim, #94a3b8); letter-spacing: 0.05em; text-transform: uppercase;">
-                                Target Author Website URL
+                            <label for="scan-url" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--color-text-dim, #94a3b8); letter-spacing: 0.05em; text-transform: uppercase;">
+                                Enter Your Website
                             </label>
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <input type="url" id="scan-url" name="scan_url" placeholder="https://yournameauthor.com" required
+                                <input type="url" id="scan-url" name="scan_url" placeholder="https://yoursite.com" required
                                     style="flex: 1 1 300px; padding: 0.85rem 1.2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 1rem; font-family: 'DM Sans', sans-serif;">
                                 <button type="submit" id="scan-submit-btn" class="btn-primary" style="padding: 0.85rem 2rem; cursor: pointer; white-space: nowrap;">
-                                    Scan AI Visibility
+                                    Scan AI Visibility →
                                 </button>
                             </div>
                             <span style="font-size: 0.8rem; color: var(--color-text-dim, #94a3b8);">
-                                Checks schema, headings, page URLs, content, outbound links, sitemap and search-crawler permissions. Optional llms.txt status is informational.
+                                Checks JSON-LD entity &amp; service schema, H1/H2 hierarchy, canonical URLs, content depth, outbound entity links, XML sitemap, and search-crawler permissions.
                             </span>
                         </div>
                     </form>
 
                     <!-- Loading State -->
                     <div id="scan-loading" style="display: none; margin-top: 2rem; text-align: center; padding: 2rem 1rem;">
-                        <div class="scanner-spinner" style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-                        <p style="font-family: 'DM Mono', monospace; font-size: 1rem; color: #a5b4fc; margin-bottom: 0.5rem;">
+                        <div class="scanner-spinner" style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #00f0ff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 1rem; color: #00f0ff; margin-bottom: 0.5rem;">
                             Scanning <span id="loading-target-url"></span>...
                         </p>
                         <p style="font-size: 0.85rem; color: #94a3b8;">
-                            Checking page markup, canonicals, sitemap and published crawler directives...
+                            Checking JSON-LD schema markup, headings, canonicals, sitemap and published crawler directives...
                         </p>
                     </div>
 
@@ -148,17 +148,17 @@
                     <div style="background: rgba(18, 20, 26, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem;">
                             <div>
-                                <span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Technical Readiness Score</span>
+                                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Technical Readiness Score</span>
                                 <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-top: 0.25rem;">
-                                    <span id="score-value" style="font-family: 'DM Serif Display', serif; font-size: 3.5rem; line-height: 1; color: #fff;">--</span>
+                                    <span id="score-value" style="font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 3.5rem; line-height: 1; color: #fff;">--</span>
                                     <span style="color: #64748b; font-size: 1.2rem;">/ 100</span>
                                 </div>
                             </div>
                             <div style="text-align: right;">
-                                <span id="score-grade" style="display: inline-block; padding: 0.4rem 1rem; border-radius: 20px; font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 600; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4);">
+                                <span id="score-grade" style="display: inline-block; padding: 0.4rem 1rem; border-radius: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; font-weight: 600; background: rgba(0, 240, 255, 0.12); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.35);">
                                     Grade
                                 </span>
-                                <div id="scan-time" style="font-family: 'DM Mono', monospace; font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">
+                                <div id="scan-time" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">
                                     0.00s
                                 </div>
                             </div>
@@ -168,7 +168,7 @@
 
                         <!-- Top Critical Failures Banner -->
                         <div id="critical-failures-box" style="margin-top: 1.5rem; display: none;">
-                            <h3 style="font-size: 1rem; color: #f87171; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
+                            <h3 style="font-size: 1rem; color: #f87171; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
                                 ⚠️ Important technical access or structure issues:
                             </h3>
                             <ul id="critical-failures-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
@@ -182,55 +182,55 @@
                     <!-- Category Breakdown Grid (unlocked by the email gate) -->
                     <div id="breakdown-grid" style="display: none; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">1. JSON-LD SCHEMA</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">1. JSON-LD ENTITY SCHEMA</div>
                             <div id="check-schema-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-schema-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">2. OPTIONAL llms.txt OVERVIEW</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">2. OPTIONAL llms.txt OVERVIEW</div>
                             <div id="check-llms-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-llms-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">3. SEARCH-CRAWLER ACCESS</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">3. SEARCH-CRAWLER ACCESS</div>
                             <div id="check-robots-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-robots-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">4. SEMANTIC HIERARCHY</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">4. SEMANTIC HIERARCHY</div>
                             <div id="check-headings-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-headings-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">5. ENTITY CONNECTIVITY</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">5. ENTITY CONNECTIVITY</div>
                             <div id="check-entity-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-entity-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">6. OPEN GRAPH TAGS</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">6. OPEN GRAPH TAGS</div>
                             <div id="check-og-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-og-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
 
                         <div class="check-card" style="background: rgba(18, 20, 26, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem;">
-                            <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">7. CRAWL &amp; IDENTITY SIGNALS</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem;">7. CRAWL &amp; IDENTITY SIGNALS</div>
                             <div id="check-crawl-status" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">--</div>
                             <p id="check-crawl-desc" style="font-size: 0.85rem; color: #94a3b8; margin: 0;"></p>
                         </div>
                     </div>
 
                     <!-- Email gate: unlocks the full breakdown and mails a copy of the report -->
-                    <div id="action-plan-gate" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
-                        <h2 id="gate-heading" style="font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 0.75rem; color: #fff;">
+                    <div id="action-plan-gate" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 12px; padding: 2.5rem; margin-bottom: 3rem;">
+                        <h2 id="gate-heading" style="font-family: 'DM Sans', sans-serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 0.75rem; color: #fff;">
                             Unlock Your Full Technical Scan Report
                         </h2>
                         <p id="gate-copy" style="color: #cbd5e1; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
-                            See every check we ran, a prioritized fix list, and an explanation of the technical signals that may affect discovery. We will email you a copy to keep.
+                            See every check we ran, a prioritized fix list, and an explanation of the technical signals that affect AI search discovery. We will email you a copy to keep.
                         </p>
 
                         <form id="pitch-capture-form" onsubmit="handleUnlockSubmit(event)">
@@ -241,7 +241,7 @@
                             </div>
 
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                                <input type="text" id="author-name-input" aria-label="Your name or pen name" placeholder="Your Name or Pen Name" autocomplete="name" required
+                                <input type="text" id="author-name-input" aria-label="Your name or business name" placeholder="Your Name or Business Name" autocomplete="name" required
                                     style="flex: 1 1 200px; padding: 0.85rem 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;">
                                 <input type="email" id="author-email-input" aria-label="Your email address" placeholder="Your Email Address" autocomplete="email" required
                                     style="flex: 1 1 250px; padding: 0.85rem 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;">
@@ -250,19 +250,19 @@
                                 </button>
                             </div>
                             <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.85rem; margin-bottom: 0;">
-                                One email with your report. Unsubscribe any time. The public text of the page you scanned is analyzed by an AI model to build your profile (<a href="/privacy" style="color: #94a3b8;">privacy</a>).
+                                One email with your report. No spam, no sales call required (<a href="/privacy" style="color: #94a3b8;">privacy</a>).
                             </p>
                         </form>
 
                         <div id="pitch-loading" style="display: none; margin-top: 1.5rem; text-align: center;">
-                            <p style="font-family: 'DM Mono', monospace; font-size: 0.9rem; color: #a5b4fc;">
+                            <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: #00f0ff;">
                                 Compiling your full report and emailing you a copy...
                             </p>
                         </div>
 
                         <!-- Full prioritized fix list, revealed after unlock -->
                         <div id="full-recommendations-box" style="display: none; margin-top: 2rem;">
-                            <h3 style="font-family: 'DM Mono', monospace; font-size: 0.85rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                            <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #00f0ff; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
                                 Every Fix, In Priority Order
                             </h3>
                             <ol id="full-recommendations-list" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; padding-left: 1.25rem; margin: 0; display: flex; flex-direction: column; gap: 0.6rem;">
@@ -271,8 +271,8 @@
 
                         <!-- AI-extracted profile, revealed after unlock when the model returned one -->
                         <div id="semantic-box" style="display: none; margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 1.5rem;">
-                            <h3 style="font-family: 'DM Mono', monospace; font-size: 0.85rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 0.5rem;">
-                                What AI Currently Infers About You
+                            <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 0.5rem;">
+                                What AI Currently Infers About Your Site
                             </h3>
                             <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0; margin-bottom: 1rem;">
                                 An AI model summarized publicly available page content. Other AI search systems may retrieve, interpret, or rank your site differently.
@@ -283,10 +283,10 @@
                         <!-- Pitch Result Box -->
                         <div id="pitch-result-box" style="display: none; margin-top: 2rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1.5rem;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <span style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #38bdf8; text-transform: uppercase;">
-                                    Custom Diagnosis &amp; Recommendations
+                                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #00f0ff; text-transform: uppercase;">
+                                    Custom Diagnosis &amp; Next Steps
                                 </span>
-                                <span id="pitch-pkg-badge" style="font-family: 'DM Mono', monospace; font-size: 0.75rem; background: rgba(99,102,241,0.25); color: #c7d2fe; padding: 0.25rem 0.75rem; border-radius: 12px;">
+                                <span id="pitch-pkg-badge" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; background: rgba(0,240,255,0.15); color: #00f0ff; padding: 0.25rem 0.75rem; border-radius: 12px;">
                                 </span>
                             </div>
                             <div id="pitch-email-text" style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; white-space: pre-wrap; font-family: 'DM Sans', sans-serif;">
@@ -295,8 +295,8 @@
                                 <a href="/kits" class="btn-primary" style="font-size: 0.9rem; padding: 0.6rem 1.25rem;">
                                     See How We Fix This →
                                 </a>
-                                <a href="/#products" class="btn-secondary" style="font-size: 0.9rem; padding: 0.6rem 1.25rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; text-decoration: none;">
-                                    View Done-For-You Packages →
+                                <a href="/#contact" class="btn-secondary" style="font-size: 0.9rem; padding: 0.6rem 1.25rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; text-decoration: none;">
+                                    Request 72-Hr DFY Fix Sprint ($750) →
                                 </a>
                             </div>
                         </div>
@@ -306,48 +306,48 @@
                 <!-- Sonexial Solutions CTA Band -->
                 <div class="dfy-band" style="margin-top: 4rem;">
                     <div class="dfy-content">
-                        <h3>Need Your AI Discovery Signals Built For You?</h3>
+                        <h3>Need Your AI Discovery Signals Engineered For You?</h3>
                         <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
-                            We build author sites with descriptive content, structured author and book data, consistent official links and straightforward navigation. Optional llms.txt summaries are available for tools that use them.
+                            We engineer websites and JSON-LD entity graphs for businesses, professional practices, and authors—either injected into your existing website in 72 hours or built from the ground up.
                         </p>
                         <ul class="deliverables" style="margin-top: 1.5rem;" aria-label="Available services">
-                            <li><span class="check" aria-hidden="true">→</span> <strong>GEO Diagnostic ($297)</strong>: More detailed technical findings, prioritized by practical impact and effort.</li>
-                            <li><span class="check" aria-hidden="true">→</span> <strong>Amazon Visibility Kit</strong>: BISAC categories, Amazon keywords, and a KDP-ready description in one deliverable.</li>
-                            <li><span class="check" aria-hidden="true">→</span> <strong>Author Starter ($497) and Author Platform ($3,000)</strong>: AI-ready author websites with schema, llms.txt, and reader funnels built in.</li>
+                            <li><span class="check" aria-hidden="true">→</span> <strong>30-Page GEO Diagnostic ($297)</strong>: Automated 30-page crawl, Impact vs. Effort priority matrix, and ready-to-paste JSON-LD, robots.txt &amp; llms.txt code.</li>
+                            <li><span class="check" aria-hidden="true">→</span> <strong>72-Hour Done-For-You GEO Fix Sprint ($750)</strong>: Keep your existing website design—our studio engineers and installs your complete entity schema and AI crawler stack in 72 hours.</li>
+                            <li><span class="check" aria-hidden="true">→</span> <strong>Launch Site ($497–$997) &amp; Full Entity Platform ($3,000)</strong>: Fast, mobile-first custom websites engineered with complete GEO architecture.</li>
                         </ul>
                     </div>
                     <div class="dfy-action">
                         <span class="dfy-price" style="font-size: 1.8rem;">Ready?</span>
-                        <a href="/kits" class="btn-primary">Browse All Kits</a>
+                        <a href="/kits" class="btn-primary">Compare Packages</a>
                     </div>
                 </div>
 
                 <!-- FAQ Section -->
                 <section class="faq" style="margin-top: 5rem;">
                     <div class="section-label">FREQUENTLY ASKED QUESTIONS</div>
-                    <h2 style="font-family: 'DM Serif Display', serif; font-size: 2.2rem; margin-top: 0.5rem; margin-bottom: 2rem;">
+                    <h2 style="font-family: 'DM Sans', sans-serif; font-size: 2.2rem; margin-top: 0.5rem; margin-bottom: 2rem;">
                         Understanding Generative Engine Optimization (GEO)
                     </h2>
 
                     <div class="faq-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
-                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What is llms.txt, and is it required?</h3>
+                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">How does accurate JSON-LD schema help my business or author site?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                An <code>/llms.txt</code> file is an optional proposed text overview for compatible tools. Major AI search products have not established it as a requirement for citation or discovery. Clear site pages and crawl access matter more.
+                                Accurate Schema.org structured data (such as <code>Organization</code>, <code>LocalBusiness</code>, <code>ProfessionalService</code>, <code>Service</code>, <code>FAQPage</code>, or <code>Person</code> and <code>Book</code>) helps AI search systems and crawlers interpret your identity, services, credentials, and FAQs without guesswork.
                             </p>
                         </div>
 
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
-                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">How does accurate JSON-LD schema help?</h3>
+                            <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What is llms.txt, and is it required?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                Accurate Schema.org <code>Person</code> and <code>Book</code> data helps search systems interpret the people and titles described on a page. It should reflect visible content; schema by itself does not guarantee an AI recommendation.
+                                An <code>/llms.txt</code> file is an optional proposed text overview for compatible retrieval tools. Major AI search products have not established it as a requirement for citation or discovery—clear on-page content, JSON-LD schema, and crawl access matter most.
                             </p>
                         </div>
 
                         <div class="faq-item" style="background: rgba(18, 20, 26, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem;">
                             <h3 style="font-size: 1.15rem; color: #fff; margin-top: 0; margin-bottom: 0.5rem;">What if my site is blocking AI crawlers in robots.txt?</h3>
                             <p style="color: #94a3b8; line-height: 1.6; margin: 0;">
-                                Check access for search crawlers such as <code>OAI-SearchBot</code>, <code>Claude-SearchBot</code>, <code>PerplexityBot</code>, and <code>Googlebot</code>. Training crawler policies (for example <code>GPTBot</code> or <code>ClaudeBot</code>) are separate choices and should not be scored as search visibility failures.
+                                Check access for search crawlers such as <code>OAI-SearchBot</code>, <code>Claude-SearchBot</code>, <code>PerplexityBot</code>, and <code>Googlebot</code>. Training crawler policies (for example <code>GPTBot</code> or <code>ClaudeBot</code>) are separate choices and are not scored as search visibility failures.
                             </p>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <img src="/Images/sonexial_logo.png" alt="Sonexial" class="footer-logo">
-                <p>AI-era author websites and infrastructure kits.</p>
+                <p>Generative Engine Optimization (GEO), AI-ready websites &amp; technical diagnostics.</p>
             </div>
             <div class="footer-links">
                 <a href="/about">About</a>
@@ -381,13 +381,8 @@
     <script>
         let currentScanReport = null;
 
-        // Determine API endpoint base URL:
-        // When deployed, calls /api/scan (proxied through Netlify to Railway)
-        // Can be overridden via window.SONEXIAL_API_URL
         const API_BASE = window.SONEXIAL_API_URL || '/api';
 
-        // The API returns JSON, but a misrouted proxy returns an HTML error page. Parsing that
-        // blindly surfaces "Unexpected end of JSON input" instead of the real status.
         async function readJson(res) {
             const body = await res.text();
             try {
@@ -400,7 +395,7 @@
         }
 
         async function handleScanSubmit(e) {
-            e.preventDefault();
+            if (e) e.preventDefault();
             const urlInput = document.getElementById('scan-url');
             const submitBtn = document.getElementById('scan-submit-btn');
             const loadingBox = document.getElementById('scan-loading');
@@ -411,7 +406,6 @@
             const url = urlInput.value.trim();
             if (!url) return;
 
-            // Reset UI
             errorBox.style.display = 'none';
             resultsBox.style.display = 'none';
             loadingBox.style.display = 'block';
@@ -447,8 +441,6 @@
         const GATE_HEADING_DEFAULT = document.getElementById('gate-heading').textContent.trim();
         const GATE_COPY_DEFAULT = document.getElementById('gate-copy').textContent.trim();
 
-        // Returns the gate to its pre-unlock state so a second scan cannot show the first report's
-        // detail. Hidden nodes are emptied too, not just hidden.
         function resetGate() {
             const breakdown = document.getElementById('breakdown-grid');
             breakdown.style.display = 'none';
@@ -474,7 +466,6 @@
             document.getElementById('score-grade').textContent = report.geo_grade;
             document.getElementById('scan-time').textContent = `Execution: ${report.execution_time}`;
 
-            // Critical Failures (the free tier: the API sends only the worst three)
             const critBox = document.getElementById('critical-failures-box');
             const critList = document.getElementById('critical-failures-list');
             critList.innerHTML = '';
@@ -508,19 +499,21 @@
         function renderFullReport(report) {
             document.getElementById('breakdown-grid').style.display = 'grid';
 
-            // 1. Schema
+            // 1. Schema (supports both Business/Organization/Service and Author/Person/Book)
             const schemaCheck = report.checks?.schema_markup || {};
             const schemaEl = document.getElementById('check-schema-status');
             const schemaDesc = document.getElementById('check-schema-desc');
-            if (schemaCheck.book && schemaCheck.person) {
-                schemaEl.innerHTML = '<span style="color: #4ade80;">✓ Full Schema (Person + Book)</span>';
-                schemaDesc.textContent = 'Structured JSON-LD entity data detected for author and book.';
-            } else if (schemaCheck.book || schemaCheck.person) {
+            const hasFullSchema = (schemaCheck.book && schemaCheck.person) || (schemaCheck.organization_or_local && (schemaCheck.service_or_product || schemaCheck.faq));
+            const hasPartialSchema = schemaCheck.book || schemaCheck.person || schemaCheck.organization_or_local || schemaCheck.service_or_product;
+            if (hasFullSchema) {
+                schemaEl.innerHTML = '<span style="color: #4ade80;">✓ Full Entity Schema</span>';
+                schemaDesc.textContent = 'Structured JSON-LD entity data detected for your organization, services, or catalog.';
+            } else if (hasPartialSchema) {
                 schemaEl.innerHTML = '<span style="color: #facc15;">⚠ Partial Schema</span>';
-                schemaDesc.textContent = 'Found partial entity markup. Missing complete Person + Book mapping.';
+                schemaDesc.textContent = 'Found partial entity markup. Missing complete Organization + Service/FAQ or Person + Book mapping.';
             } else {
-                schemaEl.innerHTML = '<span style="color: #f87171;">✕ Missing Schema</span>';
-                schemaDesc.textContent = 'No Person or Book JSON-LD found; clear visible page content can still describe these entities.';
+                schemaEl.innerHTML = '<span style="color: #f87171;">✕ Missing Entity Schema</span>';
+                schemaDesc.textContent = 'No Organization, LocalBusiness, Service, Person, or Book JSON-LD found on the scanned page.';
             }
 
             // 2. llms.txt
@@ -567,9 +560,9 @@
                 if (h1Count === 0) {
                     headDesc.textContent = 'No H1 heading detected; use a descriptive main page heading.';
                 } else if (h1Count > 1) {
-                    headDesc.textContent = 'Multiple H1 headings detected; consider a clear page heading hierarchy.';
+                    headDesc.textContent = 'Multiple H1 headings detected; consider a single primary H1 heading.';
                 } else {
-                    headDesc.textContent = 'No H2 headings detected; add useful section headings where appropriate.';
+                    headDesc.textContent = 'No H2 headings detected; add descriptive section headings where appropriate.';
                 }
             }
 
@@ -577,12 +570,12 @@
             const entCheck = report.checks?.entity_links || {};
             const entEl = document.getElementById('check-entity-status');
             const entDesc = document.getElementById('check-entity-desc');
-            if (entCheck.amazon || entCheck.goodreads || entCheck.bookbub) {
+            if (entCheck.amazon || entCheck.goodreads || entCheck.bookbub || entCheck.verified_profile_count > 0) {
                 entEl.innerHTML = '<span style="color: #4ade80;">✓ Authority Entity Links</span>';
-                entDesc.textContent = 'Outbound links to Amazon/Goodreads anchor your author knowledge graph.';
+                entDesc.textContent = 'Outbound links to verified profiles or directories anchor your knowledge graph.';
             } else {
                 entEl.innerHTML = '<span style="color: #94a3b8;">– No Entity Links</span>';
-                entDesc.textContent = 'Missing direct links to Amazon, Goodreads, or BookBub.';
+                entDesc.textContent = 'Missing direct links to official external entity profiles (LinkedIn, Google Business, BBB, or retailers).';
             }
 
             // 6. Open Graph
@@ -629,7 +622,6 @@
         const AUDIENCE_LABELS = { 'all-ages': 'All ages', 'young-adult': 'Young adult', 'new-adult': 'New adult', 'adult': 'Adult' };
         const SPICE_LABELS = ['None / fade-to-black', 'Romance, no on-page sex', 'Brief, non-explicit', 'On-page, moderate', 'Frequent, explicit', 'Very explicit'];
 
-        // Built with textContent only: every value here came from a model reading untrusted page text.
         function renderSemantic(semantic) {
             const box = document.getElementById('semantic-box');
             const fields = document.getElementById('semantic-fields');
@@ -639,23 +631,23 @@
                 return;
             }
             const rows = [
-                ['Genres', (semantic.primary_genres || []).join(', ')],
-                ['Tropes', (semantic.top_tropes || []).join(', ')],
-                ['Themes', (semantic.themes || []).join(', ')],
+                ['Category / Genre', (semantic.primary_genres || []).join(', ')],
+                ['Focus Areas', (semantic.top_tropes || []).join(', ')],
+                ['Core Themes', (semantic.themes || []).join(', ')],
                 ['Audience', (semantic.target_audience || []).map(a => AUDIENCE_LABELS[a] || a).join(', ')],
-                ['Spice', Number.isInteger(semantic.spice_level) ? `${semantic.spice_level}/5 · ${SPICE_LABELS[semantic.spice_level]}` : ''],
-                ['Bio', semantic.short_bio || '']
+                ['Summary', semantic.short_bio || '']
             ];
             rows.forEach(([label, value]) => {
+                if (!value) return;
                 const dt = document.createElement('dt');
                 dt.textContent = label;
-                dt.style.cssText = "font-family: 'DM Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; padding-top: 0.15rem;";
+                dt.style.cssText = "font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; padding-top: 0.15rem;";
                 const dd = document.createElement('dd');
-                dd.textContent = value || 'Not detected';
-                dd.style.cssText = value ? 'margin: 0;' : 'margin: 0; color: #64748b; font-style: italic;';
+                dd.textContent = value;
+                dd.style.cssText = 'margin: 0;';
                 fields.append(dt, dd);
             });
-            box.style.display = 'block';
+            box.style.display = fields.childElementCount > 0 ? 'block' : 'none';
         }
 
         async function handleUnlockSubmit(e) {
@@ -729,6 +721,19 @@
                 '"': '&quot;'
             }[tag] || tag));
         }
+
+        // Auto-populate and run scan if ?url= query parameter was passed from the homepage hero
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const prefillUrl = params.get('url');
+            if (prefillUrl) {
+                const urlInput = document.getElementById('scan-url');
+                if (urlInput) {
+                    urlInput.value = prefillUrl;
+                    handleScanSubmit();
+                }
+            }
+        });
     </script>
 </body>
 
