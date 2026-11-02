@@ -1,7 +1,7 @@
 # Sonexial Constellations — Working Memory & Epistemological Lab Notes
 
-> **Purpose:** Persistent working memory across AI sessions for Brian Plescher's strategic and philosophical development of **Sonexial** and **Sonexial Constellations**.
-> **Last Updated:** 2026-10-29
+> **Purpose:** Persistent working memory across AI sessions for Brian Plescher's strategic, technical, and philosophical development of **Sonexial** and **Sonexial Constellations**.
+> **Last Updated:** 2026-11-02
 
 ---
 
@@ -22,8 +22,8 @@
   * ***Slickens*** (Upcoming): 21-chapter literary historical novel (1850s–1880s Sierra Nevada hydraulic mining waste; Young Hegelian protagonist Jakob; nonlinear memory structure grounded in Kristeva, Deleuze/Guattari, Haraway).
   * **Recent Essays:** *After SNAP: Mutual Aid in the Age of Abandonment* (Kropotkin, Mauss, the gift as refusal) and *Post-Anthropocene: Dancing in the Burning Library* (Cixous, burning the myth of "pure media").
 * **Strategic Positioning of Sonexial ([sonexial.com](https://sonexial.com)):**
-  * **Phase 1 (Current / Low-Hanging Fruit):** Generative Engine Optimization (GEO) infrastructure for independent authors—AI Visibility Scanner, Diagnostic Engine, Amazon Visibility Kits, JSON-LD entity graphs, and `llms.txt` so AI retrieval systems (ChatGPT, Claude, Perplexity, Google AI Overviews) can parse and cite authors accurately.
-  * **Phase 2 (3–5 Year Horizon / Frontier):** **Sonexial Constellations**—moving from *discoverability* (finding existing books in a market) to *encounter* (creating dialectical collisions across disciplines, authors, and AI systems).
+  * **Phase 1 (Current / Revenue & Infrastructure Engine):** Universal Generative Engine Optimization (GEO) infrastructure for **businesses, professional practices, and authors**—Free AI Visibility & GEO Readiness Scanner (`/scan/`), $297 30-Page GEO Diagnostic, $750 72-Hour Done-For-You GEO Fix Sprint ($497 for Authors), custom platform builds ($497–$3,000), JSON-LD entity graphs (`Organization`, `LocalBusiness`, `ProfessionalService`, `Service`, `FAQPage`, `Person`, `Book`), and `llms.txt`.
+  * **Phase 2 (3–5 Year Horizon / Frontier R&D Imprint):** **Sonexial Constellations**—moving from *discoverability* (finding existing entities/books in a market) to *encounter* (creating dialectical collisions across disciplines, authors, and AI systems).
 
 ---
 
@@ -72,15 +72,33 @@ As informational books lose utility as static containers, serious publishing mut
    * Inquiry begins not as a solitary manuscript, but as a structured multi-author, multi-agent adversarial investigation (extending the multi-agent studio model of *Bunri, Kenji, Fumiko, Rika* across live human collaborators).
    * The **Book** survives not as an encyclopedia, but as an **agential cut**—a composed, finite edition that sequences and preserves a specific trajectory of encounters (including objections and failed bridges) so humans can read closely, annotate, and critique.
 2. **Epistemic Cartography (From GEO to Collision Engine):**
-   * **Today:** Sonexial structures entity graphs (`JSON-LD`) so AI engines can *find* an author's work.
+   * **Today:** Sonexial structures entity graphs (`JSON-LD`) so AI engines can *find* a business, practice, or author's work.
    * **3–5 Years:** Sonexial maps semantic latent spaces to find **structural lacunae and high-value collisions** between disparate thinkers/disciplines, brokering *Constellation Commissions* at the fault lines where standard AI synthesis flattens complexity.
 3. **Provenance & Friction as the New Scarcity:**
    * In an ocean of zero-cost synthetic fluency, value belongs to **verifiable human stakes** (*Woundwise*), **directed creative leadership** (*The Directed Author*), and **transparent dialectical rigor** (*Sonexial Constellations*).
 
 ---
 
-## 5. Next Actionable Explorations for Future Sessions
+## 5. Development Log: Oct 29 – Nov 2, 2026 (Universal SMB + Practice + Author GEO Expansion)
 
-- [ ] **Micro-Constellation Prototype on `constellations/index.html`:** Build an interactive or visual trace on the Constellations page showing an actual 4-step encounter (*Concept A $\times$ Concept B $\rightarrow$ Proposed AI Bridge $\rightarrow$ Human Philosophical Objection $\rightarrow$ Mutated Question + Preserved Failed Branch*).
-- [ ] **Inaugural Constellation Architecture:** Define the exact protocol, contributor workflow, and AI-agent roles for Investigation #1 (*"When knowledge becomes accessible, what determines which connections become thinkable?"*).
-- [ ] **Phase 1 $\rightarrow$ Phase 2 Bridge:** Connect Sonexial's revenue-generating GEO tools (low-hanging fruit) with the long-term *Constellations* editorial imprint so each reinforces the other's authority.
+Between commits `d01f2ce` and `f619f27` (plus canonical `/scan/` unification), Sonexial executed a major commercial and technical expansion to fund the studio via high-ROI B2B/SMB GEO engagements alongside author services:
+
+1. **Brand & Sitewide Positioning (`index.html`, `kits.html`, `about.html`, `Images/sonexial_logo.png`):**
+   * Updated logo tagline to **`AI INFRASTRUCTURE. DISCOVERED.`** and added full PNG chunk CRC checksum validation in `scripts/check-site.js`.
+   * Standardized site typography to `DM Sans` + `IBM Plex Mono` and introduced the centered Hero Scanner Bar (`"Enter your website"`).
+   * Reframed `about.html` around Brian's complete operational and academic authority (Amazon GRR1 Area Manager II / HRBP II, Target, Home Depot, AI evaluation consulting, MSU M.S., Yale SOM, Austin Seminary M.Div, Calvin B.A.) serving West Michigan & global SMBs, professional practices, and authors.
+   * Structured core offerings on `kits.html`: **$297 30-Page GEO Diagnostic** and **$750 72-Hour Done-For-You GEO Fix Sprint** ($497 for Authors), plus full builds.
+2. **Universal Multi-Mode Scanner & SMB Artifacts (`agent/src/smb-scanner.js`, `agent/src/scanner.js`, `agent/src/diagnostic/smb-artifacts.js`):**
+   * Built `smb-scanner.js` and updated `scanner.js` `analyzeHtml()` to score both Business/Practice entity schemas (22+ `Organization` / `LocalBusiness` / professional service types + `Service`/`Offer`/`FAQPage`) and Author schemas (`Person` + `Book`), plus verified profile links (`linkedin.com`, `google.com/maps`, `yelp.com`, `bbb.org`, `trustpilot.com`, `clutch.co`, retail links).
+   * Unified the scanner route on `https://sonexial.com/scan/` across `_redirects`, `tools/author-geo-audit/index.html` canonical/JSON-LD, `sitemap.xml`, `llms.txt`, `constellations/index.html`, and `scripts/check-site.js`, with `?url=` auto-run support.
+3. **Zero-Token Batch Outreach CLI & Plain-English Pitch Engine (`agent/scripts/batch-outreach.js`, `agent/src/pitch.js`):**
+   * Added `agent/scripts/batch-outreach.js` to batch-scan CSVs of prospect URLs, filter by qualifying score (`--max-score 70`), and output `outreach-ready.csv` with deterministic zero-token email drafts (or optional `--llm` mode).
+   * Refined SMB outreach copy in `agent/src/pitch.js` with plain-English owner labels (*Primary Identity & Heading Signals*, *Missing Service Schema*, *No AI-Ready FAQs*), two clear options ($297 DIY vs. $750 72-Hr DFY), a frictionless *"reply 'yes' for a 1-page scope"* CTA, and clean signature (`Brian L. Plescher, Founder & Principal Consultant`).
+
+---
+
+## 6. Next Actionable Explorations for Future Sessions
+
+- [ ] **SMB Batch Outreach Execution & 1-Page Scope Asset:** Run `batch-outreach.js` against target West Michigan professional practices (estate planning attorneys, wealth advisors, medical clinics/spas) and finalize the automated 1-page 72-Hour GEO Fix scope PDF/page for "yes" replies.
+- [ ] **Micro-Constellation Prototype on `constellations/index.html`:** Embed a visual/interactive trace on the Constellations page showing an actual 4-step encounter (*Concept A $\times$ Concept B $\rightarrow$ Proposed AI Bridge $\rightarrow$ Human Philosophical Objection $\rightarrow$ Mutated Question + Preserved Failed Branch*).
+- [ ] **Inaugural Constellation Architecture:** Define the contributor protocol and AI-agent roles for Investigation #1 (*"When knowledge becomes accessible, what determines which connections become thinkable?"*).

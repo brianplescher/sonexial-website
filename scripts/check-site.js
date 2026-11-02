@@ -73,6 +73,13 @@ const robots = read('robots.txt');
 assert.match(robots, /Sitemap:\s*https:\/\/sonexial\.com\/sitemap\.xml/i);
 assert.match(robots, /User-agent:\s*\*/i);
 
+const redirects = read('_redirects');
+const rewriteTargets = new Map();
+for (const line of redirects.split(/\r?\n/)) {
+  const m = line.trim().match(/^(\/\S+)\s+(\/\S+)\s+200!?$/);
+  if (m) rewriteTargets.set(m[1], m[2].replace(/^\//, ''));
+}
+
 const sitemap = read('sitemap.xml');
 const locs = Array.from(sitemap.matchAll(/<loc>([^<]+)<\/loc>/g), m => m[1]);
 assert.ok(locs.length >= 1, 'No sitemap URLs');
@@ -84,8 +91,10 @@ for (const loc of locs) {
   const candidates = pathname === '/' ? ['index.html'] : [
     pathname.replace(/^\//, '') + '.html',
     pathname.replace(/^\//, '').replace(/\/$/, '') + '/index.html',
-    pathname.replace(/^\//, '')
-  ];
+    pathname.replace(/^\//, ''),
+    rewriteTargets.get(pathname),
+    rewriteTargets.get(pathname.replace(/\/$/, ''))
+  ].filter(Boolean);
   assert.ok(candidates.some(exists), `No built file for sitemap URL ${loc}`);
 }
 const home = read('index.html');
@@ -94,7 +103,6 @@ const js = home.match(/src="\/(static\/script\.[a-f0-9]+\.js)"/);
 assert.ok(css && exists(css[1]), 'Hashed CSS missing or not referenced');
 assert.ok(js && exists(js[1]), 'Hashed JavaScript missing or not referenced');
 
-const redirects = read('_redirects');
 for (const oldRoute of ['/metadata-kit', '/bisac-kit', '/ad-copy-suite']) {
   assert.ok(redirects.split(/\r?\n/).some(line => line.startsWith(oldRoute + ' ') && / 301!?\s*$/.test(line)), `Retired route missing redirect: ${oldRoute}`);
 }

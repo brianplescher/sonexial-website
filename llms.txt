@@ -9,7 +9,7 @@ This llms.txt overview is optional and designed for humans and automated retriev
 ## Core Pages
 
 - [Home](https://sonexial.com/) - Overview of Sonexial GEO diagnostics, done-for-you implementation sprints, website builds, process, FAQ, and contact information.
-- [Free AI Visibility Scan](https://sonexial.com/tools/author-geo-audit/) - Free heuristic scan of observable technical-readiness signals: Organization/LocalBusiness/Person/Service/Book schema, headings, canonicals, content depth, and published AI crawler rules.
+- [Free AI Visibility Scan](https://sonexial.com/scan/) - Free heuristic scan of observable technical-readiness signals: Organization/LocalBusiness/Person/Service/Book schema, headings, canonicals, content depth, and published AI crawler rules.
 - [Pricing & Packages](https://sonexial.com/kits) - Self-serve diagnostics, 72-hour GEO implementation sprints, and full custom website builds for SMBs and authors.
 - [Examples](https://sonexial.com/examples) - Example platform architectures and semantic structures.
 - [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - Dedicated indie-author kit covering BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description ($99).
