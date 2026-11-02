@@ -4,7 +4,7 @@ const { sanitizeLog, parseJson } = require('./ai-utils');
 const SIGNATURE = `Best,
 
 Brian L. Plescher
-Founder & Principal Consultant, Sonexial
+Founder & Principal Consultant
 616.502.5320
 www.sonexial.com`;
 
@@ -37,7 +37,9 @@ I recently ran our technical GEO (Generative Engine Optimization) scanner on ${h
 Your site currently scores a ${score}/100 (${grade}). Three specific technical gaps stood out that could be costing you AI-driven inquiries:
 
 • Primary Identity & Heading Signals: ${topFindings[0]}
+
 • Missing Service Schema: ${topFindings[1]}
+
 • No AI-Ready FAQs: ${topFindings[2]}
 
 You have two zero-hassle ways to resolve this without changing your website's visual design:
