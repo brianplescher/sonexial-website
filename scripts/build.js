@@ -13,6 +13,37 @@ const rootFiles = fs.readdirSync(root).filter(file => {
 });
 const scriptFiles = ['calculator.js'];
 
+const HEADER_LOGO_LOCKUP_CSS = `
+/* Option 1: 2026 Noise-to-Signal Waveform Mark paired with full-res SONEXIAL wordmark */
+.home-logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  mix-blend-mode: screen;
+}
+
+.home-logo-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.home-logo-link::before {
+  content: "";
+  display: block;
+  width: 58px;
+  height: 56px;
+  background-image: url("/Images/logo_mark_2026.png");
+  background-repeat: no-repeat;
+  background-size: 136px 136px;
+  background-position: -12px -38px;
+  mix-blend-mode: screen;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+`;
+
 function removeDir(target) {
     fs.rmSync(target, { recursive: true, force: true });
 }
@@ -22,8 +53,8 @@ function copyPath(from, to) {
     fs.cpSync(from, to, { recursive: true });
 }
 
-function contentHash(filePath) {
-    return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex').slice(0, 10);
+function contentHashBuffer(buf) {
+    return crypto.createHash('sha256').update(buf).digest('hex').slice(0, 10);
 }
 
 // Hashed filenames let Netlify serve CSS/JS with a one-year immutable cache without
@@ -69,13 +100,16 @@ for (const file of scriptFiles) {
 
 // Hashed bundles live under /static/ so Netlify can cache that one prefix immutably.
 fs.mkdirSync(path.join(dist, 'static'), { recursive: true });
+const rawCss = fs.readFileSync(path.join(root, 'styles.css'), 'utf8') + '\n' + HEADER_LOGO_LOCKUP_CSS;
+const rawJs = fs.readFileSync(path.join(root, 'script.js'));
+
 const assets = {
-    css: `static/styles.${contentHash(path.join(root, 'styles.css'))}.css`,
-    js: `static/script.${contentHash(path.join(root, 'script.js'))}.js`
+    css: `static/styles.${contentHashBuffer(Buffer.from(rawCss, 'utf8'))}.css`,
+    js: `static/script.${contentHashBuffer(rawJs)}.js`
 };
 
-copyPath(path.join(root, 'styles.css'), path.join(dist, assets.css));
-copyPath(path.join(root, 'script.js'), path.join(dist, assets.js));
+fs.writeFileSync(path.join(dist, assets.css), rawCss, 'utf8');
+fs.writeFileSync(path.join(dist, assets.js), rawJs);
 
 const htmlFiles = getAllHtmlFiles(dist);
 for (const htmlPath of htmlFiles) {
