@@ -63,6 +63,10 @@ function rewriteHtml(filePath, assets) {
     let html = fs.readFileSync(filePath, 'utf8');
     html = html.replace(/href="(?:\.\.\/|\/)?styles\.css"/g, `href="/${assets.css}"`);
     html = html.replace(/src="(?:\.\.\/|\/)?script\.js"/g, `src="/${assets.js}"`);
+    html = html.replace(
+        '"sameAs": ["https://brianplescher.com", "https://www.linkedin.com/in/brianplescher"]',
+        '"sameAs": ["https://brianplescher.com", "https://www.linkedin.com/in/brianplescher", "https://www.facebook.com/profile.php?id=100064212331497"]'
+    );
     fs.writeFileSync(filePath, html);
 }
 
