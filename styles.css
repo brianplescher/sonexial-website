@@ -1356,7 +1356,6 @@ PROCESS
 .process {
   padding: 6rem 0;
   border-top: 1px solid var(--border);
-  background: var(--bg-1);
 }
 
 .steps {
@@ -1930,13 +1929,29 @@ img.logo-mark {
 
 .home-logo {
   display: block;
-  height: 56px;
+  height: 68px;
   width: auto;
+  margin: -6px 0;
+  mix-blend-mode: screen;
 }
 
 .home-logo-link {
   display: flex;
   align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.home-logo-link::before {
+  content: "";
+  display: block;
+  width: 58px;
+  height: 56px;
+  background-image: url("/Images/logo_mark_2026.png");
+  background-size: 138px 138px;
+  background-position: -13px calc(50% + 2px);
+  background-repeat: no-repeat;
+  mix-blend-mode: screen;
   flex-shrink: 0;
 }
 
