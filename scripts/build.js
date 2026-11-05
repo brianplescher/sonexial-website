@@ -14,6 +14,16 @@ const rootFiles = fs.readdirSync(root).filter(file => {
 const scriptFiles = ['calculator.js'];
 
 const HEADER_LOGO_LOCKUP_CSS = `
+/* Fine micro-dot grid in #site-header so the prominent tagline is razor sharp */
+body {
+  background-image: radial-gradient(circle, rgba(0, 240, 255, 0.025) 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+}
+
+#site-header {
+  background: rgba(5, 7, 10, 0.97) !important;
+}
+
 /* Option 1: 2026 Noise-to-Signal Waveform Mark paired with full-res SONEXIAL wordmark */
 .home-logo {
   display: block;
@@ -61,7 +71,7 @@ const HEADER_LOGO_LOCKUP_CSS = `
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, rgba(7, 10, 18, 0.25) 0%, rgba(0, 0, 0, 0.82) 100%);
+  background: radial-gradient(ellipse at center, rgba(7, 10, 18, 0.45) 0%, rgba(0, 0, 0, 0.88) 100%);
 }
 
 #sonexial-stage canvas {
@@ -76,11 +86,16 @@ main, section, footer {
 }
 
 .hero .cafe-bg {
-  opacity: 0.22;
+  opacity: 0.18;
+}
+
+.hero .cafe-content.hero-centered {
+  background: radial-gradient(ellipse at center, rgba(5, 7, 11, 0.72) 0%, rgba(5, 7, 11, 0) 75%);
+  border-radius: 16px;
 }
 
 .problem, .outcomes, .geo-proof, .products, .process, .testimonials, .methodology, .faq, .contact {
-  background-color: rgba(8, 10, 14, 0.76);
+  background-color: rgba(8, 10, 14, 0.78);
 }
 `;
 
