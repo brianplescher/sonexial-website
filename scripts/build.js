@@ -24,11 +24,12 @@ body {
   background: rgba(5, 7, 10, 0.97) !important;
 }
 
-/* Option 1: 2026 Noise-to-Signal Waveform Mark paired with full-res SONEXIAL wordmark */
+/* Option 1: Smaller, subtler waveform mark on left + larger, clearer SONEXIAL tagline */
 .home-logo {
   display: block;
-  height: 56px;
+  height: 70px;
   width: auto;
+  margin: -7px 0;
   mix-blend-mode: screen;
 }
 
@@ -42,14 +43,15 @@ body {
 .home-logo-link::before {
   content: "";
   display: block;
-  width: 58px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   background-image: url("/Images/logo_mark_2026.png");
   background-repeat: no-repeat;
-  background-size: 136px 136px;
-  background-position: -12px -38px;
+  background-size: 104px 104px;
+  background-position: -9px -29px;
   mix-blend-mode: screen;
   margin-right: 4px;
+  opacity: 0.9;
   flex-shrink: 0;
 }
 
@@ -90,7 +92,7 @@ main, section, footer {
 }
 
 .hero .cafe-content.hero-centered {
-  background: radial-gradient(ellipse at center, rgba(5, 7, 11, 0.72) 0%, rgba(5, 7, 11, 0) 75%);
+  background: radial-gradient(ellipse at center, rgba(5, 7, 11, 0.76) 0%, rgba(5, 7, 11, 0) 75%);
   border-radius: 16px;
 }
 
