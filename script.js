@@ -272,9 +272,9 @@ function initSignalOrbitStage() {
         for (let i = 0; i < COUNT; i++) {
             const gx = (i % side) / side - 0.5;
             const gz = Math.floor(i / side) / side - 0.5;
-            const x = gx * 26;
-            const z = gz * 26;
-            const y = Math.sin(x * 0.42) * 1.45 + Math.cos(z * 0.36) * 1.2 - 3.2;
+            const x = gx * 28;
+            const z = gz * 28;
+            const y = Math.sin(x * 0.42) * 1.25 + Math.cos(z * 0.36) * 1.05 - 5.2;
             pts.push([x, y, z]);
         }
         return pts;
@@ -464,6 +464,11 @@ function initSignalOrbitStage() {
             ctx.stroke();
         }
 
+        const isHeroView = activeShapeIdx === 0;
+        const sizeMult = isHeroView ? 0.042 : 0.082;
+        const maxDotR = isHeroView ? 1.65 : 3.8;
+        const minDotR = isHeroView ? 0.65 : 1.05;
+
         for (let i = 0; i < COUNT; i++) {
             const c = cur[i];
             const tg = targetShape[i];
@@ -482,10 +487,20 @@ function initSignalOrbitStage() {
             const [sx2, sy2, rz, scale] = pr;
             if (sx2 < -20 || sx2 > W + 20 || sy2 < -20 || sy2 > H + 20) continue;
 
-            const radius = Math.max(1.1, Math.min(4.2, scale * 0.085));
-            const depthAlpha = Math.max(0.12, Math.min(0.88, (34 - rz) / 22));
-            const col = colors[i];
+            // Keep dots extra fine and subtle in the top header band and hero view
+            const inTopHeader = sy2 < 105;
+            const radius = inTopHeader
+                ? Math.max(0.5, Math.min(1.0, scale * 0.028))
+                : Math.max(minDotR, Math.min(maxDotR, scale * sizeMult));
 
+            let depthAlpha = Math.max(0.10, Math.min(0.85, (34 - rz) / 22));
+            if (inTopHeader) {
+                depthAlpha *= 0.28;
+            } else if (isHeroView) {
+                depthAlpha *= 0.52;
+            }
+
+            const col = colors[i];
             ctx.fillStyle = `rgba(${col[0]}, ${col[1]}, ${col[2]}, ${depthAlpha.toFixed(2)})`;
             ctx.beginPath();
             ctx.arc(sx2, sy2, radius, 0, Math.PI * 2);
