@@ -42,6 +42,46 @@ const HEADER_LOGO_LOCKUP_CSS = `
   margin-right: 4px;
   flex-shrink: 0;
 }
+
+/* 3D Scroll-Morphing Signal & Constellation Stage */
+#sonexial-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  z-index: 1200;
+  pointer-events: none;
+}
+
+#sonexial-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(7, 10, 18, 0.25) 0%, rgba(0, 0, 0, 0.82) 100%);
+}
+
+#sonexial-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+main, section, footer {
+  position: relative;
+  z-index: 1;
+}
+
+.hero .cafe-bg {
+  opacity: 0.22;
+}
+
+.problem, .outcomes, .geo-proof, .products, .process, .testimonials, .methodology, .faq, .contact {
+  background-color: rgba(8, 10, 14, 0.76);
+}
 `;
 
 function removeDir(target) {
