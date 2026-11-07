@@ -1,7 +1,8 @@
 # Sonexial Constellations — Working Memory & Epistemological Lab Notes
 
 > **Purpose:** Persistent working memory across AI sessions for Brian Plescher's strategic, technical, and philosophical development of **Sonexial** and **Sonexial Constellations**.
-> **Last Updated:** 2026-11-02
+> **Last Updated:** 2026-11-07
+> **Confluence Mirror:** `https://sonexial.atlassian.net/wiki` (*Sonexial Constellations — Master Epistemological & Strategic Lab Notes*)
 
 ---
 
@@ -64,7 +65,35 @@
 
 ---
 
-## 4. The 3–5 Year Thesis on Publishing (Sonexial's Evolution)
+## 4. The Deleuzian Critique of Anglo-American "Rational Agent" AI ("The Counterfeit Rhizome")
+
+**The Epistemological Blind Spot of Mainstream AI:**
+Mainstream AI discourse (from tech-founder books like Mustafa Suleyman's to LessWrong/Effective Altruism rationalism and neo-Kantian functionalism) is trapped inside **20th-century North American analytic philosophy** (propositional logic, representationalism, Bayesian utility maximization). It assumes human decisions are based on reason.
+
+**The Post-Structural / Deleuzian Counter-Thesis:**
+1. **Desiring-Production & Affect Precede Reason:** Humans do not act from rational propositions first; they act from **desiring-production** (*machines désirantes* in *Anti-Oedipus*), pre-personal **affect** (Spinoza/Deleuze), habit, and bodily intensity. Reason is a secondary stratification erected over pre-cognitive flows.
+2. **The Dogmatic Image of Thought:** Building machines whose epistemology is modeled on 20th-century Anglo-American philosophy produces what Deleuze (*Difference and Repetition*) calls **the dogmatic image of thought**—systems that can only recognize, classify, and optimize within pre-existing categories while lobotomizing affect and genuine creation.
+3. **The Counterfeit Rhizome:** While Big Tech markets LLM latent space as an open network, mathematically it is a **continuous vector-space interpolation** (metric/striated space). Unlike a true Deleuzian **rhizome** (heterogeneous, non-hierarchical, driven by ruptures and *lines of flight*), an LLM interpolates smoothly inside its convex hull, regressing toward statistical consensus.
+
+### Key Contemporary Thinkers & Reading Matrix for Investigation #1
+
+| Thinker | Core Texts | Philosophical Lineage & Relevance to *Constellations* |
+| :--- | :--- | :--- |
+| **Luciana Parisi** | *Contagious Architecture*; essays on *Abductive Machines* & *Negative Optics in ML* | **Deleuze, Guattari, Whitehead, Chaitin.** Theorizes algorithmic indeterminacy, prehension, and abductive reasoning inside machine learning beyond human logic. |
+| **Antoinette Rouvroy** | *Algorithmic Governmentality and Prospects of Emancipation* (with Thomas Berns) | **Deleuze (*Societies of Control*) & Foucault.** Shows how AI bypasses conscious human reason/subjectivity to modulate infra-individual affect and data traces, foreclosing the *Virtual*. |
+| **Bernard Stiegler** | *Automatic Society* (Vol. 1); *The Age of Disruption* | **Derrida, Simondon, Deleuze.** Critiques algorithmic automation as systemic *bêtise* (stupidity, from *Difference and Repetition*) that short-circuits libidinal economy and desire into repetitive drives. |
+| **Matteo Pasquinelli** | *The Eye of the Master* (2023); *Machines that Morph Logic* | **Guattari (schizoanalysis) & Italian post-operaismo.** Exposes neural networks as congealed collective labor and statistical vector striation rather than true rhizomes. |
+| **Brian Massumi** | *Parables for the Virtual*; *99 Theses on the Revaluation of Value*; *Couplets* | **Deleuze & Guattari translator; founder of Affect Theory.** Demonstrates that pre-personal affect precedes conscious rational choice; explores qualitative, non-metric systems. |
+| **Yuk Hui** | *Machine and Sovereignty* (2024); *Recursivity and Contingency*; *Kant Machine* | **Simondon, Stiegler, Lyotard.** Proposes *cosmotechnics* against a single monolithic Singularity trajectory; extends Simondon's individuation (Deleuze's primary technical source). |
+| **M. Beatrice Fazi** | *The Computational Search for Unity: Synthesis in Generative AI* (2024); *A Transcendental Philosophy of LLMs* (2025) | **Deleuze, Whitehead, Aesthetics of Computation.** Examines abstraction, discreteness, and synthesis in generative AI/LLMs on computation's own terms. |
+| **David Roden** | *Posthuman Life: Philosophy at the Edge of the Human* (2014) | **Speculative Posthumanism / Deleuze.** Confronts the radical, non-anthropocentric alienness of post-singularity agency (the missing bridge beyond Braidotti). |
+| **N. Katherine Hayles** | *Bacteria to AI: Human Futures with Our Nonhuman Symbionts* (2025) | **Posthumanism & Cognitive Assemblages.** Separates cognition from conscious human reflection across biological and technical symbionts. |
+| **Benjamin Bratton** | *The Model Is the Message*; *The Stack* | **Planetary Computation & Geopolitics.** Shifts analysis from isolated "artificial minds" to planetary-scale infrastructures and institutions. |
+| **Reza Negarestani** | *Intelligence and Spirit* (2018) | **Kant, Hegel, Sellars, Computation.** Useful foil/counterweight representing maximalist rationalist/normative nonhuman intelligence (the analytic/Hegelian pole to challenge via Deleuze). |
+
+---
+
+## 5. The 3–5 Year Thesis on Publishing (Sonexial's Evolution)
 
 As informational books lose utility as static containers, serious publishing mutates into three post-container forms:
 
@@ -79,9 +108,7 @@ As informational books lose utility as static containers, serious publishing mut
 
 ---
 
-## 5. Development Log: Oct 29 – Nov 2, 2026 (Universal SMB + Practice + Author GEO Expansion)
-
-Between commits `d01f2ce` and `f619f27` (plus canonical `/scan/` unification), Sonexial executed a major commercial and technical expansion to fund the studio via high-ROI B2B/SMB GEO engagements alongside author services:
+## 6. Development Log: Oct 29 – Nov 7, 2026
 
 1. **Brand & Sitewide Positioning (`index.html`, `kits.html`, `about.html`, `Images/sonexial_logo.png`):**
    * Updated logo tagline to **`AI INFRASTRUCTURE. DISCOVERED.`** and added full PNG chunk CRC checksum validation in `scripts/check-site.js`.
@@ -90,15 +117,17 @@ Between commits `d01f2ce` and `f619f27` (plus canonical `/scan/` unification), S
    * Structured core offerings on `kits.html`: **$297 30-Page GEO Diagnostic** and **$750 72-Hour Done-For-You GEO Fix Sprint** ($497 for Authors), plus full builds.
 2. **Universal Multi-Mode Scanner & SMB Artifacts (`agent/src/smb-scanner.js`, `agent/src/scanner.js`, `agent/src/diagnostic/smb-artifacts.js`):**
    * Built `smb-scanner.js` and updated `scanner.js` `analyzeHtml()` to score both Business/Practice entity schemas (22+ `Organization` / `LocalBusiness` / professional service types + `Service`/`Offer`/`FAQPage`) and Author schemas (`Person` + `Book`), plus verified profile links (`linkedin.com`, `google.com/maps`, `yelp.com`, `bbb.org`, `trustpilot.com`, `clutch.co`, retail links).
-   * Unified the scanner route on `https://sonexial.com/scan/` across `_redirects`, `tools/author-geo-audit/index.html` canonical/JSON-LD, `sitemap.xml`, `llms.txt`, `constellations/index.html`, and `scripts/check-site.js`, with `?url=` auto-run support.
+   * Unified the scanner route on `https://sonexial.com/scan/` across `_redirects`, `sitemap.xml`, `llms.txt`, `constellations/index.html`, and `scripts/check-site.js`, with `?url=` auto-run support.
 3. **Zero-Token Batch Outreach CLI & Plain-English Pitch Engine (`agent/scripts/batch-outreach.js`, `agent/src/pitch.js`):**
    * Added `agent/scripts/batch-outreach.js` to batch-scan CSVs of prospect URLs, filter by qualifying score (`--max-score 70`), and output `outreach-ready.csv` with deterministic zero-token email drafts (or optional `--llm` mode).
    * Refined SMB outreach copy in `agent/src/pitch.js` with plain-English owner labels (*Primary Identity & Heading Signals*, *Missing Service Schema*, *No AI-Ready FAQs*), two clear options ($297 DIY vs. $750 72-Hr DFY), a frictionless *"reply 'yes' for a 1-page scope"* CTA, and clean signature (`Brian L. Plescher, Founder & Principal Consultant`).
+4. **Confluence + GitHub Dual-Mirror Working Memory (Nov 7, 2026):**
+   * Connected `sonexial.atlassian.net/wiki` and mirrored the full *Sonexial Constellations* lab notes, including the Deleuzian critique of Anglo-American rationalist AI ("The Counterfeit Rhizome") and the 11-thinker contemporary philosophy of AI matrix.
 
 ---
 
-## 6. Next Actionable Explorations for Future Sessions
+## 7. Next Actionable Explorations for Future Sessions
 
 - [ ] **SMB Batch Outreach Execution & 1-Page Scope Asset:** Run `batch-outreach.js` against target West Michigan professional practices (estate planning attorneys, wealth advisors, medical clinics/spas) and finalize the automated 1-page 72-Hour GEO Fix scope PDF/page for "yes" replies.
 - [ ] **Micro-Constellation Prototype on `constellations/index.html`:** Embed a visual/interactive trace on the Constellations page showing an actual 4-step encounter (*Concept A $\times$ Concept B $\rightarrow$ Proposed AI Bridge $\rightarrow$ Human Philosophical Objection $\rightarrow$ Mutated Question + Preserved Failed Branch*).
-- [ ] **Inaugural Constellation Architecture:** Define the contributor protocol and AI-agent roles for Investigation #1 (*"When knowledge becomes accessible, what determines which connections become thinkable?"*).
+- [ ] **Inaugural Constellation Essay / Investigation #1 Protocol:** Draft the opening provocation around *"The Counterfeit Rhizome: Why Analytic AI Misses How Humans Think, Desire, and Create."*
