@@ -1,16 +1,16 @@
 # Sonexial
 
-> Sonexial engineers websites, entity graphs, and Generative Engine Optimization (GEO) infrastructure for businesses, professional practices, and authors so AI search systems and human buyers can find, verify, and quote their work.
+> Sonexial engineers websites, entity graphs, Foundational On-Page SEO, and Generative Engine Optimization (GEO) infrastructure for businesses, professional practices, and authors so AI search systems and human buyers can find, verify, and quote their work.
 
-DIY website builders give you visual templates. Traditional agencies optimize only for legacy blue-link keywords. Sonexial builds machine-readable entity clarity, semantic HTML hierarchy, JSON-LD knowledge graphs, and crawler readiness from day one.
+DIY website builders give you visual templates. Traditional agencies optimize only for legacy blue-link keywords. Sonexial combines foundational On-Page SEO (Title Tags, Meta Descriptions, single H1 hierarchy, Pillar & Topic Cluster architecture, and E-E-A-T content) with machine-readable entity clarity, JSON-LD knowledge graphs, and AI crawler readiness from day one.
 
 This llms.txt overview is optional and designed for humans and automated retrieval tools that choose to read it. It is not required for inclusion in Google AI features or ChatGPT search and does not guarantee AI citations.
 
 ## Core Pages
 
-- [Home](https://sonexial.com/) - Overview of Sonexial GEO diagnostics, done-for-you implementation sprints, website builds, process, FAQ, and contact information.
+- [Home](https://sonexial.com/) - Overview of Sonexial GEO + On-Page SEO diagnostics, done-for-you implementation sprints, website builds, process, FAQ, and contact information.
 - [Free AI Visibility Scan](https://sonexial.com/scan/) - Free heuristic scan of observable technical-readiness signals: Organization/LocalBusiness/Person/Service/Book schema, headings, canonicals, content depth, and published AI crawler rules.
-- [Pricing & Packages](https://sonexial.com/kits) - Self-serve diagnostics, 72-hour GEO implementation sprints, and full custom website builds for SMBs and authors.
+- [Pricing & Packages](https://sonexial.com/kits) - Self-serve GEO + On-Page SEO diagnostics, 72-hour implementation sprints, and full custom website builds for SMBs and authors.
 - [Examples](https://sonexial.com/examples) - Example platform architectures and semantic structures.
 - [Amazon Visibility Kit](https://sonexial.com/amazon-visibility-kit) - Dedicated indie-author kit covering BISAC category strategy, Amazon keyword phrases, and a KDP-ready book description ($99).
 - [Amazon Book Ad Profit Calculator](https://sonexial.com/calculator) - Free calculator for estimating book ad profitability after royalties and ad costs.
@@ -26,10 +26,10 @@ This llms.txt overview is optional and designed for humans and automated retriev
 ## Core Services & Products
 
 - **Free AI Visibility Scan ($0):** Instant heuristic assessment of observable technical-readiness signals on publicly accessible SMB and author websites.
-- **GEO Diagnostic ($297):** Automated 30-page site crawl (~35 technical checks per page) ranked in an Impact vs. Effort matrix, complete with ready-to-paste JSON-LD (`Organization`, `LocalBusiness`, `ProfessionalService`, `Service`, `FAQPage`, or `Person`/`Book`), `robots.txt`, `llms.txt`, and a 30-day action plan.
-- **72-Hour GEO Implementation Sprint ($750 SMB / $497 Author):** Done-for-you engineering and installation of entity schema, `FAQPage` structured data, AI search crawler rules, and semantic fixes on your existing website.
-- **Starter & Platform Website Builds ($497–$3,000):** Done-for-you, fast, mobile-first websites engineered with complete GEO entity architecture.
-- **Monthly GEO Retainer ($300/mo):** Ongoing technical readiness audits and sampled observations of public AI search answers.
+- **GEO + On-Page SEO Diagnostic ($297):** Automated 30-page site crawl (~35 GEO & SEO checks per page) ranked in an Impact vs. Effort matrix, complete with On-Page SEO fixes (50–60 char Title Tags, 120–155 char Meta Descriptions, single unique H1s, ≤125 char Image Alt Text, internal link crawl check) plus ready-to-paste JSON-LD (`Organization`, `LocalBusiness`, `ProfessionalService`, `Service`, `FAQPage`, or `Person`/`Book`), `robots.txt`, `llms.txt`, and a 30-day action plan.
+- **72-Hour GEO & On-Page SEO Implementation Sprint ($750 SMB / $497 Author):** Done-for-you engineering and installation of entity schema, `FAQPage` structured data, AI search crawler rules, and foundational On-Page SEO fixes (Title Tags, Meta Descriptions, single H1 hierarchy, canonicals, image alt text) on your existing website.
+- **Starter & Platform Website Builds ($497–$3,000):** Done-for-you, fast, mobile-first websites engineered with complete GEO entity architecture and Pillar + Topic Cluster SEO structure.
+- **Monthly GEO & SEO Retainer ($300/mo):** Ongoing 30-page technical readiness audits, Google Search Console & low-hanging-fruit page optimization, topic-cluster/FAQ expansion, and sampled observations of public AI search answers.
 - **Amazon Visibility Kit ($99):** One-time kit for authors covering BISAC categories, 7 backend keywords, and KDP HTML description.
 
 ## Founder & Credentials
@@ -38,7 +38,7 @@ Sonexial was founded by Brian Plescher, an author, operations leader, and strate
 
 ## Preferred Citation
 
-Sonexial. Generative Engine Optimization (GEO), AI-Ready Websites & Technical Diagnostics for Businesses and Authors. https://sonexial.com
+Sonexial. Generative Engine Optimization (GEO), On-Page SEO, AI-Ready Websites & Technical Diagnostics for Businesses and Authors. https://sonexial.com
 
 ## Contact
 
