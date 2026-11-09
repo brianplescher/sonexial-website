@@ -8,10 +8,6 @@ http://www.sonexial.com/* https://sonexial.com/:splat 301!
 # Redirect HTTP to HTTPS
 http://sonexial.com/* https://sonexial.com/:splat 301!
 
-# Trailing slash consistency (optional - redirects /page to /page/)
-# Uncomment if needed:
-# /*/  /:splat  301
-
 # Pretty URL rewrites
 /about /about.html 200
 /calculator /calculator.html 200
@@ -22,36 +18,35 @@ http://sonexial.com/* https://sonexial.com/:splat 301!
 /amazon-visibility-kit /amazon-visibility-kit.html 200
 /kits /kits.html 200
 
-# Retired kits (Phase 1.5 consolidation) — BISAC, Metadata and Description
-# merged into the Amazon Visibility Kit; the rest are no longer sold.
+# Retired kits & legacy audit paths -> redirect cleanly to /scan/ so clients never see /tools/author-geo-audit/
 /metadata-kit /amazon-visibility-kit 301!
 /metadata-kit.html /amazon-visibility-kit 301!
 /bisac-kit /amazon-visibility-kit 301!
 /bisac-kit.html /amazon-visibility-kit 301!
 /ad-copy-suite /kits 301!
 /ad-copy-suite.html /kits 301!
-/cover-design-audit /tools/author-geo-audit/ 301!
-/cover-design-audit.html /tools/author-geo-audit/ 301!
-/website-seo-audit /tools/author-geo-audit/ 301!
-/website-seo-audit.html /tools/author-geo-audit/ 301!
+/cover-design-audit /scan/ 301!
+/cover-design-audit.html /scan/ 301!
+/website-seo-audit /scan/ 301!
+/website-seo-audit.html /scan/ 301!
 /Intake/metadata.html /Intake/amazon-visibility.html 301!
 /Intake/bisac.html /Intake/amazon-visibility.html 301!
 /Intake/optimization-intake.html /Intake/amazon-visibility.html 301!
 /Intake/ad-copy.html /kits 301!
-/Intake/cover-audit.html /tools/author-geo-audit/ 301!
-/Intake/website-seo.html /tools/author-geo-audit/ 301!
+/Intake/cover-audit.html /scan/ 301!
+/Intake/website-seo.html /scan/ 301!
+/tools/author-geo-audit /scan/ 301!
+/tools/author-geo-audit/ /scan/ 301!
 
-# Content Vault retired: return Gone, rather than indexing deleted articles or relabeling them as Constellations.
+# Content Vault retired
 /blog /constellations/ 301!
 /blog/ /constellations/ 301!
 /blog/* /404.html 410!
-/tools/author-geo-audit /tools/author-geo-audit/ 301
-/tools/author-geo-audit/ /tools/author-geo-audit/index.html 200
 /diagnostic/start /diagnostic/start/ 301
 /diagnostic/start/ /diagnostic/start/index.html 200
 
 # Dual-mode SMB & Author Scanner clean URLs
 /scan /tools/author-geo-audit/index.html 200
 /scan/ /tools/author-geo-audit/index.html 200
-/audit /tools/author-geo-audit/index.html 200
-/audit/ /tools/author-geo-audit/index.html 200
+/audit /scan/ 301!
+/audit/ /scan/ 301!
