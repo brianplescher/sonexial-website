@@ -569,23 +569,22 @@
             const lockedEl = document.getElementById('locked-summary');
             const lockedFailures = report.locked_failures || 0;
             const lockedFixes = report.locked_recommendations || 0;
-            const urlParams = new URLSearchParams(window.location.search);
-            const isTeardownMode = urlParams.get('teardown') === '1' || urlParams.get('unlock') === '1';
-
-            if (isTeardownMode) {
+            if (window.IS_TEARDOWN_MODE) {
                 lockedEl.style.display = 'none';
-                renderFullReport(report);
-                document.getElementById('pitch-capture-form').style.display = 'none';
-                const scannedDomain = (document.getElementById('scan-url')?.value || 'your website').replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
-                document.getElementById('gate-heading').textContent = `Custom 1-Page Teardown Unlocked for ${scannedDomain}`;
-                document.getElementById('gate-copy').textContent = 'All 7 technical readiness categories are unlocked above. Choose how you would like to resolve these gaps (100% of the $297 Diagnostic is credited toward the $750 72-Hour Fix Sprint within 14 days):';
+                if (report.checks) {
+                    renderFullReport(report);
+                }
+                const gateHeading = document.getElementById('gate-heading');
+                const gateCopy = document.getElementById('gate-copy');
+                const pitchResultBox = document.getElementById('pitch-result-box');
                 const pkgBadge = document.getElementById('pitch-pkg-badge');
                 const emailText = document.getElementById('pitch-email-text');
-                const resultBox = document.getElementById('pitch-result-box');
-                if (pkgBadge && emailText && resultBox) {
-                    pkgBadge.textContent = 'Zero-Call Turnkey Options';
-                    emailText.textContent = `• Option 1 — 30-Page GEO + On-Page SEO Diagnostic ($297): Automated 30-page crawl, Impact vs. Effort priority matrix, optimized Title/Meta/H1/Alt tags, Google Business Profile bonus pack, and ready-to-paste JSON-LD, robots.txt & llms.txt code.\n\n• Option 2 — 72-Hour Done-For-You GEO & On-Page SEO Fix Sprint ($750): Keep your existing visual design—our Grand Haven studio engineers and installs your complete entity schema, On-Page SEO fixes, and AI crawler stack in 72 hours (with a Before & After verification scan).`;
-                    resultBox.style.display = 'block';
+                if (gateHeading) gateHeading.textContent = `Custom 1-Page Teardown & Fix Options (${report.score}/100)`;
+                if (gateCopy) gateCopy.textContent = 'Want a written copy of every check and prioritized fix emailed to your team, or ready to have us engineer the fixes for you?';
+                if (pitchResultBox && pkgBadge && emailText) {
+                    pkgBadge.textContent = '100% Diagnostic Credit Toward 72-Hr Sprint';
+                    emailText.textContent = `• Option 1 ($297 — 30-Page GEO + On-Page SEO Diagnostic): Crawls up to 30 pages and delivers ready-to-paste Organization, Service & FAQPage JSON-LD, robots.txt, llms.txt, and optimized Title/Meta/H1/Alt tags (100% credited toward a 72-Hour Fix Sprint within 14 days).\n• Option 2 ($750 — 72-Hour Done-For-You GEO & On-Page SEO Sprint): Keep your existing website design—our studio in Grand Haven engineers and installs the complete AI-readiness schema and On-Page SEO stack for you in 72 hours (with a Before & After verification scan).`;
+                    pitchResultBox.style.display = 'block';
                 }
             } else if (report.locked && (lockedFailures > 0 || lockedFixes > 0)) {
                 const parts = [];
@@ -823,10 +822,15 @@
             }[tag] || tag));
         }
 
-        // Auto-populate and run scan if ?url= query parameter was passed from the homepage hero
+        // Auto-populate and run scan if ?url= query parameter was passed (supports &teardown=1 auto-unlock for Email #2)
+        window.IS_TEARDOWN_MODE = false;
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const prefillUrl = params.get('url');
+            const teardownParam = params.get('teardown') || params.get('unlock');
+            if (teardownParam === '1' || teardownParam === 'true') {
+                window.IS_TEARDOWN_MODE = true;
+            }
             if (prefillUrl) {
                 const urlInput = document.getElementById('scan-url');
                 if (urlInput) {
