@@ -41,6 +41,14 @@
   <title>Sonexial | GEO, On-Page SEO &amp; AI-Ready Websites</title>
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
+  <!-- Google Analytics Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PNZ96JWY7X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PNZ96JWY7X');
+  </script>
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-mlnDXnyJw4f4-_94WfHEk.js"></script>
   <script>
@@ -92,7 +100,7 @@
           <div class="hero-scan-box">
             <form class="hero-scan-form" action="/scan/" method="GET">
               <input type="url" name="url" id="hero-scan-url" class="hero-scan-input" placeholder="Enter your website (e.g. https://yoursite.com)" aria-label="Enter your website" required>
-              <button type="submit" class="btn-primary">Run Free Scan →</button>
+              <button type="submit" id="hero-scan-btn" class="btn-primary">Run Free Scan →</button>
             </form>
 
             <p class="hero-fine-print">
