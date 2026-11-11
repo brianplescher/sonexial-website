@@ -448,6 +448,10 @@
             targetSpan.textContent = url;
             submitBtn.disabled = true;
 
+            if (typeof gtag === 'function') {
+                gtag('event', 'geo_scan_run', { scan_url: url, teardown_mode: !!window.IS_TEARDOWN_MODE });
+            }
+
             try {
                 const res = await fetch(`${API_BASE}/scan`, {
                     method: 'POST',
@@ -462,6 +466,9 @@
                 }
 
                 currentScanReport = data;
+                if (typeof gtag === 'function') {
+                    gtag('event', 'geo_scan_complete', { scan_url: url, score: data.score, grade: data.geo_grade });
+                }
                 resetGate();
                 renderScanResults(data);
                 resultsBox.style.display = 'block';
@@ -785,6 +792,10 @@
                 const data = await readJson(res);
                 if (!res.ok) {
                     throw new Error(data.error || 'Failed to unlock your report.');
+                }
+
+                if (typeof gtag === 'function') {
+                    gtag('event', 'geo_report_unlocked', { scan_url: currentScanReport.url || '' });
                 }
 
                 if (data.report) {
