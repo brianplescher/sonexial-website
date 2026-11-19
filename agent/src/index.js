@@ -8,6 +8,7 @@ const pitch = require('./pitch');
 const llm = require('./llm');
 const semanticExtractor = require('./semantic-extractor');
 const mailer = require('./email');
+const outreachCompliance = require('./outreach-compliance');
 const stripe = require('./stripe');
 const { verifyNetlifySignature, verifyNetlifyProxySignature } = require('./netlify-signature');
 const diagnostics = require('./diagnostic/fulfill');
@@ -423,6 +424,31 @@ app.post('/diagnostics/:id/retry', requireAdmin, async (req, res) => {
     }
 });
 
+
+// Signed, public opt-out endpoint; no account, login or personal information required.
+// GET shows confirmation (avoids accidental opt-out from email security link previews).
+// POST is an idempotent unsubscribe, suitable for List-Unsubscribe-Post.
+app.get('/api/unsubscribe', (req, res) => {
+    let email;
+    try { email = outreachCompliance.parseToken(req.query.token); } catch { return res.status(503).type('text').send('Unsubscribe temporarily unavailable'); }
+    if (!email) return res.status(400).type('text').send('Invalid unsubscribe link');
+    res.setHeader('Cache-Control', 'no-store');
+    res.type('html').send('<!doctype html><html lang="en"><meta charset="utf-8"><title>Sonexial unsubscribe</title><main><h1>Unsubscribe from Sonexial outreach</h1><p>Stop all future commercial outreach emails to this address.</p><form method="post" action="/api/unsubscribe"><input type="hidden" name="token" value="' + encodeURIComponent(req.query.token) + '"><button type="submit">Unsubscribe</button></form></main></html>');
+});
+app.post('/api/unsubscribe', express.urlencoded({ extended: false }), async (req, res) => {
+    let email;
+    try { email = outreachCompliance.parseToken(req.body?.token || req.query.token); } catch { return res.status(503).type('text').send('Unsubscribe temporarily unavailable'); }
+    if (!email) return res.status(400).type('text').send('Invalid unsubscribe link');
+    try {
+        await db.suppressEmail(email, 'web-unsubscribe');
+        res.setHeader('Cache-Control', 'no-store');
+        res.type('text').send('You have been unsubscribed from Sonexial commercial outreach.');
+    } catch (err) {
+        console.error('Unsubscribe storage failure:', sanitizeLog(err.message));
+        res.status(503).type('text').send('Unable to process unsubscribe; please reply "unsubscribe" to the email.');
+    }
+});
+
 // Admin endpoints
 app.get('/jobs', requireAdmin, async (req, res) => {
     try {
@@ -431,6 +457,20 @@ app.get('/jobs', requireAdmin, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+app.post('/outreach/suppress', requireAdmin, async (req, res) => {
+    const email = outreachCompliance.normalizeEmail(req.body?.email);
+    if (!email) return res.status(400).json({ error: 'Valid email required' });
+    try {
+        await db.suppressEmail(email, 'reply-or-manual-opt-out');
+        res.status(204).end();
+    } catch (err) { res.status(500).json({ error: 'Could not record opt-out' }); }
+});
+
+app.get('/outreach/suppressions', requireAdmin, async (req, res) => {
+    try { res.json(await db.getSuppressions()); }
+    catch (err) { res.status(500).json({ error: 'Could not list suppressions' }); }
 });
 
 app.get('/leads', requireAdmin, async (req, res) => {
