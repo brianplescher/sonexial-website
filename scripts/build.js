@@ -73,6 +73,7 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.45;
   background: radial-gradient(ellipse at center, rgba(7, 10, 18, 0.45) 0%, rgba(0, 0, 0, 0.88) 100%);
 }
 

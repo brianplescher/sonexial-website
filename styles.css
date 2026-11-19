@@ -458,10 +458,6 @@ HERO
   font-weight: 700;
 }
 
-#sonexial-stage {
-  opacity: 0.45;
-}
-
 .hero-grid-overlay {
   position: absolute;
   inset: 0;
