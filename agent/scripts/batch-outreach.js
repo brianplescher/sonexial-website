@@ -104,13 +104,13 @@ async function main() {
                 const qualified = report.score < maxScore;
                 let pitch = { subject: '', email_draft: '', recommended_package: '', key_findings_summary: [] };
                 if (qualified) {
-                    qualifiedCount++;
                     pitch = await generatePitch(report, p.name, { mode: p.mode, useLlm });
                     // Recheck before writing a campaign draft, even if a scan ran first.
                     if (await db.isSuppressed(p.email)) {
                         pitch = { subject: '', email_draft: '', recommended_package: '', key_findings_summary: [] };
                     } else {
                         pitch.email_draft = pitch.email_draft.trimEnd() + compliance.footer(p.email);
+                        qualifiedCount++;
                     }
                 }
                 const row = {
