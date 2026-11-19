@@ -41,6 +41,14 @@ db.serialize(() => {
 
     db.run('CREATE INDEX IF NOT EXISTS idx_leads_email ON leads (email)');
 
+    db.run(`
+        CREATE TABLE IF NOT EXISTS outreach_suppressions (
+            email TEXT PRIMARY KEY,
+            reason TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
     // stripe_session_id is UNIQUE so a retried Stripe webhook cannot start a second fulfillment.
     db.run(`
         CREATE TABLE IF NOT EXISTS diagnostics (
@@ -224,7 +232,23 @@ const getDiagnosticByToken = (token) => {
     });
 };
 
+// Every campaign and sending integration must consult this same persistent database.
+const isSuppressed = (email) => new Promise((resolve, reject) => {
+    db.get('SELECT 1 AS blocked FROM outreach_suppressions WHERE email = ?', [String(email || '').trim().toLowerCase()], (err, row) => err ? reject(err) : resolve(Boolean(row)));
+});
+const suppressEmail = (email, reason = 'unsubscribe') => new Promise((resolve, reject) => {
+    const normalized = String(email || '').trim().toLowerCase();
+    db.run('INSERT OR IGNORE INTO outreach_suppressions (email, reason) VALUES (?, ?)', [normalized, reason],
+        (err) => err ? reject(err) : resolve());
+});
+const getSuppressions = () => new Promise((resolve, reject) => {
+    db.all('SELECT email, reason, created_at FROM outreach_suppressions ORDER BY created_at DESC', [], (err, rows) => err ? reject(err) : resolve(rows));
+});
+
 module.exports = {
+    isSuppressed,
+    suppressEmail,
+    getSuppressions,
     db,
     getLead,
     createDiagnostic,

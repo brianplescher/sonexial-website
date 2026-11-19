@@ -165,21 +165,11 @@
 
                         <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin: 1.25rem 0 0;">A heuristic based on observable page and crawler signals. This does not measure actual AI search results, ranking, citations or recommendation probability.</p>
 
-                        <!-- West Michigan Benchmark Comparison Bar -->
+                        <!-- No named or unsupported third-party comparisons are displayed. -->
                         <div id="wm-benchmark-box" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
-                                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: #00f0ff; text-transform: uppercase; letter-spacing: 0.05em;">
-                                    Benchmark vs. West Michigan Leaders
-                                </span>
-                                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #94a3b8;">
-                                    Regional Avg: 58/100 · Grade-A Leaders: 85–100/100
-                                </span>
-                            </div>
-                            <div style="position: relative; height: 12px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-bottom: 0.65rem;">
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: #00f0ff; text-transform: uppercase; letter-spacing: 0.05em;">Your site's technical-readiness score</span>
+                            <div style="height: 12px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-top: 0.6rem;">
                                 <div id="wm-benchmark-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00f0ff, #38bdf8); border-radius: 999px; transition: width 0.6s ease;"></div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.78rem; color: #94a3b8;">
-                                <span>Grade-A Benchmarks: <strong style="color: #e2e8f0;">Kraayeveld Law (100)</strong> · <strong style="color: #e2e8f0;">Grand Beauty Spa (100)</strong> · <strong style="color: #e2e8f0;">Hungerford CPAs (92)</strong> · <strong style="color: #e2e8f0;">Progressive Cos. (85)</strong></span>
                             </div>
                         </div>
 
@@ -580,6 +570,9 @@
                 lockedEl.style.display = 'none';
                 if (report.checks) {
                     renderFullReport(report);
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'geo_teardown_viewed', { scan_url: report.url || '' });
                 }
                 const gateHeading = document.getElementById('gate-heading');
                 const gateCopy = document.getElementById('gate-copy');

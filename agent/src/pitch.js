@@ -5,7 +5,6 @@ const SIGNATURE = `Best,
 
 Brian L. Plescher
 Founder & Principal Consultant
-616.502.5320
 www.sonexial.com`;
 
 function generateTemplatePitch(scanReport, recipientName = 'there', options = {}) {
