@@ -1,0 +1,510 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test for Build & Asset Rewriting": {
+      "status": "passed",
+      "failingExample": "Bug condition exploration test FAILED as expected (6 bug-condition assertions failed, 4 preservation assertions passed). Counterexamples found:\n\nBUG 1.1 (deep nested path not rewritten): build.js rewriteHtml regex `href=\"(?:\\.\\.\\/|\\/)?styles\\.css\"` only matches 0 or 1 `../` prefix.\n  - Input: `<link rel=\"stylesheet\" href=\"../../styles.css\">` → actual output: unchanged (`../../styles.css` survives), expected: `/static/styles.<hash>.css`\n  - Input: `<link rel=\"stylesheet\" href=\"../../../styles.css\">` → actual: unchanged, expected: rewritten\n  - Input: `<script src=\"../../script.js\" defer></script>` → actual: unchanged, expected: `/static/script.<hash>.js`\n  Note: no current page uses ../../ paths (diagnostic/start and tools/author-geo-audit use /styles.css root-relative), so the bug is latent in the regex but demonstrable via direct testing.\n\nBUG 1.2 (intake page missing script tag): Intake/amazon-visibility.html has no `<script src=\"...script.js\">` element — only Plausible analytics and inline form scripts. No client-side JS runs on that page.\n\nBUG 1.3 (Netlify post-processing flags enabled): netlify.toml sets `[build.processing.css] bundle = true`, `[build.processing.js] bundle = true`, and `[build.processing.html] pretty_urls = true`, bypassing immutable /static/* cache headers.\n\nPRESERVATION (confirmed working): single-level `../styles.css`, root-relative `/styles.css`, and bare `styles.css` all rewrite correctly. Built dist/Intake/amazon-visibility.html correctly references hashed /static/styles.<hash>.css.",
+      "lastRunTimestamp": 1793310304907
+    },
+    "2. Write bug condition exploration test for Frontend & HTML Bugs": {
+      "status": "passed",
+      "failingExample": "All 18 bug-condition assertions FAILED as expected (proving bugs exist), all 7 preservation assertions PASSED. Counterexamples documented: 1.4 Squeeze Meter — styles.css missing .meter-track, .meter-fill, .result-value, .positive, .negative, .product-detail-grid classes (meter height 0); 1.5 Footer Logo — tools/author-geo-audit/index.html uses legacy .footer-logo/.footer-links/.footer-copy classes instead of canonical .logo-mark/.footer-bottom AND missing <script src=\"...script.js\"> tag (nav-toggle non-functional); 1.6 Nav-Toggle — 404.html and diagnostic/start/index.html both missing <button class=\"nav-toggle\"> in #site-header; 1.7 Kits Form — kits.html missing netlify-honeypot=\"bot-field\" attribute, bot-field hidden input, and #success-modal markup; 1.8 JSON-LD Entity — about.html jobTitle=\"Founder &amp; Strategist\" (HTML entity in JSON string) instead of literal &; 1.9 Fonts URL — Intake/amazon-visibility.html Google Fonts URL has duplicate weight 800;800 (DM+Sans:wght@300;400;500;600;800;800); 1.10 Custom Properties — styles.css missing --color-surface and --color-text-dim definitions (used by diagnostic/start/index.html and tools/author-geo-audit/index.html with fallback values)",
+      "lastRunTimestamp": 1793310814444
+    },
+    "3. Write bug condition exploration test for Backend / Agent Service Bugs": {
+      "status": "passed",
+      "failingExample": "Bug condition exploration test FAILED as expected (8 bug-condition tests fail, 4 preservation tests pass). Counterexamples found:\n\n1. Bug 1.11 (Stale Assertion): test-comprehensive.js contains `repB.critical_failures.some(f => f.includes('llms.txt'))` — asserts llms.txt in critical_failures, but scanner treats llms.txt as optional.\n\n2. Bug 1.12 (Redundant DNS, ~9 lookups): safeFetch calls `validateSSRF(currentUrl)` directly (1 DNS lookup) AND uses `ssrfSafeAgent` with `guardedLookup` (1 DNS lookup) = 2 per fetch. scanWithContent also calls `validateSSRF(urlToScan)` directly = 1 + 4*(1+1) = 9 DNS lookups per hostname per scan.\n\n3. Bug 1.13 (Double-Fetch): runDiagnostic calls `scanner.runScan(url)` (fetches homepage/robots/llms/sitemap) then `crawlSite(scan.url, options)` which independently re-fetches the same 4 resources — each fetched twice.\n\n4. Bug 1.14 (Missing OWNER_EMAIL Guard): sendDraftEmail guard is `if (!process.env.RESEND_API_KEY)` and sendErrorEmail guard is the same — neither checks `!OWNER_EMAIL`. When OWNER_EMAIL is unset, `to: OWNER_EMAIL` is undefined, causing Resend API error. Compare: sendLeadNotification and sendDiagnosticOwnerNotice correctly check `!process.env.RESEND_API_KEY || !OWNER_EMAIL`.\n\nPreservation baseline confirmed: sendLeadNotification and sendDiagnosticOwnerNotice both guard both env vars; scanner exports scanWithContent; analyzeFiles sets checks.llms_txt=true when present.",
+      "lastRunTimestamp": 1793311652621
+    },
+    "4. Write bug condition exploration test for CI / GitHub Actions Bugs": {
+      "status": "passed",
+      "failingExample": "6 bug condition tests FAIL (proving bugs exist), 3 preservation baselines PASS. Counterexamples:\n\n1.15a SEO Monitor Exit: seo-monitor.yml has NO `exit 1` anywhere — all check steps use `if grep ...; then echo \"✓\"; else echo \"✗\"; fi` and always exit 0. The `if: failure()` \"Comment on commit\" step is dead code.\n\n1.15b Hardcoded Node Version: seo-monitor.yml has `node-version: '18'` hardcoded (line 24) instead of `node-version-file: '.nvmrc'` (which specifies Node 22).\n\n1.16a Security Grep Swallows Matches: security-scan.yml \"Scan for hardcoded credentials\" step contains `grep -r -l \"password\\s*=\" . --include=\"*.js\" --include=\"*.html\" --exclude-dir=node_modules || echo \"No hardcoded passwords found\"` — the `|| echo` always forces exit 0.\n\n1.16b No Exit 1 in Credential Scan: The \"Scan for hardcoded credentials\" step has no `exit 1` — only `|| echo` patterns, so the workflow never fails on credential findings. (Contrast: the \"Check for common secret patterns\" step correctly uses `&& echo \"::error::...\" && exit 1`.)\n\n1.17a Non-Recursive Glob (package.json): `test:html` script is `html-validate '*.html'` — only matches root-level HTML files, skips subdirectory files.\n\n1.17b Non-Recursive Glob (deploy.yml): Uses `npx html-validate \"*.html\"` — non-recursive glob that skips subdirectory HTML files (diagnostic/start/index.html, Intake/amazon-visibility.html, tools/author-geo-audit/index.html).\n\nPreservation baselines PASS: subdirectory HTML files exist, security-scan.yml already uses .nvmrc, root-level HTML files exist.",
+      "lastRunTimestamp": 1793312366745
+    },
+    "5. Write bug condition exploration test for Code Duplications": {
+      "status": "passed",
+      "failingExample": "13 bug condition assertions FAILED (proving bugs exist), 4 preservation assertions PASSED.\n\nCounterexamples found:\n1. sanitizeLog: 3 definitions across agent/src/ (ai-utils.js, index.js, scanner.js) instead of 1 shared\n2. index.js defines sanitizeLog locally instead of importing from ai-utils.js\n3. scanner.js defines sanitizeLog locally instead of importing from ai-utils.js\n4. metadata-kit.js re-implements JSON extraction with indexOf(\"{\") instead of using shared parseJson from ai-utils.js\n5. escapeHtml: 2 definitions in agent/src/ (email.js, render.js as esc) + 1 inline in tools/author-geo-audit/index.html = 3 total\n6. email.js defines escapeHtml locally instead of importing from shared module\n7. render.js defines esc locally instead of importing escapeHtml from shared module\n8. author-geo-audit/index.html defines escapeHtml inline\n9. netlify-signature.js: timingSafeEqual appears 2 times (duplicated HS256 verification in both verifyNetlifySignature and verifyNetlifyProxySignature)\n10. JSON-LD walker: 3 of 3 files (scanner.js, page-facts.js, semantic-extractor.js) define local walk() functions\n11. optimize-images.yml does NOT call `npm run optimize:images` — duplicates raw optipng/jpegoptim/cwebp shell commands\n12. Redundant test scripts exist: agent/scripts/test-scanner.js, test-comprehensive.js, test-api-endpoints.js\n13. Unreferenced logo assets exist: assets/img/logo-full.png, assets/img/logo.png, Images/logo_mark_2026.png, Images/signal-bg.jpg\n\nPreservation baselines confirmed (PASS): ai-utils.js exports shared helpers; scripts/optimize-images.js exists; agent/test/scanner.test.js exists; referenced logo assets (sonexial_logo.png, favicon.png) still exist.",
+      "lastRunTimestamp": 1793313191025
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test for Build & Asset Rewriting": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540342
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309553120
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793310322479
+      }
+    ],
+    "2. Write bug condition exploration test for Frontend & HTML Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540408
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793310328334
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793311437617
+      }
+    ],
+    "3. Write bug condition exploration test for Backend / Agent Service Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540462
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793311443075
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793311970231
+      }
+    ],
+    "4. Write bug condition exploration test for CI / GitHub Actions Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540498
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793311976426
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793312392893
+      }
+    ],
+    "5. Write bug condition exploration test for Code Duplications": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540537
+      },
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793312399527
+      }
+    ],
+    "6. Write bug condition exploration test for Unnecessary / Dead / Legacy Code": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540578
+      }
+    ],
+    "7. Write preservation property tests for Build & Asset Rewriting": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540648
+      }
+    ],
+    "8. Write preservation property tests for Frontend & HTML Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540715
+      }
+    ],
+    "9. Write preservation property tests for Backend / Agent Service Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540781
+      }
+    ],
+    "10. Write preservation property tests for CI / GitHub Actions Bugs": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540831
+      }
+    ],
+    "11. Write preservation property tests for Code Duplications": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540885
+      }
+    ],
+    "12. Write preservation property tests for Unnecessary / Dead / Legacy Code": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540962
+      }
+    ],
+    "13.1 Fix deep nested asset path rewriting in build.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309540993
+      }
+    ],
+    "13.2 Add script.js tag to Intake/amazon-visibility.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541031
+      }
+    ],
+    "13.3 Disable Netlify post-processing flags in netlify.toml": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541087
+      }
+    ],
+    "13.4 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541129
+      }
+    ],
+    "13.5 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541180
+      }
+    ],
+    "14.1 Add calculator CSS classes to styles.css": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541222
+      }
+    ],
+    "14.2 Fix Google Fonts duplicate weight URL in Intake/amazon-visibility.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541262
+      }
+    ],
+    "14.3 Add missing CSS custom properties to styles.css": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541298
+      }
+    ],
+    "14.4 Fix footer classes in tools/author-geo-audit/index.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541338
+      }
+    ],
+    "14.5 Add script.js tag to tools/author-geo-audit/index.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541417
+      }
+    ],
+    "14.6 Fix undefined custom properties in subdirectory pages": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541463
+      }
+    ],
+    "14.7 Add nav-toggle button to 404.html and diagnostic/start/index.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541505
+      }
+    ],
+    "14.8 Add honeypot and success modal to kits.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541540
+      }
+    ],
+    "14.9 Fix JSON-LD jobTitle entity in about.html": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541577
+      }
+    ],
+    "14.10 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541613
+      }
+    ],
+    "14.11 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541647
+      }
+    ],
+    "15.1 Fix stale llms.txt assertion in test-comprehensive.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541680
+      }
+    ],
+    "15.2 Cache SSRF validation per hostname in scanner.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541720
+      }
+    ],
+    "15.3 Reuse fetched results in diagnostic/index.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541762
+      }
+    ],
+    "15.4 Add OWNER_EMAIL guard to sendDraftEmail and sendErrorEmail": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541811
+      }
+    ],
+    "15.5 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541846
+      }
+    ],
+    "15.6 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541880
+      }
+    ],
+    "16.1 Make SEO monitor exit non-zero on findings": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541947
+      }
+    ],
+    "16.2 Use .nvmrc for Node version in seo-monitor.yml": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309541981
+      }
+    ],
+    "16.3 Make security scan fail on credential matches": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542016
+      }
+    ],
+    "16.4 Fix html-validate glob to include subdirectories": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542049
+      }
+    ],
+    "16.5 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542086
+      }
+    ],
+    "16.6 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542114
+      }
+    ],
+    "17.1 Export shared helpers from ai-utils.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542151
+      }
+    ],
+    "17.2 Remove local sanitizeLog from scanner.js and index.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542181
+      }
+    ],
+    "17.3 Use shared parseJson in metadata-kit.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542216
+      }
+    ],
+    "17.4 Extract shared escapeHtml and import in all consumers": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542247
+      }
+    ],
+    "17.5 Extract shared JSON-LD tree-walker module": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542283
+      }
+    ],
+    "17.6 Extract shared HS256 verifier in netlify-signature.js": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542324
+      }
+    ],
+    "17.7 Call npm run optimize:images from workflow": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542374
+      }
+    ],
+    "17.8 Remove redundant test scripts and unused imports": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542415
+      }
+    ],
+    "17.9 Consolidate logos and remove unreferenced assets": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542464
+      }
+    ],
+    "17.10 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542502
+      }
+    ],
+    "17.11 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542547
+      }
+    ],
+    "18.1 Remove dead files": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542582
+      }
+    ],
+    "18.2 Remove Audio directory config from build.js and netlify.toml": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542621
+      }
+    ],
+    "18.3 Remove dead CSS selectors from styles.css": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542670
+      }
+    ],
+    "18.4 Resolve inconsistent font loading": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542737
+      }
+    ],
+    "18.5 Remove unused build scripts from package.json": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542796
+      }
+    ],
+    "18.6 Remove unused devDependencies from package.json": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542827
+      }
+    ],
+    "18.7 Align Node versions across .nvmrc and workflows": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542862
+      }
+    ],
+    "18.8 Clean up stale branches": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542898
+      }
+    ],
+    "18.9 Verify bug condition exploration test now passes": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542931
+      }
+    ],
+    "18.10 Verify preservation tests still pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542963
+      }
+    ],
+    "19. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "c4a6758b-128e-4f83-aa54-f72b8c4815e7",
+        "chatSessionId": "sess_30b0269d-5584-4954-990a-2bf0c9a19431",
+        "timestamp": 1793309542999
+      }
+    ]
+  }
+}
