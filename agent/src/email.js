@@ -1,4 +1,6 @@
 const { Resend } = require('resend');
+const db = require('./db');
+const compliance = require('./outreach-compliance');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const OWNER_EMAIL = process.env.OWNER_EMAIL;
@@ -239,7 +241,38 @@ async function sendDiagnosticOwnerNotice(subject, lines) {
     });
 }
 
+
+/**
+ * Centralized commercial outreach sender. Enforce suppression at SEND time, not only
+ * during CSV generation. Call this for every new campaign and scheduled follow-up.
+ * Transactional reports and customer purchases use their existing separate functions.
+ */
+async function sendCommercialOutreach(toEmail, subject, body) {
+    const email = compliance.normalizeEmail(toEmail);
+    if (!email) throw new Error('Valid recipient email is required');
+    if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY required for outreach');
+    // Construct footer first; fail closed unless the postal address and signing secret exist.
+    const footer = compliance.footer(email);
+    if (await db.isSuppressed(email)) return { skipped: true, reason: 'unsubscribed' };
+    const token = compliance.makeToken(email);
+    const unsubscribe = 'https://sonexial.com/api/unsubscribe?token=' + encodeURIComponent(token);
+    // Recheck suppression immediately before the provider request.
+    if (await db.isSuppressed(email)) return { skipped: true, reason: 'unsubscribed' };
+    const result = await send({
+        from: SCANNER_FROM,
+        to: email,
+        subject,
+        text: String(body || '').trimEnd() + footer,
+        headers: {
+            'List-Unsubscribe': '<' + unsubscribe + '>',
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+        }
+    });
+    return { skipped: false, result };
+}
+
 module.exports = {
+    sendCommercialOutreach,
     sendDiagnosticEmail,
     sendDiagnosticUrlRequest,
     sendDiagnosticOwnerNotice,
