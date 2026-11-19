@@ -450,7 +450,7 @@ function initSignalOrbitStage() {
         // Draw subtle constellation lines between HUBS when in neural or gyro mode
         if (activeShapeIdx === 1 || activeShapeIdx === 2) {
             const hubProj = HUBS.map(h => project3D(h[0], h[1], h[2], cy, sy, cx, sx));
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.13)';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.07)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (let i = 0; i < hubProj.length; i++) {
@@ -493,11 +493,11 @@ function initSignalOrbitStage() {
                 ? Math.max(0.5, Math.min(1.0, scale * 0.028))
                 : Math.max(minDotR, Math.min(maxDotR, scale * sizeMult));
 
-            let depthAlpha = Math.max(0.10, Math.min(0.85, (34 - rz) / 22));
+            let depthAlpha = Math.max(0.08, Math.min(0.55, (34 - rz) / 22));
             if (inTopHeader) {
-                depthAlpha *= 0.28;
+                depthAlpha *= 0.20;
             } else if (isHeroView) {
-                depthAlpha *= 0.52;
+                depthAlpha *= 0.28;
             }
 
             const col = colors[i];
