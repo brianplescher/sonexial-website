@@ -361,7 +361,7 @@ function initSignalOrbitStage() {
         return pts;
     }
 
-    const SHAPES = [makeWave(), makeNeural(), makeGyro(), makeCubes(), makeGalaxy()];
+    const SHAPES = [makeNeural(), makeGyro(), makeWave(), makeCubes(), makeGalaxy()];
     const cur = SHAPES[0].map(p => [p[0], p[1], p[2]]);
     const colors = [];
     for (let i = 0; i < COUNT; i++) {
@@ -448,9 +448,9 @@ function initSignalOrbitStage() {
         ctx.clearRect(0, 0, W, H);
 
         // Draw subtle constellation lines between HUBS when in neural or gyro mode
-        if (activeShapeIdx === 1 || activeShapeIdx === 2) {
+        if (activeShapeIdx === 0 || activeShapeIdx === 1) {
             const hubProj = HUBS.map(h => project3D(h[0], h[1], h[2], cy, sy, cx, sx));
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.07)';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.14)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (let i = 0; i < hubProj.length; i++) {
@@ -465,9 +465,9 @@ function initSignalOrbitStage() {
         }
 
         const isHeroView = activeShapeIdx === 0;
-        const sizeMult = isHeroView ? 0.042 : 0.082;
-        const maxDotR = isHeroView ? 1.65 : 3.8;
-        const minDotR = isHeroView ? 0.65 : 1.05;
+        const sizeMult = isHeroView ? 0.065 : 0.082;
+        const maxDotR = isHeroView ? 2.8 : 3.8;
+        const minDotR = isHeroView ? 0.85 : 1.05;
 
         for (let i = 0; i < COUNT; i++) {
             const c = cur[i];
@@ -493,11 +493,11 @@ function initSignalOrbitStage() {
                 ? Math.max(0.5, Math.min(1.0, scale * 0.028))
                 : Math.max(minDotR, Math.min(maxDotR, scale * sizeMult));
 
-            let depthAlpha = Math.max(0.08, Math.min(0.55, (34 - rz) / 22));
+            let depthAlpha = Math.max(0.10, Math.min(0.65, (34 - rz) / 22));
             if (inTopHeader) {
-                depthAlpha *= 0.20;
+                depthAlpha *= 0.25;
             } else if (isHeroView) {
-                depthAlpha *= 0.28;
+                depthAlpha *= 0.55;
             }
 
             const col = colors[i];
