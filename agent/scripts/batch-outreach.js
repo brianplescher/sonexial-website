@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const { runMultiModeScan } = require('../src/smb-scanner');
 const { generatePitch } = require('../src/pitch');
+const db = require('../src/db');
+const compliance = require('../src/outreach-compliance');
+require('dotenv').config();
 
 function parseArgs(argv) {
     const positional = [];
@@ -71,6 +74,9 @@ async function main() {
         process.exit(1);
     }
 
+    // Fail closed: drafts are not eligible for outreach without configured opt-out safeguards.
+    compliance.mailingAddress();
+    compliance.makeToken('validation@sonexial.com');
     const prospects = parseProspectCsv(input, mode);
     const outPath = path.resolve(output);
     const stream = fs.createWriteStream(outPath);
@@ -85,19 +91,34 @@ async function main() {
         while (queue.length) {
             const p = queue.shift();
             try {
+                if (!compliance.normalizeEmail(p.email)) {
+                    stream.write(OUT_COLUMNS.map(col => csvCell(({ ...p, qualified: 'SKIP_INVALID_EMAIL', error: 'Valid recipient email required' })[col])).join(',') + '\n');
+                    continue;
+                }
+                if (await db.isSuppressed(p.email)) {
+                    stream.write(OUT_COLUMNS.map(col => csvCell(({ ...p, qualified: 'SKIP_UNSUBSCRIBED' })[col])).join(',') + '\n');
+                    console.log('[SUPPRESSED] Recipient opted out; no draft created.');
+                    continue;
+                }
                 const report = await runMultiModeScan(p.url, { mode: p.mode });
                 const qualified = report.score < maxScore;
                 let pitch = { subject: '', email_draft: '', recommended_package: '', key_findings_summary: [] };
                 if (qualified) {
                     qualifiedCount++;
                     pitch = await generatePitch(report, p.name, { mode: p.mode, useLlm });
+                    // Recheck before writing a campaign draft, even if a scan ran first.
+                    if (await db.isSuppressed(p.email)) {
+                        pitch = { subject: '', email_draft: '', recommended_package: '', key_findings_summary: [] };
+                    } else {
+                        pitch.email_draft = pitch.email_draft.trimEnd() + compliance.footer(p.email);
+                    }
                 }
                 const row = {
                     url: report.url,
                     name: p.name,
                     email: p.email,
                     mode: p.mode,
-                    qualified: qualified ? 'YES' : 'NO_SCORE_TOO_HIGH',
+                    qualified: qualified ? (pitch.email_draft ? 'YES' : 'SKIP_UNSUBSCRIBED') : 'NO_SCORE_TOO_HIGH',
                     score: report.score,
                     geo_grade: report.geo_grade,
                     recommended_package: pitch.recommended_package,
